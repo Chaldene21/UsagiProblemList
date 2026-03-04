@@ -1,0 +1,79 @@
+{
+  "id": "greedy-101",
+  "title": "贪心算法题单",
+  "description": "为方便大家练习，我把比较套路的贪心题目放在前面，适合初学者入门。包含基本贪心策略、区间问题、配对问题等经典题型。",
+  "category": "贪心算法",
+  "sections": [
+    {
+      "title": "一、贪心策略",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "有两种基本贪心策略：从最小/最大开始贪心，以及按某种顺序排序后依次处理。下面我们分别介绍。"
+        },
+        {
+          "title": "§1.1 从最小/最大开始贪心",
+          "idea": "优先考虑最小/最大的数，从小到大/从大到小贪心。这种策略通常用于分配、配对等问题。",
+          "code_template": "// C++ 示例\nsort(nums.begin(), nums.end());\nint ans = 0;\nfor (int i = 0; i < n; i++) {\n    // 贪心处理\n}",
+          "problems": [
+            {
+              "id": "3074",
+              "name": "重新分装苹果",
+              "difficulty": 1198,
+              "tags": ["greedy", "sorting"],
+              "url": "https://codeforces.com/contest/3074/problem/A",
+              "note": "从最小箱子开始贪心"
+            },
+            {
+              "id": "2037",
+              "name": "Minimum Number of Moves to Seat Everyone",
+              "difficulty": 1245,
+              "tags": ["greedy", "sorting"],
+              "url": "https://codeforces.com/contest/2037/problem/A",
+              "note": "排序后对应位置配对"
+            }
+          ]
+        },
+        {
+          "title": "§1.2 单序列配对",
+          "idea": "同上，从最小/最大的元素开始贪心。关键在于确定配对的顺序。",
+          "code_template": "// 板子代码\nsort(a.begin(), a.end());\nint l = 0, r = n - 1;\nwhile (l < r) {\n    // 配对逻辑\n    l++; r--;\n}",
+          "problems": [
+            {
+              "id": "1399",
+              "name": "Remove Smallest",
+              "difficulty": 1200,
+              "tags": ["greedy", "sorting"],
+              "url": "https://codeforces.com/contest/1399/problem/A",
+              "note": "相邻元素差值判断"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "二、区间问题",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "区间问题是贪心算法的经典应用场景，包括区间调度、区间覆盖等问题。"
+        },
+        {
+          "title": "§2.1 区间调度",
+          "idea": "按结束时间排序，每次选择结束最早的不重叠区间。",
+          "code_template": "// 按结束时间排序\nsort(intervals.begin(), intervals.end(), [](auto& a, auto& b) {\n    return a[1] < b[1];\n});\nint count = 0, end = INT_MIN;\nfor (auto& i : intervals) {\n    if (i[0] >= end) {\n        count++;\n        end = i[1];\n    }\n}",
+          "problems": [
+            {
+              "id": "1582",
+              "name": "Luntik and Subsequences",
+              "difficulty": 1300,
+              "tags": ["greedy", "math"],
+              "url": "https://codeforces.com/contest/1582/problem/A",
+              "note": "统计子序列数量"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
