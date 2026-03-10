@@ -1,0 +1,498 @@
+{
+  "id": "math_001",
+  "title": "数学专题训练：数论与组合数学",
+  "description": "本专题精选Codeforces上涉及数论、组合数学等数学知识点的题目，涵盖从入门到高阶的各个难度层次。通过系统训练，掌握GCD/LCM、素数筛、模运算、排列组合、容斥原理、生成函数等核心数学工具在算法竞赛中的应用。",
+  "category": "math",
+  "sections": [
+    {
+      "title": "数论基础",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "数论是算法竞赛中数学问题的基石，涉及整数性质、整除、同余等概念。掌握这些基础知识是解决更复杂数论问题的前提。"
+        },
+        {
+          "title": "§1.1 GCD与LCM",
+          "code_template": "int gcd(int a, int b) {\n    return b == 0 ? a : gcd(b, a % b);\n}\nint lcm(int a, int b) {\n    return a / gcd(a, b) * b;\n}",
+          "idea": "最大公约数(GCD)和最小公倍数(LCM)是数论中最基础的概念。欧几里得算法(gcd)效率高，常用于化简分数、判断数的整除性。LCM可通过GCD计算。解题时注意利用GCD的性质简化问题。",
+          "problems": [
+            {
+              "id": "1245A",
+              "name": "Good ol' Numbers Coloring",
+              "difficulty": 1000,
+              "tags": [
+                "math",
+                "number theory"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1245/A",
+              "note": "判断两个数是否互质，即gcd(a,b)=1，决定了染色模式。"
+            },
+            {
+              "id": "1372B",
+              "name": "Omkar and Last Class of Math",
+              "difficulty": 1300,
+              "tags": [
+                "greedy",
+                "math",
+                "number theory"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1372/B",
+              "note": "给定n，找a+b=n且lcm(a,b)最小。最优解是让a为n的最大真因子。"
+            },
+            {
+              "id": "495B",
+              "name": "Modular Equations",
+              "difficulty": 1600,
+              "tags": [
+                "math",
+                "number theory"
+              ],
+              "url": "https://codeforces.com/problemset/problem/495/B",
+              "note": "解方程a mod x = b，转化为找(a-b)的大于b的因子个数。"
+            }
+          ]
+        },
+        {
+          "title": "§1.2 素数筛与质因数分解",
+          "code_template": "// 埃氏筛\nvector<bool> isPrime(n+1, true);\nisPrime[0] = isPrime[1] = false;\nfor (int i = 2; i * i <= n; i++) {\n    if (isPrime[i]) {\n        for (int j = i * i; j <= n; j += i) {\n            isPrime[j] = false;\n        }\n    }\n}\n// 质因数分解\nvector<pair<int, int>> factorize(int x) {\n    vector<pair<int, int>> factors;\n    for (int i = 2; i * i <= x; i++) {\n        if (x % i == 0) {\n            int cnt = 0;\n            while (x % i == 0) {\n                x /= i;\n                cnt++;\n            }\n            factors.push_back({i, cnt});\n        }\n    }\n    if (x > 1) factors.push_back({x, 1});\n    return factors;\n}",
+          "idea": "素数筛法用于快速生成素数表或判断素数。质因数分解是将数分解为素数幂次乘积的形式，是分析数论问题的重要工具。注意时间复杂度优化。",
+          "problems": [
+            {
+              "id": "1794B",
+              "name": "Not Dividing",
+              "difficulty": 900,
+              "tags": [
+                "constructive algorithms",
+                "greedy",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1794/B",
+              "note": "构造数组使得每个数不被后一个数整除。通过加1操作破坏整除性。"
+            },
+            {
+              "id": "233B",
+              "name": "Non-square Equation",
+              "difficulty": 1400,
+              "tags": [
+                "binary search",
+                "brute force",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/233/B",
+              "note": "解方程x^2 + s(x)*x - n = 0，s(x)为数字和。枚举s(x)范围求解。"
+            },
+            {
+              "id": "460B",
+              "name": "Little Dima and Equation",
+              "difficulty": 1500,
+              "tags": [
+                "brute force",
+                "implementation",
+                "math",
+                "number theory"
+              ],
+              "url": "https://codeforces.com/problemset/problem/460/B",
+              "note": "找满足x = b * s(x)^a + c的x。s(x)范围有限，可枚举s(x)反推x。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "同余与模运算",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "模运算在计算机科学中至关重要，涉及取余、模逆元、同余方程等概念。掌握模运算性质能有效处理大数运算和循环问题。"
+        },
+        {
+          "title": "§2.1 模运算性质与快速幂",
+          "code_template": "// 快速幂取模\nlong long pow_mod(long long a, long long b, long long mod) {\n    long long res = 1;\n    while (b > 0) {\n        if (b & 1) res = (res * a) % mod;\n        a = (a * a) % mod;\n        b >>= 1;\n    }\n    return res;\n}\n// 模逆元（费马小定理，mod为素数）\nlong long inv(long long a, long long mod) {\n    return pow_mod(a, mod - 2, mod);\n}",
+          "idea": "快速幂用于高效计算a^b mod m。当模数m为素数时，可用费马小定理求逆元。注意处理负数取模和乘法溢出。",
+          "problems": [
+            {
+              "id": "1451A",
+              "name": "Subtract or Divide",
+              "difficulty": 800,
+              "tags": [
+                "greedy",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1451/A",
+              "note": "将n变为1的最少操作次数。奇偶性分析和除以最大因子策略。"
+            },
+            {
+              "id": "1312C",
+              "name": "Adding Powers",
+              "difficulty": 1400,
+              "tags": [
+                "bitmasks",
+                "greedy",
+                "implementation",
+                "math",
+                "number theory",
+                "ternary search"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1312/C",
+              "note": "判断数组能否表示为k的幂次和，每个幂次最多用一次。转化为k进制表示问题。"
+            },
+            {
+              "id": "983A",
+              "name": "Finite or not?",
+              "difficulty": 1700,
+              "tags": [
+                "implementation",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/983/A",
+              "note": "判断分数p/q在b进制下是否为有限小数。化简q，检查其质因子是否都是b的因子。"
+            }
+          ]
+        },
+        {
+          "title": "§2.2 同余方程与模逆元",
+          "code_template": "// 扩展欧几里得算法求ax+by=gcd(a,b)\nint extgcd(int a, int b, int &x, int &y) {\n    if (b == 0) {\n        x = 1; y = 0;\n        return a;\n    }\n    int d = extgcd(b, a % b, y, x);\n    y -= a / b * x;\n    return d;\n}\n// 求a在模m下的逆元（a与m互质）\nint mod_inv(int a, int m) {\n    int x, y;\n    extgcd(a, m, x, y);\n    return (x % m + m) % m;\n}",
+          "idea": "扩展欧几里得算法可求解线性同余方程ax ≡ b (mod m)。当a与m互质时，a存在模m逆元。组合数学中常需用逆元计算除法取模。",
+          "problems": [
+            {
+              "id": "300C",
+              "name": "Beautiful Numbers",
+              "difficulty": 1800,
+              "tags": [
+                "brute force",
+                "combinatorics"
+              ],
+              "url": "https://codeforces.com/problemset/problem/300/C",
+              "note": "统计由数字a和b组成的n位数，且各位数字和也只由a和b组成。组合数计算需模逆元。"
+            },
+            {
+              "id": "1931G",
+              "name": "One-Dimensional Puzzle",
+              "difficulty": 2000,
+              "tags": [
+                "combinatorics",
+                "math",
+                "number theory"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1931/G",
+              "note": "拼接四种类型拼图。分析相邻关系，转化为插板法组合问题，需要模逆元计算组合数。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "组合数学",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "组合数学研究离散对象的计数问题，包括排列、组合、容斥原理等。在算法竞赛中常用于统计方案数，通常需要结合模运算处理大数。"
+        },
+        {
+          "title": "§3.1 排列组合与二项式系数",
+          "code_template": "// 预处理阶乘和逆元用于计算组合数\nconst int MOD = 1e9+7;\nvector<long long> fact, inv_fact;\nvoid precompute(int n) {\n    fact.resize(n+1);\n    inv_fact.resize(n+1);\n    fact[0] = 1;\n    for (int i = 1; i <= n; i++) fact[i] = fact[i-1] * i % MOD;\n    inv_fact[n] = pow_mod(fact[n], MOD-2, MOD);\n    for (int i = n-1; i >= 0; i--) inv_fact[i] = inv_fact[i+1] * (i+1) % MOD;\n}\nlong long C(int n, int k) {\n    if (k < 0 || k > n) return 0;\n    return fact[n] * inv_fact[k] % MOD * inv_fact[n-k] % MOD;\n}",
+          "idea": "组合数C(n,k)表示从n个不同元素中取k个的方案数。常用预处理阶乘和逆元的方式快速计算。注意边界条件和模运算。",
+          "problems": [
+            {
+              "id": "844B",
+              "name": "Rectangles",
+              "difficulty": 1300,
+              "tags": [
+                "combinatorics",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/844/B",
+              "note": "统计棋盘上单色矩形个数。每行/列同色子集可形成矩形，用组合数计算。"
+            },
+            {
+              "id": "630I",
+              "name": "Parking Lot",
+              "difficulty": 1700,
+              "tags": [
+                "combinatorics",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/630/I",
+              "note": "停车位排列问题。计算恰好n个连续相同品牌车的方案数，分类讨论位置。"
+            },
+            {
+              "id": "1312D",
+              "name": "Count the Arrays",
+              "difficulty": 1700,
+              "tags": [
+                "combinatorics",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1312/D",
+              "note": "统计满足特定条件的数组个数：先增后减，有且仅有一对相等元素。组合选择最大值和相等对。"
+            }
+          ]
+        },
+        {
+          "title": "§3.2 容斥原理与鸽巢原理",
+          "code_template": "// 容斥原理示例：计算1~n中能被a或b整除的数的个数\nint count_divisible(int n, int a, int b) {\n    int lcm_ab = lcm(a, b);\n    return n/a + n/b - n/lcm_ab;\n}\n// 一般情况：枚举子集\nlong long inclusion_exclusion(vector<int> primes, long long n) {\n    int k = primes.size();\n    long long res = 0;\n    for (int mask = 1; mask < (1 << k); mask++) {\n        long long prod = 1;\n        int bits = 0;\n        for (int i = 0; i < k; i++) {\n            if (mask >> i & 1) {\n                prod *= primes[i];\n                bits++;\n            }\n        }\n        if (bits % 2 == 1) res += n / prod;\n        else res -= n / prod;\n    }\n    return res;\n}",
+          "idea": "容斥原理用于计算多个集合的并集大小。鸽巢原理（抽屉原理）指出若物品多于容器，则必有容器包含至少两件物品。两者都是解决计数问题的有力工具。",
+          "problems": [
+            {
+              "id": "92A",
+              "name": "Chips",
+              "difficulty": 800,
+              "tags": [
+                "implementation",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/92/A",
+              "note": "循环分发芯片，简单模拟或数学计算剩余量。"
+            },
+            {
+              "id": "630D",
+              "name": "Hexagons!",
+              "difficulty": 1100,
+              "tags": [
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/630/D",
+              "note": "计算六边形网格中距离原点不超过n的格子数。公式推导：1 + 6 * (1+2+...+n)。"
+            },
+            {
+              "id": "238A",
+              "name": "Not Wool Sequences",
+              "difficulty": 1300,
+              "tags": [
+                "constructive algorithms",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/238/A",
+              "note": "统计长度为n的数组，使得任意连续子段异或和非零。等价于前缀异或数组元素互不相同。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "进阶数论与组合",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "进阶部分涉及更复杂的数论结构和组合问题，包括欧拉函数、生成函数、概率期望等，需要综合运用多种数学工具。"
+        },
+        {
+          "title": "§4.1 欧拉函数与数论函数",
+          "code_template": "// 欧拉函数：小于n且与n互质的数的个数\nint phi(int n) {\n    int result = n;\n    for (int i = 2; i * i <= n; i++) {\n        if (n % i == 0) {\n            while (n % i == 0) n /= i;\n            result -= result / i;\n        }\n    }\n    if (n > 1) result -= result / n;\n    return result;\n}\n// 线性筛求欧拉函数\nvector<int> get_phi(int n) {\n    vector<int> phi(n+1), primes;\n    vector<bool> is_prime(n+1, true);\n    phi[1] = 1;\n    for (int i = 2; i <= n; i++) {\n        if (is_prime[i]) {\n            primes.push_back(i);\n            phi[i] = i - 1;\n        }\n        for (int p : primes) {\n            if (i * p > n) break;\n            is_prime[i * p] = false;\n            if (i % p == 0) {\n                phi[i * p] = phi[i] * p;\n                break;\n            } else {\n                phi[i * p] = phi[i] * (p - 1);\n            }\n        }\n    }\n    return phi;\n}",
+          "idea": "欧拉函数φ(n)在模运算和密码学中有重要应用。欧拉定理是费马小定理的推广。数论函数如约数个数、约数和等也常出现在竞赛题中。",
+          "problems": [
+            {
+              "id": "1027G",
+              "name": "X-mouse in the Campus",
+              "difficulty": 2600,
+              "tags": [
+                "bitmasks",
+                "math",
+                "number theory"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1027/G",
+              "note": "计算模m下x的乘法阶相关问题。需要分解m的质因数，分析循环节长度。"
+            },
+            {
+              "id": "1103E",
+              "name": "Radix sum",
+              "difficulty": 3400,
+              "tags": [
+                "fft",
+                "math",
+                "number theory"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1103/E",
+              "note": "十进制下按位卷积问题。使用10进制下的FFT（即10次单位根）和数论变换。"
+            }
+          ]
+        },
+        {
+          "title": "§4.2 生成函数与多项式",
+          "code_template": "// 快速傅里叶变换(FFT)框架（伪代码）\n// 实际使用需实现复数运算或使用NTT模数版本\ntypedef complex<double> cd;\nvoid fft(vector<cd> &a, bool invert) {\n    int n = a.size();\n    for (int i = 1, j = 0; i < n; i++) {\n        int bit = n >> 1;\n        for (; j & bit; bit >>= 1) j ^= bit;\n        j ^= bit;\n        if (i < j) swap(a[i], a[j]);\n    }\n    for (int len = 2; len <= n; len <<= 1) {\n        double ang = 2 * PI / len * (invert ? -1 : 1);\n        cd wlen(cos(ang), sin(ang));\n        for (int i = 0; i < n; i += len) {\n            cd w(1);\n            for (int j = 0; j < len/2; j++) {\n                cd u = a[i+j], v = a[i+j+len/2] * w;\n                a[i+j] = u + v;\n                a[i+j+len/2] = u - v;\n                w *= wlen;\n            }\n        }\n    }\n    if (invert) for (cd &x : a) x /= n;\n}\nvector<int> multiply(vector<int> const& a, vector<int> const& b) {\n    vector<cd> fa(a.begin(), a.end()), fb(b.begin(), b.end());\n    int n = 1;\n    while (n < a.size() + b.size()) n <<= 1;\n    fa.resize(n); fb.resize(n);\n    fft(fa, false); fft(fb, false);\n    for (int i = 0; i < n; i++) fa[i] *= fb[i];\n    fft(fa, true);\n    vector<int> result(n);\n    for (int i = 0; i < n; i++) result[i] = round(fa[i].real());\n    return result;\n}",
+          "idea": "生成函数将序列转化为形式幂级数，便于处理组合计数问题。FFT/NTT用于多项式乘法加速，可解决大规模卷积问题。",
+          "problems": [
+            {
+              "id": "1988F",
+              "name": "Heartbeat",
+              "difficulty": 3000,
+              "tags": [
+                "combinatorics",
+                "dp",
+                "fft",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1988/F",
+              "note": "复杂组合计数问题，涉及生成函数和FFT优化多项式乘法。"
+            },
+            {
+              "id": "1326F2",
+              "name": "Wise Men (Hard Version)",
+              "difficulty": 3200,
+              "tags": [
+                "bitmasks",
+                "dp",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1326/F2",
+              "note": "图论与容斥原理结合，需要快速子集卷积，可用位运算和生成函数优化。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "综合应用与构造",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "数学在算法竞赛中不仅限于纯计算，还常与构造、贪心、动态规划等结合。本节题目需要综合运用多种数学思维解决问题。"
+        },
+        {
+          "title": "§5.1 数学构造与贪心",
+          "code_template": "// 构造题通常没有固定模板，需要根据题目特性设计算法\n// 常见思路：数学归纳法、极端情况分析、对称构造等",
+          "idea": "构造题要求直接构建满足条件的解。常用方法包括数学归纳法、贪心选择、利用对称性、极端情况分析等。需要深入理解问题本质。",
+          "problems": [
+            {
+              "id": "1013A",
+              "name": "Piles With Stones",
+              "difficulty": 800,
+              "tags": [
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1013/A",
+              "note": "比较两堆石子总数，简单不等式判断。"
+            },
+            {
+              "id": "1700A",
+              "name": "Optimal Path",
+              "difficulty": 800,
+              "tags": [
+                "constructive algorithms",
+                "greedy",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1700/A",
+              "note": "矩阵中从左上到右下的最小路径和。先向右走到底再向下走最优。"
+            },
+            {
+              "id": "1914B",
+              "name": "Preparing for the Contest",
+              "difficulty": 800,
+              "tags": [
+                "constructive algorithms",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1914/B",
+              "note": "构造1~n的排列，使得恰好有k个位置满足pi < pi+1。"
+            },
+            {
+              "id": "1739B",
+              "name": "Array Recovery",
+              "difficulty": 1100,
+              "tags": [
+                "constructive algorithms",
+                "greedy",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1739/B",
+              "note": "根据差分数组d恢复原数组a，需检查是否唯一。"
+            },
+            {
+              "id": "748C",
+              "name": "Santa Claus and Robot",
+              "difficulty": 1400,
+              "tags": [
+                "constructive algorithms",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/748/C",
+              "note": "机器人路径规划，最小化标记点。当方向抵消时需标记新点。"
+            },
+            {
+              "id": "1725H",
+              "name": "Hot Black Hot White",
+              "difficulty": 1800,
+              "tags": [
+                "constructive algorithms",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1725H",
+              "note": "给数组元素染色，使得满足条件的同色对尽可能少。利用模3余数性质构造。"
+            }
+          ]
+        },
+        {
+          "title": "§5.2 数学与动态规划结合",
+          "code_template": "// DP与数学结合常见形式：计数DP、概率DP、数位DP等\n// 示例：斐波那契数列DP\ndp[0] = 0; dp[1] = 1;\nfor (int i = 2; i <= n; i++) dp[i] = dp[i-1] + dp[i-2];\n// 模意义下的线性递推可使用矩阵快速幂优化",
+          "idea": "动态规划常与组合数学结合用于计数问题。数位DP处理数字位上的约束。概率DP计算期望值。矩阵快速幂可优化线性递推。",
+          "problems": [
+            {
+              "id": "1452D",
+              "name": "Radio Towers",
+              "difficulty": 1600,
+              "tags": [
+                "combinatorics",
+                "dp",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1452/D",
+              "note": "放置信号塔的方案数，满足间隔约束。递推关系类似斐波那契数列。"
+            },
+            {
+              "id": "1795D",
+              "name": "Triangle Coloring",
+              "difficulty": 1600,
+              "tags": [
+                "combinatorics",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1795/D",
+              "note": "三角形三边染色，组合计数问题。每个三角形独立考虑，再乘组合数。"
+            },
+            {
+              "id": "1307C",
+              "name": "Cow and Message",
+              "difficulty": 1500,
+              "tags": [
+                "brute force",
+                "dp",
+                "math",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1307/C",
+              "note": "找字符串子序列的最大出现次数。只需考虑长度为1或2的子序列。"
+            },
+            {
+              "id": "1614C",
+              "name": "Divan and bitwise operations",
+              "difficulty": 1500,
+              "tags": [
+                "bitmasks",
+                "combinatorics",
+                "constructive algorithms",
+                "dp",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1614/C",
+              "note": "根据区间或值还原数组所有子段异或和之和。按位独立考虑贡献。"
+            },
+            {
+              "id": "559C",
+              "name": "Gerald and Giant Chess",
+              "difficulty": 2200,
+              "tags": [
+                "combinatorics",
+                "dp",
+                "math",
+                "number theory"
+              ],
+              "url": "https://codeforces.com/problemset/problem/559/C",
+              "note": "棋盘上避开障碍物从左上到右下的路径数。容斥DP，需要组合数模逆元。"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

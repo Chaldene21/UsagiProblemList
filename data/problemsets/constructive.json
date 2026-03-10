@@ -1,0 +1,650 @@
+{
+  "id": "constructive-algorithms",
+  "title": "构造算法专题训练",
+  "description": "构造算法是算法竞赛中的重要题型，要求选手根据题目条件设计出满足特定要求的方案或结构。本专题系统性地整理了Codeforces上经典的构造题目，涵盖奇偶构造、顺序构造、模拟构造、逆向构造、网格构造和数学构造等核心技巧，帮助选手掌握构造问题的解题思路和实现方法。",
+  "category": "constructive",
+  "sections": [
+    {
+      "title": "构造算法基础",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "构造算法要求选手根据题目给出的条件，设计出满足要求的方案、排列或结构。这类问题通常没有标准解法，需要创造性思维和观察能力。本节介绍构造问题的基本思路和常见技巧。"
+        },
+        {
+          "title": "§1.1 奇偶构造",
+          "code_template": "// 奇偶构造常用思路\n// 1. 分析奇偶性质对结果的影响\n// 2. 根据奇偶性分类讨论\n// 3. 利用奇偶性构造特殊排列\n\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    // 读取输入\n    int n;\n    cin >> n;\n    \n    // 根据奇偶性构造答案\n    if (n % 2 == 0) {\n        // 偶数情况的构造\n        for (int i = 1; i <= n; i += 2) {\n            cout << i + 1 << \" \" << i << \" \";\n        }\n    } else {\n        // 奇数情况的构造\n        cout << \"1 \";\n        for (int i = 2; i <= n; i += 2) {\n            cout << i + 1 << \" \" << i << \" \";\n        }\n    }\n    \n    return 0;\n}",
+          "idea": "奇偶构造的核心是利用数字的奇偶性质来设计方案。常见技巧包括：1) 将元素按奇偶分组；2) 利用奇偶性保证某些性质（如和、差、异或等）；3) 通过奇偶变换调整结果。解题时先分析奇偶性对目标的影响，再设计相应的构造策略。",
+          "problems": [
+            {
+              "id": "1612A",
+              "name": "Distance",
+              "difficulty": 800,
+              "tags": [
+                "brute force",
+                "constructive algorithms"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1612/A",
+              "note": "根据坐标和的奇偶性构造点，使得曼哈顿距离满足条件"
+            },
+            {
+              "id": "1370B",
+              "name": "GCD Compression",
+              "difficulty": 1100,
+              "tags": [
+                "constructive algorithms",
+                "math",
+                "number theory"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1370/B",
+              "note": "利用奇偶性构造数对，使得所有数对的和有大于1的公因子"
+            },
+            {
+              "id": "1722G",
+              "name": "Even-Odd XOR",
+              "difficulty": 1500,
+              "tags": [
+                "bitmasks",
+                "constructive algorithms",
+                "greedy"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1722/G",
+              "note": "构造数组使得奇数位置和偶数位置的异或值相等，利用异或的奇偶性质"
+            },
+            {
+              "id": "1325D",
+              "name": "Ehab the Xorcist",
+              "difficulty": 1700,
+              "tags": [
+                "bitmasks",
+                "constructive algorithms",
+                "greedy",
+                "number theory"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1325/D",
+              "note": "给定异或和与和，构造最短数组，利用异或与和的奇偶关系"
+            },
+            {
+              "id": "2178D",
+              "name": "Xmas or Hysteria",
+              "difficulty": 1700,
+              "tags": [
+                "constructive algorithms",
+                "greedy",
+                "implementation",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/2178/D",
+              "note": "利用奇偶性构造操作序列，使得最终状态满足要求"
+            }
+          ]
+        },
+        {
+          "title": "§1.2 顺序构造",
+          "code_template": "// 顺序构造常用思路\n// 1. 确定元素的排列顺序\n// 2. 按照特定规则放置元素\n// 3. 保证相邻元素满足条件\n\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    \n    vector<int> arr(n);\n    // 构造特定顺序的排列\n    int l = 1, r = n;\n    for (int i = 0; i < n; i++) {\n        if (i % 2 == 0) {\n            arr[i] = l++;\n        } else {\n            arr[i] = r--;\n        }\n    }\n    \n    // 输出结果\n    for (int x : arr) {\n        cout << x << \" \";\n    }\n    \n    return 0;\n}",
+          "idea": "顺序构造关注元素在序列中的相对位置。常见技巧包括：1) 交替放置大小元素；2) 按递增或递减顺序排列；3) 根据相邻关系设计排列；4) 使用双指针从两端向中间构造。解题时要分析题目对相邻元素或相对位置的要求。",
+          "problems": [
+            {
+              "id": "1930B",
+              "name": "Permutation Printing",
+              "difficulty": 1000,
+              "tags": [
+                "brute force",
+                "constructive algorithms",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1930/B",
+              "note": "构造排列使得相邻元素的最大公约数满足特定条件"
+            },
+            {
+              "id": "1003B",
+              "name": "Binary String Constructing",
+              "difficulty": 1300,
+              "tags": [
+                "constructive algorithms"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1003/B",
+              "note": "构造01串使得恰好有指定数量的相邻不同字符对"
+            },
+            {
+              "id": "1927E",
+              "name": "Klever Permutation",
+              "difficulty": 1400,
+              "tags": [
+                "constructive algorithms",
+                "math",
+                "two pointers"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1927/E",
+              "note": "构造排列使得任意长度为k的子数组的和相差不超过1"
+            },
+            {
+              "id": "359B",
+              "name": "Permutation",
+              "difficulty": 1400,
+              "tags": [
+                "constructive algorithms",
+                "dp",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/359/B",
+              "note": "构造排列使得相邻元素差的绝对值之和满足特定条件"
+            },
+            {
+              "id": "1157F",
+              "name": "Maximum Balanced Circle",
+              "difficulty": 2000,
+              "tags": [
+                "constructive algorithms",
+                "dp",
+                "greedy",
+                "two pointers"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1157/F",
+              "note": "构造最大环使得相邻元素差值不超过1，需要精心设计顺序"
+            }
+          ]
+        },
+        {
+          "title": "§1.3 模拟构造",
+          "code_template": "// 模拟构造常用思路\n// 1. 按照规则逐步构建答案\n// 2. 维护当前状态并更新\n// 3. 处理边界情况\n\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    \n    vector<int> ans(n);\n    // 模拟构造过程\n    int cur = 1;\n    for (int i = 0; i < n; i++) {\n        // 根据当前状态决定下一步\n        if (满足条件A) {\n            ans[i] = cur++;\n        } else {\n            ans[i] = cur--;\n        }\n        \n        // 更新状态\n        更新状态变量;\n    }\n    \n    // 检查并输出\n    for (int x : ans) {\n        cout << x << \" \";\n    }\n    \n    return 0;\n}",
+          "idea": "模拟构造按照题目给出的规则或条件，逐步构建答案。常见技巧包括：1) 从左到右或从右到左依次构造；2) 维护当前状态并根据规则更新；3) 使用贪心策略选择当前最优操作；4) 处理构造过程中的边界情况。",
+          "problems": [
+            {
+              "id": "1081A",
+              "name": "Definite Game",
+              "difficulty": 800,
+              "tags": [
+                "constructive algorithms",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1081/A",
+              "note": "简单模拟构造，每次选择最大的不是自身的除数"
+            },
+            {
+              "id": "118B",
+              "name": "Present from Lena",
+              "difficulty": 1000,
+              "tags": [
+                "constructive algorithms",
+                "implementation"
+              ],
+              "url": "https://codeforces.com/problemset/problem/118/B",
+              "note": "模拟构造数字金字塔图案"
+            },
+            {
+              "id": "1375B",
+              "name": "Neighbor Grid",
+              "difficulty": 1200,
+              "tags": [
+                "constructive algorithms",
+                "greedy"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1375/B",
+              "note": "模拟构造网格，使得每个格子的值等于相邻格子的数量"
+            },
+            {
+              "id": "1368B",
+              "name": "Codeforces Subsequences",
+              "difficulty": 1500,
+              "tags": [
+                "brute force",
+                "constructive algorithms",
+                "greedy",
+                "math",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1368/B",
+              "note": "模拟构造字符串，使其包含至少指定数量的\"codeforces\"子序列"
+            },
+            {
+              "id": "1367D",
+              "name": "Task On The Board",
+              "difficulty": 1800,
+              "tags": [
+                "constructive algorithms",
+                "greedy",
+                "implementation",
+                "sortings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1367/D",
+              "note": "模拟构造字符串，根据位置值逐步确定字符"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "构造算法进阶",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "进阶构造问题涉及更复杂的场景和技巧，需要综合运用多种构造方法。本节涵盖逆向构造、网格构造和数学构造等高级技巧，帮助选手解决更具挑战性的构造问题。"
+        },
+        {
+          "title": "§2.1 逆向构造",
+          "code_template": "// 逆向构造常用思路\n// 1. 从最终状态向前推导\n// 2. 还原操作序列\n// 3. 确定可行的初始状态\n\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    \n    // 从结果反推\n    vector<int> target(n);\n    for (int i = 0; i < n; i++) {\n        cin >> target[i];\n    }\n    \n    // 逆向推导初始状态\n    vector<int> initial(n);\n    for (int i = n - 1; i >= 0; i--) {\n        // 根据目标状态和已知操作反推\n        initial[i] = target[i] - 某些操作;\n    }\n    \n    // 验证并输出\n    if (验证成功) {\n        for (int x : initial) {\n            cout << x << \" \";\n        }\n    } else {\n        cout << \"-1\";\n    }\n    \n    return 0;\n}",
+          "idea": "逆向构造从目标状态或最终结果出发，反向推导初始状态或操作序列。常见技巧包括：1) 分析操作的逆操作；2) 从后向前处理；3) 确定必要条件并验证充分性；4) 使用数学公式反向计算。",
+          "problems": [
+            {
+              "id": "1088C",
+              "name": "Ehab and a 2-operation task",
+              "difficulty": 1400,
+              "tags": [
+                "constructive algorithms",
+                "greedy",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1088/C",
+              "note": "逆向思考，通过模运算构造严格递增数组"
+            },
+            {
+              "id": "605A",
+              "name": "Sorting Railway Cars",
+              "difficulty": 1600,
+              "tags": [
+                "constructive algorithms",
+                "greedy"
+              ],
+              "url": "https://codeforces.com/problemset/problem/605/A",
+              "note": "逆向考虑最长递增子序列，构造最小操作次数"
+            },
+            {
+              "id": "1798D",
+              "name": "Shocking Arrangement",
+              "difficulty": 1600,
+              "tags": [
+                "constructive algorithms",
+                "greedy",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1798/D",
+              "note": "从结果出发构造排列，使得前缀和的范围受限"
+            },
+            {
+              "id": "1659D",
+              "name": "Reverse Sort Sum",
+              "difficulty": 1900,
+              "tags": [
+                "constructive algorithms",
+                "data structures",
+                "greedy",
+                "implementation",
+                "math",
+                "two pointers"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1659/D",
+              "note": "从结果数组逆向推导原始二进制数组"
+            },
+            {
+              "id": "1416B",
+              "name": "Make Them Equal",
+              "difficulty": 2000,
+              "tags": [
+                "constructive algorithms",
+                "greedy",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1416/B",
+              "note": "逆向操作，通过三次操作使数组元素相等"
+            }
+          ]
+        },
+        {
+          "title": "§2.2 网格构造",
+          "code_template": "// 网格构造常用思路\n// 1. 设计矩阵的填充模式\n// 2. 考虑行和列的性质\n// 3. 处理边界和特殊情况\n\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    int n, m;\n    cin >> n >> m;\n    \n    vector<vector<int>> grid(n, vector<int>(m));\n    \n    // 构造网格\n    for (int i = 0; i < n; i++) {\n        for (int j = 0; j < m; j++) {\n            // 根据行列关系设计填充规则\n            grid[i][j] = (i * 某种系数 + j) % 某个值 + 1;\n        }\n    }\n    \n    // 输出网格\n    for (int i = 0; i < n; i++) {\n        for (int j = 0; j < m; j++) {\n            cout << grid[i][j] << \" \";\n        }\n        cout << \"\\n\";\n    }\n    \n    return 0;\n}",
+          "idea": "网格构造涉及矩阵、棋盘等二维结构的构建。常见技巧包括：1) 设计循环填充模式；2) 利用行列索引的数学关系；3) 对角线填充或螺旋填充；4) 考虑颜色交替（棋盘格）；5) 处理奇偶行列的不同情况。",
+          "problems": [
+            {
+              "id": "1868A",
+              "name": "Fill in the Matrix",
+              "difficulty": 1300,
+              "tags": [
+                "constructive algorithms",
+                "implementation"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1868/A",
+              "note": "构造矩阵使得每列的MEX值形成排列"
+            },
+            {
+              "id": "2101A",
+              "name": "Mex in the Grid",
+              "difficulty": 1300,
+              "tags": [
+                "constructive algorithms",
+                "implementation"
+              ],
+              "url": "https://codeforces.com/problemset/problem/2101/A",
+              "note": "在网格中放置数字使得特定模式的MEX值最大"
+            },
+            {
+              "id": "40A",
+              "name": "Find Color",
+              "difficulty": 1300,
+              "tags": [
+                "constructive algorithms",
+                "geometry",
+                "implementation",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/40/A",
+              "note": "根据点在棋盘格中的位置确定颜色，涉及几何构造"
+            },
+            {
+              "id": "1551D1",
+              "name": "Domino (easy version)",
+              "difficulty": 1700,
+              "tags": [
+                "constructive algorithms",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1551/D1",
+              "note": "在网格中放置水平多米诺骨牌，构造可行方案"
+            },
+            {
+              "id": "1574E",
+              "name": "Coloring",
+              "difficulty": 2500,
+              "tags": [
+                "combinatorics",
+                "constructive algorithms",
+                "implementation",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1574/E",
+              "note": "网格染色构造，满足相邻行和列的约束条件"
+            }
+          ]
+        },
+        {
+          "title": "§2.3 数学构造",
+          "code_template": "// 数学构造常用思路\n// 1. 利用数论性质（质数、同余、整除）\n// 2. 应用组合数学原理\n// 3. 设计满足方程或不等式的结构\n\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    \n    // 基于数学性质的构造\n    if (n 满足某些数学条件) {\n        vector<int> ans(n);\n        \n        // 利用数论性质构造\n        for (int i = 0; i < n; i++) {\n            ans[i] = (某个公式 involving i);\n        }\n        \n        // 验证数学性质\n        bool valid = true;\n        for (int i = 0; i < n; i++) {\n            if (!满足数学条件(ans[i])) {\n                valid = false;\n                break;\n            }\n        }\n        \n        if (valid) {\n            for (int x : ans) {\n                cout << x << \" \";\n            }\n        }\n    } else {\n        cout << \"-1\";\n    }\n    \n    return 0;\n}",
+          "idea": "数学构造利用数论、代数、组合等数学性质设计解决方案。常见技巧包括：1) 利用质数性质构造互质对；2) 使用模运算设计循环结构；3) 应用鸽巢原理或容斥原理；4) 构造满足特定方程组的解；5) 利用数学归纳法设计递归构造。",
+          "problems": [
+            {
+              "id": "2127A",
+              "name": "Mix Mex Max",
+              "difficulty": 800,
+              "tags": [
+                "constructive algorithms",
+                "greedy",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/2127/A",
+              "note": "基于MEX和最大值的简单数学构造"
+            },
+            {
+              "id": "414A",
+              "name": "Mashmokh and Numbers",
+              "difficulty": 1500,
+              "tags": [
+                "constructive algorithms",
+                "number theory"
+              ],
+              "url": "https://codeforces.com/problemset/problem/414/A",
+              "note": "构造数列使得所有无序对的GCD之和等于指定值"
+            },
+            {
+              "id": "1009D",
+              "name": "Relatively Prime Graph",
+              "difficulty": 1700,
+              "tags": [
+                "brute force",
+                "constructive algorithms",
+                "graphs",
+                "greedy",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1009/D",
+              "note": "构造无向图使得边连接的两个节点互质"
+            },
+            {
+              "id": "1151C",
+              "name": "Problem for Nazar",
+              "difficulty": 1800,
+              "tags": [
+                "constructive algorithms",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1151/C",
+              "note": "基于奇偶数列的数学构造，计算区间和"
+            },
+            {
+              "id": "487C",
+              "name": "Prefix Product Sequence",
+              "difficulty": 2300,
+              "tags": [
+                "constructive algorithms",
+                "math",
+                "number theory"
+              ],
+              "url": "https://codeforces.com/problemset/problem/487/C",
+              "note": "构造排列使得前缀积模n构成0到n-1的排列，需要数论知识"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "构造算法综合应用",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "综合构造问题需要结合多种构造技巧，并可能涉及图论、数据结构、交互等高级主题。本节选取具有代表性的综合构造题目，帮助选手提升解决复杂构造问题的能力。"
+        },
+        {
+          "title": "§3.1 图论构造",
+          "code_template": "// 图论构造常用思路\n// 1. 设计图的连接方式\n// 2. 保证图的特定性质（连通性、度数、路径等）\n// 3. 使用DFS/BFS等算法辅助构造\n\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    int n, m;\n    cin >> n >> m;\n    \n    vector<pair<int, int>> edges;\n    \n    // 构造图结构\n    if (需要满足特定性质) {\n        // 设计连接策略\n        for (int i = 1; i <= n; i++) {\n            for (int j = i + 1; j <= n; j++) {\n                if (满足连接条件) {\n                    edges.push_back({i, j});\n                    if (edges.size() == m) break;\n                }\n            }\n            if (edges.size() == m) break;\n        }\n    }\n    \n    // 输出结果\n    if (edges.size() == m) {\n        for (auto [u, v] : edges) {\n            cout << u << \" \" << v << \"\\n\";\n        }\n    } else {\n        cout << \"-1\";\n    }\n    \n    return 0;\n}",
+          "idea": "图论构造涉及构建满足特定性质的图结构。常见技巧包括：1) 设计特殊的连接模式（星型、链状、环状等）；2) 保证度数条件；3) 构造特定直径或连通性的图；4) 构建树或森林；5) 设计满足路径或距离条件的图。",
+          "problems": [
+            {
+              "id": "1761C",
+              "name": "Set Construction",
+              "difficulty": 1400,
+              "tags": [
+                "constructive algorithms",
+                "dfs and similar",
+                "graphs",
+                "greedy"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1761/C",
+              "note": "根据集合包含关系构造集合，可转化为图论问题"
+            },
+            {
+              "id": "698B",
+              "name": "Fix a Tree",
+              "difficulty": 1700,
+              "tags": [
+                "constructive algorithms",
+                "dfs and similar",
+                "dsu",
+                "graphs",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/698/B",
+              "note": "将几乎是一棵树的图修改为真正的树，最小化修改次数"
+            },
+            {
+              "id": "1133F2",
+              "name": "Spanning Tree with One Fixed Degree",
+              "difficulty": 1900,
+              "tags": [
+                "constructive algorithms",
+                "dfs and similar",
+                "dsu",
+                "graphs",
+                "greedy"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1133/F2",
+              "note": "构造生成树使得节点1的度数恰好为指定值"
+            },
+            {
+              "id": "1003E",
+              "name": "Tree Constructing",
+              "difficulty": 2100,
+              "tags": [
+                "constructive algorithms",
+                "graphs"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1003/E",
+              "note": "构造树满足节点数、直径和最大度数的限制"
+            },
+            {
+              "id": "350E",
+              "name": "Wrong Floyd",
+              "difficulty": 2200,
+              "tags": [
+                "brute force",
+                "constructive algorithms",
+                "dfs and similar",
+                "graphs"
+              ],
+              "url": "https://codeforces.com/problemset/problem/350/E",
+              "note": "构造图使得Floyd算法在特定起点上产生错误结果"
+            }
+          ]
+        },
+        {
+          "title": "§3.2 交互构造",
+          "code_template": "// 交互构造常用思路\n// 1. 设计询问策略获取信息\n// 2. 根据反馈逐步构造答案\n// 3. 最小化询问次数\n\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    \n    // 交互构造过程\n    vector<int> ans(n);\n    \n    // 通过询问获取信息\n    for (int i = 0; i < n; i++) {\n        // 设计询问\n        cout << \"? \" << i + 1 << endl;\n        fflush(stdout);\n        \n        int response;\n        cin >> response;\n        \n        // 根据响应更新构造\n        ans[i] = 根据response计算;\n    }\n    \n    // 输出最终答案\n    cout << \"! \";\n    for (int x : ans) {\n        cout << x << \" \";\n    }\n    cout << endl;\n    \n    return 0;\n}",
+          "idea": "交互构造需要通过询问获取信息，并据此构建答案。常见技巧包括：1) 二分搜索定位；2) 逐步确定元素值；3) 利用已知信息推导未知；4) 设计信息量最大的询问；5) 处理不确定性和错误情况。",
+          "problems": [
+            {
+              "id": "1583D",
+              "name": "Omkar and the Meaning of Life",
+              "difficulty": 1800,
+              "tags": [
+                "constructive algorithms",
+                "greedy",
+                "interactive"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1583/D",
+              "note": "通过交互确定排列，设计巧妙的询问策略"
+            },
+            {
+              "id": "1624F",
+              "name": "Interacdive Problem",
+              "difficulty": 2000,
+              "tags": [
+                "binary search",
+                "constructive algorithms",
+                "interactive"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1624/F",
+              "note": "通过交互确定隐藏值，使用二分搜索策略"
+            },
+            {
+              "id": "1867E1",
+              "name": "Salyg1n and Array (simple version)",
+              "difficulty": 2000,
+              "tags": [
+                "constructive algorithms",
+                "interactive",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1867/E1",
+              "note": "通过交互获取数组异或和，设计询问模式"
+            },
+            {
+              "id": "2156D",
+              "name": "Find the Last Number",
+              "difficulty": 1900,
+              "tags": [
+                "binary search",
+                "bitmasks",
+                "constructive algorithms",
+                "interactive"
+              ],
+              "url": "https://codeforces.com/problemset/problem/2156/D",
+              "note": "交互确定二进制数，通过位运算构造询问"
+            },
+            {
+              "id": "1100D",
+              "name": "Dasha and Chess",
+              "difficulty": 2500,
+              "tags": [
+                "constructive algorithms",
+                "games",
+                "interactive"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1100/D",
+              "note": "棋盘上的交互游戏，构造必胜策略"
+            }
+          ]
+        },
+        {
+          "title": "§3.3 高级综合构造",
+          "code_template": "// 高级综合构造\n// 结合多种技巧解决复杂问题\n\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    // 读取复杂输入\n    int n, m, k;\n    cin >> n >> m >> k;\n    \n    // 综合运用多种构造技巧\n    if (问题有解) {\n        // 步骤1: 分析约束条件\n        // 步骤2: 设计构造策略\n        // 步骤3: 实现构造算法\n        // 步骤4: 验证构造结果\n        \n        vector<vector<int>> solution;\n        \n        // 可能结合：\n        // - 数学推导\n        // - 贪心策略\n        // - 图论建模\n        // - 数据结构维护\n        // - 算法优化\n        \n        // 输出复杂构造结果\n        cout << \"YES\\n\";\n        for (auto& row : solution) {\n            for (int x : row) {\n                cout << x << \" \";\n            }\n            cout << \"\\n\";\n        }\n    } else {\n        cout << \"NO\\n\";\n    }\n    \n    return 0;\n}",
+          "idea": "高级综合构造需要结合多种算法技巧和数学知识。解题思路包括：1) 深入分析问题本质，建立数学模型；2) 设计多阶段构造策略；3) 结合贪心、动态规划等算法；4) 使用数据结构优化构造过程；5) 处理边界情况和特殊条件。",
+          "problems": [
+            {
+              "id": "1383B",
+              "name": "GameGame",
+              "difficulty": 1900,
+              "tags": [
+                "bitmasks",
+                "constructive algorithms",
+                "dp",
+                "games",
+                "greedy",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1383/B",
+              "note": "博弈论与构造结合，分析异或游戏的最优策略"
+            },
+            {
+              "id": "1406D",
+              "name": "Three Sequences",
+              "difficulty": 2200,
+              "tags": [
+                "constructive algorithms",
+                "data structures",
+                "greedy",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1406/D",
+              "note": "构造两个序列使得条件满足，需要数学推导和数据结构"
+            },
+            {
+              "id": "1148E",
+              "name": "Earth Wind and Fire",
+              "difficulty": 2300,
+              "tags": [
+                "constructive algorithms",
+                "greedy",
+                "math",
+                "sortings",
+                "two pointers"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1148/E",
+              "note": "通过操作使数组变为目标数组，设计操作序列"
+            },
+            {
+              "id": "1735E",
+              "name": "House Planning",
+              "difficulty": 2400,
+              "tags": [
+                "constructive algorithms",
+                "data structures",
+                "graph matchings",
+                "greedy"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1735/E",
+              "note": "构造一维点集满足距离条件，综合几何和匹配思想"
+            },
+            {
+              "id": "1031E",
+              "name": "Triple Flips",
+              "difficulty": 2600,
+              "tags": [
+                "constructive algorithms"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1031/E",
+              "note": "通过三元组翻转操作使数组归零，设计精巧的构造策略"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

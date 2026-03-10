@@ -40,6 +40,33 @@ body {
     color: var(--text-dark);
     line-height: 1.7;
     min-height: 100vh;
+    position: relative;
+}
+
+body.bg-enabled {
+    background: transparent;
+}
+
+/* 背景图片层 */
+.bg-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('/data/pictures/bg.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 0;
+    transition: opacity 0.5s ease;
+}
+
+.bg-layer.visible {
+    opacity: 0.3;
 }
 
 #app {
@@ -422,7 +449,7 @@ body {
 
 /* 🐰✨ 题单详情页 ✨🐰 */
 .problemset-detail {
-    animation: cuteFadeIn 0.6s ease;
+    /* 移除动画，避免闪烁 */
 }
 
 @keyframes cuteFadeIn {
@@ -753,8 +780,7 @@ body {
 
 .problem-item {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
     padding: 1.5rem;
     background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(255,250,252,0.98));
     border-radius: 18px;
@@ -784,6 +810,14 @@ body {
 
 .problem-item:hover::before {
     opacity: 1;
+}
+
+.problem-main {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    width: 100%;
 }
 
 .problem-info {
@@ -823,10 +857,70 @@ body {
     font-size: 1.05rem;
 }
 
+.problem-tags-container {
+    margin-top: 0.8rem;
+    padding-top: 0.8rem;
+    border-top: 2px dashed rgba(255, 158, 172, 0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
 .problem-tags {
     display: flex;
     gap: 0.6rem;
     flex-wrap: wrap;
+    align-items: center;
+}
+
+.tags-hidden {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    align-items: center;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.tags-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 1rem;
+    background: linear-gradient(135deg, rgba(255, 158, 172, 0.1), rgba(155, 123, 184, 0.1));
+    border: 2px dashed rgba(255, 158, 172, 0.3);
+    border-radius: 20px;
+    color: var(--kokoa-pink);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: fit-content;
+    margin-top: 0.3rem;
+}
+
+.tags-toggle:hover {
+    background: linear-gradient(135deg, rgba(255, 158, 172, 0.2), rgba(155, 123, 184, 0.2));
+    border-color: var(--kokoa-pink);
+    transform: scale(1.02);
+}
+
+.tags-toggle.expanded {
+    background: linear-gradient(135deg, rgba(255, 158, 172, 0.15), rgba(155, 123, 184, 0.15));
+}
+
+.tags-toggle i {
+    font-size: 0.75rem;
 }
 
 .tag {
@@ -838,9 +932,10 @@ body {
     font-family: 'JetBrains Mono', monospace;
     font-weight: 600;
     border: 2px solid rgba(125, 190, 125, 0.25);
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 0.3rem;
+    white-space: nowrap;
 }
 
 .tag::before {
@@ -1017,15 +1112,20 @@ body {
         font-size: 1.8rem;
     }
 
-    .problem-item {
+    .problem-main {
         flex-direction: column;
         align-items: flex-start;
-        gap: 1rem;
+        gap: 0.8rem;
+    }
+
+    .problem-item {
+        padding: 1.2rem;
     }
 
     .problem-meta {
         width: 100%;
-        justify-content: space-between;
+        justify-content: flex-start;
+        gap: 1rem;
     }
 
     .subsection {
@@ -1033,8 +1133,23 @@ body {
     }
 
     .problem-info {
-        flex-direction: column;
-        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 0.8rem;
+    }
+
+    .problem-tags-container {
+        margin-top: 0.6rem;
+        padding-top: 0.6rem;
+    }
+
+    .tag {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.6rem;
+    }
+
+    .tags-toggle {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.8rem;
     }
 }
 
@@ -1095,6 +1210,17 @@ body {
     color: white;
     transform: translateY(-3px) rotate(5deg);
     box-shadow: 0 5px 15px rgba(255, 158, 172, 0.4);
+}
+
+.nav-btn.active {
+    background: linear-gradient(135deg, var(--chino-blue), var(--rize-purple));
+    color: white;
+    box-shadow: 0 3px 10px rgba(108, 180, 238, 0.4);
+}
+
+/* 🐰 背景图按钮高亮 🐰 */
+.nav-btn.active i {
+    color: white;
 }
 
 .nav-user {
@@ -1403,7 +1529,7 @@ body {
 
 /* 🐰✨ 统计页面样式 ✨🐰 */
 .stats-page {
-    animation: cuteFadeIn 0.6s ease;
+    /* 移除动画，避免闪烁 */
 }
 
 .stats-overview {
@@ -1537,4 +1663,689 @@ body {
 
 .problemset-progress-bar .progress-text {
     min-width: 60px;
+}
+
+/* 🐰✨ 力扣风格个人主页 ✨🐰 */
+.profile-container {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 2rem;
+    /* 移除动画，避免闪烁 */
+}
+
+/* 左侧用户信息卡片 */
+.profile-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.profile-card {
+    background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(255,250,252,0.98));
+    border-radius: 25px;
+    padding: 2rem;
+    border: 3px solid rgba(255, 158, 172, 0.3);
+    box-shadow: 0 10px 40px rgba(255, 158, 172, 0.12);
+}
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 1.5rem;
+    background: linear-gradient(135deg, var(--kokoa-pink), var(--chino-blue), var(--rize-purple));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: white;
+    box-shadow: 0 8px 30px rgba(255, 158, 172, 0.4);
+    position: relative;
+}
+
+.profile-avatar::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 3px dashed rgba(255, 158, 172, 0.5);
+    animation: spin 20s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.profile-name {
+    text-align: center;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+}
+
+.profile-username {
+    text-align: center;
+    color: var(--text-light);
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+}
+
+.profile-stats-mini {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    padding-top: 1.5rem;
+    border-top: 2px dashed rgba(255, 158, 172, 0.3);
+}
+
+.profile-stat-item {
+    text-align: center;
+}
+
+.profile-stat-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    background: linear-gradient(90deg, var(--kokoa-pink), var(--rize-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.profile-stat-label {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    margin-top: 0.3rem;
+}
+
+.profile-days {
+    text-align: center;
+    padding: 1rem;
+    background: linear-gradient(135deg, rgba(255, 158, 172, 0.1), rgba(108, 180, 238, 0.1));
+    border-radius: 15px;
+    margin-top: 1.5rem;
+}
+
+.profile-days-value {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--kokoa-pink);
+}
+
+.profile-days-label {
+    font-size: 0.85rem;
+    color: var(--text-light);
+}
+
+/* 右侧主内容 */
+.profile-main {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+/* 进度卡片 */
+.progress-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.2rem;
+}
+
+.progress-card {
+    background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(255,250,252,0.98));
+    border-radius: 20px;
+    padding: 1.5rem;
+    border: 3px solid rgba(255, 158, 172, 0.25);
+    box-shadow: 0 8px 25px rgba(255, 158, 172, 0.1);
+    transition: all 0.3s;
+    text-align: center;
+}
+
+.progress-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(255, 158, 172, 0.18);
+}
+
+.progress-card.easy { border-color: rgba(125, 190, 125, 0.5); }
+.progress-card.medium { border-color: rgba(245, 215, 110, 0.5); }
+.progress-card.hard { border-color: rgba(255, 158, 172, 0.5); }
+
+.progress-card-icon {
+    width: 45px;
+    height: 45px;
+    margin: 0 auto 1rem;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.progress-card.easy .progress-card-icon {
+    background: linear-gradient(135deg, var(--chiya-green), #5BA898);
+    color: white;
+}
+
+.progress-card.medium .progress-card-icon {
+    background: linear-gradient(135deg, var(--syaro-yellow), #DAA520);
+    color: white;
+}
+
+.progress-card.hard .progress-card-icon {
+    background: linear-gradient(135deg, var(--kokoa-pink), #E85A8F);
+    color: white;
+}
+
+.progress-card.all .progress-card-icon {
+    background: linear-gradient(135deg, var(--chino-blue), var(--rize-purple));
+    color: white;
+}
+
+.progress-card-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 0.3rem;
+}
+
+.progress-card-label {
+    font-size: 0.9rem;
+    color: var(--text-light);
+}
+
+.progress-card-sub {
+    font-size: 0.8rem;
+    color: var(--kokoa-pink);
+    margin-top: 0.5rem;
+}
+
+/* 热力图区域 */
+.heatmap-section {
+    background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(255,250,252,0.98));
+    border-radius: 25px;
+    padding: 1.5rem;
+    border: 3px solid rgba(255, 158, 172, 0.3);
+    box-shadow: 0 10px 40px rgba(255, 158, 172, 0.12);
+}
+
+.heatmap-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.heatmap-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.heatmap-title i {
+    color: var(--kokoa-pink);
+}
+
+.heatmap-legend {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--text-light);
+}
+
+.heatmap-legend-item {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+}
+
+.heatmap-legend-item.level-0 { background: #ebedf0; }
+.heatmap-legend-item.level-1 { background: rgba(255, 158, 172, 0.3); }
+.heatmap-legend-item.level-2 { background: rgba(255, 158, 172, 0.5); }
+.heatmap-legend-item.level-3 { background: rgba(255, 158, 172, 0.7); }
+.heatmap-legend-item.level-4 { background: var(--kokoa-pink); }
+
+.heatmap-container {
+    overflow-x: auto;
+    padding: 0.5rem 0;
+}
+
+.heatmap-grid {
+    display: flex;
+    gap: 3px;
+}
+
+.heatmap-week {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.heatmap-day {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.heatmap-day:hover {
+    transform: scale(1.3);
+    box-shadow: 0 2px 8px rgba(255, 158, 172, 0.4);
+}
+
+.heatmap-day.level-0 { background: #ebedf0; }
+.heatmap-day.level-1 { background: rgba(255, 158, 172, 0.3); }
+.heatmap-day.level-2 { background: rgba(255, 158, 172, 0.5); }
+.heatmap-day.level-3 { background: rgba(255, 158, 172, 0.7); }
+.heatmap-day.level-4 { background: var(--kokoa-pink); }
+
+.heatmap-months {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    padding: 0 0.5rem;
+}
+
+.heatmap-month {
+    font-size: 0.75rem;
+    color: var(--text-light);
+}
+
+/* 难度分布和分类进度 */
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.stats-box {
+    background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(255,250,252,0.98));
+    border-radius: 20px;
+    padding: 1.5rem;
+    border: 3px solid rgba(255, 158, 172, 0.3);
+    box-shadow: 0 10px 40px rgba(255, 158, 172, 0.12);
+}
+
+.stats-box-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.stats-box-title i {
+    color: var(--kokoa-pink);
+}
+
+/* 饼图 */
+.pie-chart-container {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.pie-chart {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    position: relative;
+    background: conic-gradient(
+        var(--chiya-green) 0deg,
+        var(--chiya-green) var(--easy-deg, 0deg),
+        var(--syaro-yellow) var(--easy-deg, 0deg),
+        var(--syaro-yellow) var(--medium-deg, 0deg),
+        var(--kokoa-pink) var(--medium-deg, 0deg),
+        var(--kokoa-pink) var(--hard-deg, 0deg),
+        #ebedf0 var(--hard-deg, 0deg),
+        #ebedf0 360deg
+    );
+    box-shadow: 0 4px 15px rgba(255, 158, 172, 0.2);
+}
+
+.pie-chart-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 80px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.pie-chart-total {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.pie-chart-label {
+    font-size: 0.75rem;
+    color: var(--text-light);
+}
+
+.pie-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.pie-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.pie-legend-color {
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+}
+
+.pie-legend-color.easy { background: var(--chiya-green); }
+.pie-legend-color.medium { background: var(--syaro-yellow); }
+.pie-legend-color.hard { background: var(--kokoa-pink); }
+
+.pie-legend-text {
+    font-size: 0.9rem;
+    color: var(--text-dark);
+}
+
+.pie-legend-value {
+    font-weight: 600;
+    color: var(--kokoa-pink);
+}
+
+/* 最近活动 */
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.8rem 1rem;
+    background: rgba(255, 158, 172, 0.05);
+    border-radius: 12px;
+    transition: all 0.3s;
+}
+
+.activity-item:hover {
+    background: rgba(255, 158, 172, 0.1);
+    transform: translateX(5px);
+}
+
+.activity-difficulty {
+    min-width: 60px;
+    padding: 0.3rem 0.6rem;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.activity-difficulty.easy {
+    background: rgba(125, 190, 125, 0.15);
+    color: #5BA898;
+}
+
+.activity-difficulty.medium {
+    background: rgba(245, 215, 110, 0.2);
+    color: #DAA520;
+}
+
+.activity-difficulty.hard {
+    background: rgba(255, 158, 172, 0.15);
+    color: #E85A8F;
+}
+
+.activity-info {
+    flex: 1;
+}
+
+.activity-name {
+    font-weight: 600;
+    color: var(--text-dark);
+    font-size: 0.95rem;
+}
+
+.activity-time {
+    font-size: 0.8rem;
+    color: var(--text-light);
+}
+
+/* 题单进度列表 */
+.problemset-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.problemset-item {
+    padding: 1.2rem;
+    background: rgba(255, 158, 172, 0.05);
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.problemset-item:hover {
+    background: rgba(255, 158, 172, 0.1);
+    transform: translateX(5px);
+}
+
+.problemset-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.8rem;
+}
+
+.problemset-name {
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.problemset-category-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.8rem;
+    background: linear-gradient(135deg, rgba(108, 180, 238, 0.15), rgba(155, 123, 184, 0.15));
+    border-radius: 10px;
+    color: var(--rize-purple);
+}
+
+.problemset-progress-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.problemset-progress-bar {
+    flex: 1;
+    height: 10px;
+    background: rgba(255, 158, 172, 0.15);
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.problemset-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--kokoa-pink), var(--rize-purple));
+    border-radius: 5px;
+    transition: width 0.5s ease;
+}
+
+.problemset-progress-text {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--kokoa-pink);
+    min-width: 60px;
+    text-align: right;
+}
+
+/* 响应式 */
+@media (max-width: 1024px) {
+    .profile-container {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-sidebar {
+        order: -1;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .progress-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .pie-chart-container {
+        flex-direction: column;
+    }
+
+    .heatmap-day {
+        width: 10px;
+        height: 10px;
+    }
+}
+
+/* 分类进度条样式 */
+.category-progress-bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.category-bar {
+    flex: 1;
+    height: 10px;
+    background: rgba(255, 158, 172, 0.15);
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.category-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--kokoa-pink), var(--rize-purple));
+    border-radius: 5px;
+    transition: width 0.5s ease;
+}
+
+.category-text {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--kokoa-pink);
+    min-width: 60px;
+    text-align: right;
+}
+
+/* 难度进度条 */
+.difficulty-progress {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.difficulty-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.difficulty-label {
+    min-width: 60px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.difficulty-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.difficulty-dot.easy { background: var(--chiya-green); }
+.difficulty-dot.medium { background: var(--syaro-yellow); }
+.difficulty-dot.hard { background: var(--kokoa-pink); }
+
+.difficulty-bar {
+    flex: 1;
+    height: 8px;
+    background: rgba(255, 158, 172, 0.15);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.difficulty-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.difficulty-bar-fill.easy { background: var(--chiya-green); }
+.difficulty-bar-fill.medium { background: var(--syaro-yellow); }
+.difficulty-bar-fill.hard { background: var(--kokoa-pink); }
+
+.difficulty-count {
+    min-width: 80px;
+    text-align: right;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-light);
+}
+
+/* Tooltip */
+.heatmap-tooltip {
+    position: fixed;
+    background: rgba(0, 0, 0, 0.85);
+    color: white;
+    padding: 0.5rem 0.8rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    pointer-events: none;
+    z-index: 1000;
+    white-space: nowrap;
+}
+
+/* 空状态 */
+.empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-light);
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: rgba(255, 158, 172, 0.3);
+}
+
+.empty-state p {
+    font-size: 1rem;
 }

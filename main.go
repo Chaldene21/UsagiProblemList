@@ -24,6 +24,7 @@ func main() {
 
 	// 静态文件服务
 	r.Static("/static", "./static")
+	r.StaticFile("/data/pictures/bg.png", "./data/pictures/bg.png")
 	r.StaticFile("/", "./static/index.html")
 	r.StaticFile("/favicon.ico", "./static/images/favicon.ico")
 
@@ -52,6 +53,8 @@ func main() {
 			authGroup.GET("/progress/problemset/:id", handler.GetProblemSetProgress)
 			authGroup.GET("/progress/stats", handler.GetUserStats)
 			authGroup.GET("/progress/category", handler.GetCategoryProgress)
+			authGroup.GET("/progress/heatmap", handler.GetHeatmapData)
+			authGroup.GET("/progress/detail", handler.GetDetailedStats)
 		}
 	}
 

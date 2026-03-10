@@ -1,0 +1,750 @@
+{
+  "id": "graphs",
+  "title": "图论题单",
+  "description": "本题单包含图论的7个知识点，涵盖从入门到挑战的各难度题目。",
+  "category": "图论",
+  "sections": [
+    {
+      "title": "一、图论基础",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "本题单按知识点划分为7个部分，每个部分包含该知识点的解题思路、代码模板和精选练习题。"
+        }
+      ]
+    },
+    {
+      "title": "二、知识点详解",
+      "content": [
+        {
+          "title": "§1 最短路算法",
+          "code_template": "#include <bits/stdc++.h>\nusing namespace std;\n\n// Dijkstra 算法（优先队列优化）\nvector<long long> dijkstra(int n, vector<vector<pair<int, int>>>& adj, int src) {\n    vector<long long> dist(n, LLONG_MAX);\n    dist[src] = 0;\n    priority_queue<pair<long long, int>, vector<pair<long long, int>>, greater<>> pq;\n    pq.push({0, src});\n    while (!pq.empty()) {\n        auto [d, u] = pq.top();\n        pq.pop();\n        if (d > dist[u]) continue;\n        for (auto [v, w] : adj[u]) {\n            if (dist[v] > dist[u] + w) {\n                dist[v] = dist[u] + w;\n                pq.push({dist[v], v});\n            }\n        }\n    }\n    return dist;\n}\n\n// Bellman-Ford 算法（检测负环）\nbool bellmanFord(int n, vector<tuple<int, int, int>>& edges, int src, vector<long long>& dist) {\n    dist.assign(n, LLONG_MAX);\n    dist[src] = 0;\n    for (int i = 0; i < n - 1; i++) {\n        for (auto [u, v, w] : edges) {\n            if (dist[u] != LLONG_MAX && dist[v] > dist[u] + w) {\n                dist[v] = dist[u] + w;\n            }\n        }\n    }\n    for (auto [u, v, w] : edges) {\n        if (dist[u] != LLONG_MAX && dist[v] > dist[u] + w) {\n            return true; // 存在负环\n        }\n    }\n    return false;\n}\n\n// SPFA 算法（队列优化）\nvector<long long> spfa(int n, vector<vector<pair<int, int>>>& adj, int src) {\n    vector<long long> dist(n, LLONG_MAX);\n    vector<bool> inQueue(n, false);\n    queue<int> q;\n    dist[src] = 0;\n    q.push(src);\n    inQueue[src] = true;\n    while (!q.empty()) {\n        int u = q.front();\n        q.pop();\n        inQueue[u] = false;\n        for (auto [v, w] : adj[u]) {\n            if (dist[v] > dist[u] + w) {\n                dist[v] = dist[u] + w;\n                if (!inQueue[v]) {\n                    q.push(v);\n                    inQueue[v] = true;\n                }\n            }\n        }\n    }\n    return dist;\n}\n\n// Floyd-Warshall 算法（全源最短路）\nvector<vector<long long>> floydWarshall(int n, vector<vector<long long>>& dist) {\n    for (int k = 0; k < n; k++) {\n        for (int i = 0; i < n; i++) {\n            for (int j = 0; j < n; j++) {\n                if (dist[i][k] != LLONG_MAX && dist[k][j] != LLONG_MAX) {\n                    dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j]);\n                }\n            }\n        }\n    }\n    return dist;\n}",
+          "idea": "最短路算法用于求解图中两点之间的最短路径。常见算法包括：\n1. Dijkstra：适用于非负权图，使用优先队列优化，时间复杂度 O((V+E)logV)。\n2. Bellman-Ford：可处理负权边，检测负环，时间复杂度 O(VE)。\n3. SPFA：Bellman-Ford 的队列优化，平均时间复杂度 O(kE)，但最坏情况仍为 O(VE)。\n4. Floyd-Warshall：全源最短路，动态规划思想，时间复杂度 O(V^3)。\n\n解题思路：\n- 根据图的性质（权值正负、稠密稀疏）选择合适的算法。\n- 单源最短路常用 Dijkstra（非负权）或 SPFA（含负权）。\n- 全源最短路或点数较少时用 Floyd。\n- 注意使用 long long 防止溢出，用 LLONG_MAX 表示无穷大。\n- 负环检测可用 Bellman-Ford 或 SPFA 记录入队次数。",
+          "problems": [
+            {
+              "id": "1869B",
+              "name": "2D Traveling",
+              "difficulty": 1100,
+              "tags": [
+                "geometry",
+                "math",
+                "shortest paths",
+                "sortings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1869/B",
+              "note": "关键城市间的最短路问题，可转化为考虑从起点到关键城市、关键城市到终点的最短路径。"
+            },
+            {
+              "id": "369D",
+              "name": "Valera and Fools",
+              "difficulty": 2200,
+              "tags": [
+                "dfs and similar",
+                "dp",
+                "graphs",
+                "shortest paths"
+              ],
+              "url": "https://codeforces.com/problemset/problem/369/D",
+              "note": "状态图上的最短路问题，需要将问题抽象为图论模型，用 BFS/Dijkstra 求解。"
+            },
+            {
+              "id": "1370F1",
+              "name": "The Hidden Pair (Easy Version)",
+              "difficulty": 2400,
+              "tags": [
+                "binary search",
+                "dfs and similar",
+                "graphs",
+                "interactive",
+                "shortest paths",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1370/F1",
+              "note": "树上的最短路与交互结合，需要利用树的直径性质，通过查询距离信息定位节点。"
+            }
+          ]
+        },
+        {
+          "title": "§2 最小生成树",
+          "code_template": "#include <bits/stdc++.h>\nusing namespace std;\n\n// Kruskal算法模板\nstruct Edge {\n    int u, v, w;\n    bool operator<(const Edge& other) const {\n        return w < other.w;\n    }\n};\n\nclass DSU {\n    vector<int> parent, rank;\npublic:\n    DSU(int n) {\n        parent.resize(n);\n        rank.resize(n, 0);\n        for (int i = 0; i < n; i++) parent[i] = i;\n    }\n    int find(int x) {\n        if (parent[x] != x) parent[x] = find(parent[x]);\n        return parent[x];\n    }\n    bool unite(int x, int y) {\n        x = find(x); y = find(y);\n        if (x == y) return false;\n        if (rank[x] < rank[y]) parent[x] = y;\n        else if (rank[x] > rank[y]) parent[y] = x;\n        else { parent[y] = x; rank[x]++; }\n        return true;\n    }\n};\n\nlong long kruskal(int n, vector<Edge>& edges) {\n    sort(edges.begin(), edges.end());\n    DSU dsu(n);\n    long long total = 0;\n    int cnt = 0;\n    for (auto& e : edges) {\n        if (dsu.unite(e.u, e.v)) {\n            total += e.w;\n            cnt++;\n            if (cnt == n - 1) break;\n        }\n    }\n    return cnt == n - 1 ? total : -1; // 返回-1表示不连通\n}\n\n// Prim算法模板（邻接矩阵，稠密图）\nlong long prim_dense(int n, vector<vector<int>>& g) {\n    vector<int> dist(n, INT_MAX);\n    vector<bool> vis(n, false);\n    dist[0] = 0;\n    long long total = 0;\n    for (int i = 0; i < n; i++) {\n        int u = -1;\n        for (int j = 0; j < n; j++) {\n            if (!vis[j] && (u == -1 || dist[j] < dist[u])) u = j;\n        }\n        if (dist[u] == INT_MAX) return -1;\n        vis[u] = true;\n        total += dist[u];\n        for (int v = 0; v < n; v++) {\n            if (!vis[v] && g[u][v] < dist[v]) dist[v] = g[u][v];\n        }\n    }\n    return total;\n}\n\n// Prim算法模板（邻接表+优先队列，稀疏图）\nlong long prim_sparse(int n, vector<vector<pair<int, int>>>& adj) {\n    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;\n    vector<bool> vis(n, false);\n    pq.push({0, 0});\n    long long total = 0;\n    int cnt = 0;\n    while (!pq.empty() && cnt < n) {\n        auto [w, u] = pq.top(); pq.pop();\n        if (vis[u]) continue;\n        vis[u] = true;\n        total += w;\n        cnt++;\n        for (auto& [v, weight] : adj[u]) {\n            if (!vis[v]) pq.push({weight, v});\n        }\n    }\n    return cnt == n ? total : -1;\n}\n\nint main() {\n    // 根据题目选择合适的最小生成树算法\n    // Kruskal适合稀疏图，Prim适合稠密图\n    return 0;\n}",
+          "idea": "最小生成树（Minimum Spanning Tree, MST）是连接图中所有顶点的边权值和最小的树。主要算法有：\n\n1. **Kruskal算法**：\n   - 将边按权值从小到大排序\n   - 依次考虑每条边，如果连接的两个顶点不在同一连通分量中，则加入生成树\n   - 使用并查集（DSU）高效判断连通性\n   - 时间复杂度：O(E log E)，适合稀疏图\n\n2. **Prim算法**：\n   - 从任意顶点开始，维护一个已选顶点集合\n   - 每次选择连接已选集合和未选集合的最小权值边\n   - 使用优先队列优化后时间复杂度：O(E log V)\n   - 适合稠密图，特别是邻接矩阵存储的情况\n\n3. **次小生成树**：\n   - 定义：权值第二小的生成树\n   - 求法：先求出最小生成树，然后枚举不在MST中的边(u,v)，替换MST中u到v路径上的最大边\n   - 需要预处理树上任意两点间的最大边权，可用倍增法或树链剖分\n   - 时间复杂度：O(E log V + V log V)\n\n**解题技巧**：\n- 判断图是否连通，不连通则无生成树\n- 注意边权可能为负，但算法依然适用\n- 当需要特殊性质的生成树时（如最大度最小），可结合贪心策略\n- 次小生成树问题常与树上路径查询结合",
+          "problems": [
+            {
+              "id": "1133F1",
+              "name": "Spanning Tree with Maximum Degree",
+              "difficulty": 1600,
+              "tags": [
+                "graphs"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1133/F1",
+              "note": "要求生成树中最大度尽可能大。先找到度数最大的顶点，将其所有邻边加入生成树，然后对剩余顶点跑Kruskal或Prim。"
+            },
+            {
+              "id": "1009D",
+              "name": "Relatively Prime Graph",
+              "difficulty": 1700,
+              "tags": [
+                "brute force",
+                "constructive algorithms",
+                "graphs",
+                "greedy",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1009/D",
+              "note": "构造一个n个顶点的连通图，边数恰好为m，且每条边连接的两个顶点互质。先生成所有互质边，然后取前m条构成生成树（需保证m≥n-1）。"
+            },
+            {
+              "id": "990D",
+              "name": "Graph And Its Complement",
+              "difficulty": 1700,
+              "tags": [
+                "constructive algorithms",
+                "graphs",
+                "implementation"
+              ],
+              "url": "https://codeforces.com/problemset/problem/990D",
+              "note": "构造一个图及其补图，使得两者都连通。当n=2或3时无解，否则可以构造一个生成树及其补图的生成树。"
+            },
+            {
+              "id": "1307D",
+              "name": "Cow and Fields",
+              "difficulty": 1900,
+              "tags": [
+                "binary search",
+                "data structures",
+                "dfs and similar",
+                "graphs",
+                "greedy",
+                "shortest paths",
+                "sortings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1307/D",
+              "note": "在特殊顶点对间添加一条边，使得最短路最大化。先计算所有顶点到起点和终点的距离，然后选择最优的特殊顶点对，本质是最短路与生成树思想的结合。"
+            },
+            {
+              "id": "1023F",
+              "name": "Mobile Phone Network",
+              "difficulty": 2600,
+              "tags": [
+                "dfs and similar",
+                "dsu",
+                "graphs",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1023/F",
+              "note": "次小生成树变体。给定一些必须选择的边和可选边，要求最小化总成本。先考虑必须边，然后对可选边跑类Kruskal算法，用并查集维护连通性，同时记录路径最大边权。"
+            }
+          ]
+        },
+        {
+          "title": "§3 Tarjan算法",
+          "code_template": "#include <bits/stdc++.h>\nusing namespace std;\n\nconst int N = 1e5 + 5;\nvector<int> g[N];\nint n, m;\n\n// Tarjan求强连通分量\nint dfn[N], low[N], timestamp;\nint stk[N], top;\nbool in_stk[N];\nint scc_id[N], scc_cnt;\n\nvoid tarjan(int u) {\n    dfn[u] = low[u] = ++timestamp;\n    stk[++top] = u;\n    in_stk[u] = true;\n    \n    for (int v : g[u]) {\n        if (!dfn[v]) {\n            tarjan(v);\n            low[u] = min(low[u], low[v]);\n        } else if (in_stk[v]) {\n            low[u] = min(low[u], dfn[v]);\n        }\n    }\n    \n    if (dfn[u] == low[u]) {\n        ++scc_cnt;\n        int y;\n        do {\n            y = stk[top--];\n            in_stk[y] = false;\n            scc_id[y] = scc_cnt;\n        } while (y != u);\n    }\n}\n\n// Tarjan求割点\nbool cut[N];\nint root;\n\nvoid tarjan_cut(int u) {\n    dfn[u] = low[u] = ++timestamp;\n    int child = 0;\n    \n    for (int v : g[u]) {\n        if (!dfn[v]) {\n            tarjan_cut(v);\n            low[u] = min(low[u], low[v]);\n            \n            if (low[v] >= dfn[u]) {\n                child++;\n                if (u != root || child > 1) cut[u] = true;\n            }\n        } else {\n            low[u] = min(low[u], dfn[v]);\n        }\n    }\n}\n\n// Tarjan求桥\nvector<pair<int, int>> bridges;\n\nvoid tarjan_bridge(int u, int from) {\n    dfn[u] = low[u] = ++timestamp;\n    \n    for (int v : g[u]) {\n        if (v == from) continue;\n        if (!dfn[v]) {\n            tarjan_bridge(v, u);\n            low[u] = min(low[u], low[v]);\n            \n            if (low[v] > dfn[u]) {\n                bridges.push_back({u, v});\n            }\n        } else {\n            low[u] = min(low[u], dfn[v]);\n        }\n    }\n}\n\nint main() {\n    cin >> n >> m;\n    for (int i = 0; i < m; i++) {\n        int u, v;\n        cin >> u >> v;\n        g[u].push_back(v);\n        g[v].push_back(u); // 无向图\n    }\n    \n    // 求强连通分量（有向图）\n    // for (int i = 1; i <= n; i++) {\n    //     if (!dfn[i]) tarjan(i);\n    // }\n    \n    // 求割点\n    // for (int i = 1; i <= n; i++) {\n    //     if (!dfn[i]) {\n    //         root = i;\n    //         tarjan_cut(i);\n    //     }\n    // }\n    \n    // 求桥\n    // for (int i = 1; i <= n; i++) {\n    //     if (!dfn[i]) tarjan_bridge(i, -1);\n    // }\n    \n    return 0;\n}",
+          "idea": "Tarjan算法是一种基于深度优先搜索的图论算法，主要用于求解有向图的强连通分量、无向图的割点和桥。核心思想是通过维护两个数组：dfn（深度优先搜索序）和low（通过非树边能回溯到的最早祖先的dfn值）。\n\n1. 强连通分量（SCC）：\n   - 对有向图进行DFS，记录每个节点的dfn和low值\n   - 使用栈维护当前搜索路径上的节点\n   - 当某个节点的dfn == low时，说明找到了一个强连通分量，将栈中节点弹出直到当前节点\n   - 缩点后形成DAG，可以用于拓扑排序等操作\n\n2. 割点（割顶）：\n   - 对于无向图，如果删除某个点后图的连通分量数增加，则该点为割点\n   - 判断条件：对于非根节点u，如果存在子节点v满足low[v] >= dfn[u]，则u是割点\n   - 对于根节点，需要有两个以上子节点才是割点\n\n3. 桥（割边）：\n   - 对于无向图，如果删除某条边后图的连通分量数增加，则该边为桥\n   - 判断条件：对于边(u,v)，如果low[v] > dfn[u]，则(u,v)是桥\n\n应用场景：\n- 强连通分量：2-SAT问题、有向图缩点\n- 割点：网络可靠性分析、关键节点识别\n- 桥：网络脆弱性分析、双连通分量分解",
+          "problems": [
+            {
+              "id": "277A",
+              "name": "Learning Languages",
+              "difficulty": 1400,
+              "tags": [
+                "dfs and similar",
+                "dsu"
+              ],
+              "url": "https://codeforces.com/problemset/problem/277/A",
+              "note": "虽然不是直接使用Tarjan，但涉及连通分量概念。可以用DFS或并查集求连通块，理解连通分量的基本应用。"
+            },
+            {
+              "id": "1000E",
+              "name": "We Need More Bosses",
+              "difficulty": 2100,
+              "tags": [
+                "dfs and similar",
+                "graphs",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1000/E",
+              "note": "经典桥相关题目。先求无向图中的桥，然后缩点形成树，问题转化为求树的直径。考察对桥的理解和缩点技巧。"
+            },
+            {
+              "id": "1016F",
+              "name": "Road Projects",
+              "difficulty": 2600,
+              "tags": [
+                "dfs and similar",
+                "dp",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1016/F",
+              "note": "高级树形DP与路径分析。虽然不是直接Tarjan，但涉及图的深度遍历和路径分析，需要类似Tarjan的DFS思维。"
+            }
+          ]
+        },
+        {
+          "title": "§4 树相关算法",
+          "code_template": "#include <bits/stdc++.h>\nusing namespace std;\n\nconst int N = 2e5 + 5;\nconst int LOG = 20;\nvector<int> adj[N];\nint depth[N], parent[N][LOG];\nint sz[N], heavy[N], head[N], pos[N], cur_pos;\nint dp[N]; // 树形DP数组\n\n// LCA预处理\nvoid dfs_lca(int u, int p) {\n    parent[u][0] = p;\n    depth[u] = depth[p] + 1;\n    for (int i = 1; i < LOG; i++) {\n        parent[u][i] = parent[parent[u][i-1]][i-1];\n    }\n    for (int v : adj[u]) {\n        if (v != p) dfs_lca(v, u);\n    }\n}\n\nint lca(int u, int v) {\n    if (depth[u] < depth[v]) swap(u, v);\n    int diff = depth[u] - depth[v];\n    for (int i = 0; i < LOG; i++) {\n        if (diff & (1 << i)) u = parent[u][i];\n    }\n    if (u == v) return u;\n    for (int i = LOG-1; i >= 0; i--) {\n        if (parent[u][i] != parent[v][i]) {\n            u = parent[u][i];\n            v = parent[v][i];\n        }\n    }\n    return parent[u][0];\n}\n\n// 树链剖分预处理\nvoid dfs_hld(int u, int p) {\n    sz[u] = 1;\n    heavy[u] = -1;\n    for (int v : adj[u]) {\n        if (v == p) continue;\n        dfs_hld(v, u);\n        sz[u] += sz[v];\n        if (heavy[u] == -1 || sz[v] > sz[heavy[u]]) {\n            heavy[u] = v;\n        }\n    }\n}\n\nvoid decompose(int u, int h, int p) {\n    head[u] = h;\n    pos[u] = cur_pos++;\n    if (heavy[u] != -1) decompose(heavy[u], h, u);\n    for (int v : adj[u]) {\n        if (v != p && v != heavy[u]) decompose(v, v, u);\n    }\n}\n\n// 树形DP示例（最大独立集）\nvoid dfs_dp(int u, int p) {\n    int take = 1, not_take = 0;\n    for (int v : adj[u]) {\n        if (v == p) continue;\n        dfs_dp(v, u);\n        take += dp[v][0]; // 取u时，子节点不能取\n        not_take += max(dp[v][0], dp[v][1]); // 不取u时，子节点随意\n    }\n    dp[u][1] = take;\n    dp[u][0] = not_take;\n}\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    \n    int n, q;\n    cin >> n >> q;\n    \n    for (int i = 1; i < n; i++) {\n        int u, v;\n        cin >> u >> v;\n        adj[u].push_back(v);\n        adj[v].push_back(u);\n    }\n    \n    // 初始化\n    dfs_lca(1, 0);\n    dfs_hld(1, 0);\n    cur_pos = 0;\n    decompose(1, 1, 0);\n    \n    // 处理查询\n    while (q--) {\n        int u, v;\n        cin >> u >> v;\n        cout << lca(u, v) << '\\n';\n    }\n    \n    return 0;\n}",
+          "idea": "树相关算法主要包括：\n1. LCA（最近公共祖先）：用于快速查询树上两节点的最近公共祖先，常用倍增法（预处理O(nlogn)，查询O(logn)）或树链剖分实现。\n2. 树链剖分：将树分解为若干条链，结合线段树等数据结构，支持路径查询/修改、子树查询/修改等操作。\n3. 树形DP：在树结构上进行动态规划，通常采用后序遍历（DFS），状态转移考虑子树信息合并。常见模型包括：最大独立集、最小点覆盖、树的重心、树的直径、换根DP等。\n\n解题思路：\n- 识别问题是否在树上操作（无环连通图）\n- 判断需要哪种算法：\n  * 涉及路径查询 → LCA/树链剖分\n  * 涉及路径修改 → 树链剖分+数据结构\n  * 涉及最优值选择/统计 → 树形DP\n- 树形DP常需考虑：\n  1. 状态定义（以节点为状态，考虑子树信息）\n  2. 转移方程（如何合并子节点信息）\n  3. 遍历顺序（通常DFS后序遍历）\n  4. 边界条件（叶子节点）\n- 对于复杂问题，可能需要结合多种技术，如换根DP、树上背包等。",
+          "problems": [
+            {
+              "id": "1324F",
+              "name": "Maximum White Subtree",
+              "difficulty": 1800,
+              "tags": [
+                "dfs and similar",
+                "dp",
+                "graphs",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1324/F",
+              "note": "经典换根DP问题。先计算每个节点子树的答案，然后通过二次DFS将父节点信息传递给子节点，得到每个节点为根时的答案。"
+            },
+            {
+              "id": "1210C",
+              "name": "Kamil and Making a Stream",
+              "difficulty": 2000,
+              "tags": [
+                "math",
+                "number theory",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1210/C",
+              "note": "树形DP结合数论。维护从根到当前节点路径上所有gcd值的集合，由于gcd种类数有限，可以暴力合并。"
+            },
+            {
+              "id": "1000E",
+              "name": "We Need More Bosses",
+              "difficulty": 2100,
+              "tags": [
+                "dfs and similar",
+                "graphs",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1000/E",
+              "note": "先求边双连通分量缩点得到树，问题转化为求树的直径。使用两次DFS或树形DP求直径。"
+            },
+            {
+              "id": "440D",
+              "name": "Berland Federalization",
+              "difficulty": 2200,
+              "tags": [
+                "dp",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/440/D",
+              "note": "树形背包DP。定义dp[u][k]表示以u为根的子树保留k个节点最少需要删除的边数，转移时考虑每个子节点的贡献。"
+            },
+            {
+              "id": "1016F",
+              "name": "Road Projects",
+              "difficulty": 2600,
+              "tags": [
+                "dfs and similar",
+                "dp",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1016/F",
+              "note": "复杂树形DP。需要维护1到n路径上的信息，考虑添加一条边后对最短路的影响，分类讨论并优化。"
+            }
+          ]
+        },
+        {
+          "title": "§5 拓扑排序",
+          "code_template": "#include <bits/stdc++.h>\nusing namespace std;\n\nconst int N = 1e5 + 5;\nvector<int> g[N];\nint indeg[N];\n\n// Kahn算法（BFS拓扑排序）\nvector<int> topological_sort(int n) {\n    vector<int> res;\n    queue<int> q;\n    \n    // 初始化入度\n    for (int i = 1; i <= n; i++) {\n        if (indeg[i] == 0) {\n            q.push(i);\n        }\n    }\n    \n    while (!q.empty()) {\n        int u = q.front();\n        q.pop();\n        res.push_back(u);\n        \n        for (int v : g[u]) {\n            indeg[v]--;\n            if (indeg[v] == 0) {\n                q.push(v);\n            }\n        }\n    }\n    \n    // 检查是否有环\n    if (res.size() != n) {\n        return {}; // 存在环，返回空数组\n    }\n    return res;\n}\n\n// DFS拓扑排序（检测环）\nbool dfs(int u, vector<int>& color, vector<int>& order) {\n    color[u] = 1; // 正在访问\n    \n    for (int v : g[u]) {\n        if (color[v] == 1) return false; // 发现环\n        if (color[v] == 0 && !dfs(v, color, order)) return false;\n    }\n    \n    color[u] = 2; // 访问完成\n    order.push_back(u);\n    return true;\n}\n\nbool topological_sort_dfs(int n) {\n    vector<int> color(n + 1, 0); // 0=未访问，1=访问中，2=已访问\n    vector<int> order;\n    \n    for (int i = 1; i <= n; i++) {\n        if (color[i] == 0 && !dfs(i, color, order)) {\n            return false; // 有环\n        }\n    }\n    \n    reverse(order.begin(), order.end());\n    // order即为拓扑序\n    return true;\n}\n\nint main() {\n    int n, m;\n    cin >> n >> m;\n    \n    // 读入有向边\n    for (int i = 0; i < m; i++) {\n        int u, v;\n        cin >> u >> v;\n        g[u].push_back(v);\n        indeg[v]++;\n    }\n    \n    // 方法1：Kahn算法\n    vector<int> topo = topological_sort(n);\n    if (topo.empty()) {\n        cout << \"有环！\" << endl;\n    } else {\n        for (int x : topo) cout << x << \" \";\n        cout << endl;\n    }\n    \n    // 方法2：DFS检测环\n    if (!topological_sort_dfs(n)) {\n        cout << \"有环！\" << endl;\n    }\n    \n    return 0;\n}",
+          "idea": "拓扑排序用于处理有向无环图（DAG）的节点排序问题，使得对于每条有向边(u,v)，u都排在v的前面。\n\n核心思想：\n1. **Kahn算法（BFS）**：\n   - 统计每个节点的入度\n   - 将入度为0的节点加入队列\n   - 每次从队列取出节点，将其所有邻居的入度减1，若邻居入度变为0则入队\n   - 最后检查排序节点数是否等于总节点数，若不等于则说明有环\n\n2. **DFS方法**：\n   - 使用三色标记法（0=未访问，1=访问中，2=已访问）\n   - 在DFS过程中，如果遇到标记为1的节点，说明存在环\n   - 在递归返回时将节点加入结果列表，最后反转得到拓扑序\n\n应用场景：\n- 课程安排（先修课程）\n- 任务调度（依赖关系）\n- 编译顺序（文件依赖）\n- 判断有向图是否有环\n\n注意事项：\n- 拓扑排序不唯一，可能存在多种合法排序\n- 对于有环图，无法进行拓扑排序\n- 可以结合优先队列实现字典序最小/最大的拓扑排序",
+          "problems": [
+            {
+              "id": "1549B",
+              "name": "Gregor and the Pawn Game",
+              "difficulty": 800,
+              "tags": [
+                "dfs and similar",
+                "dp",
+                "flows",
+                "graph matchings",
+                "graphs",
+                "greedy",
+                "implementation"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1549/B",
+              "note": "虽然标签包含graphs，但本题实际是贪心+模拟，可作为图论入门题"
+            },
+            {
+              "id": "2078B",
+              "name": "Vicious Labyrinth",
+              "difficulty": 1100,
+              "tags": [
+                "constructive algorithms",
+                "graphs",
+                "greedy",
+                "implementation",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/2078/B",
+              "note": "图论构造题，理解图的基本概念"
+            },
+            {
+              "id": "1065B",
+              "name": "Vasya and Isolated Vertices",
+              "difficulty": 1300,
+              "tags": [
+                "constructive algorithms",
+                "graphs"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1065/B",
+              "note": "图论构造，分析孤立点的最小和最大可能数量"
+            },
+            {
+              "id": "2066A",
+              "name": "Object Identification",
+              "difficulty": 1400,
+              "tags": [
+                "graphs",
+                "greedy",
+                "implementation",
+                "interactive"
+              ],
+              "url": "https://codeforces.com/problemset/problem/2066/A",
+              "note": "交互题，通过询问边的关系确定节点类型"
+            },
+            {
+              "id": "1133F1",
+              "name": "Spanning Tree with Maximum Degree",
+              "difficulty": 1600,
+              "tags": [
+                "graphs"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1133/F1",
+              "note": "生成树问题，从度数最大的节点开始构建生成树"
+            },
+            {
+              "id": "1009D",
+              "name": "Relatively Prime Graph",
+              "difficulty": 1700,
+              "tags": [
+                "brute force",
+                "constructive algorithms",
+                "graphs",
+                "greedy",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1009/D",
+              "note": "构造互质图，需要数论知识结合图论构造"
+            },
+            {
+              "id": "990D",
+              "name": "Graph And Its Complement",
+              "difficulty": 1700,
+              "tags": [
+                "constructive algorithms",
+                "graphs",
+                "implementation"
+              ],
+              "url": "https://codeforces.com/problemset/problem/990D",
+              "note": "构造原图和补图，满足特定连通性要求"
+            },
+            {
+              "id": "1307D",
+              "name": "Cow and Fields",
+              "difficulty": 1900,
+              "tags": [
+                "binary search",
+                "data structures",
+                "dfs and similar",
+                "graphs",
+                "greedy",
+                "shortest paths",
+                "sortings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1307/D",
+              "note": "最短路+特殊点处理，需要BFS计算距离"
+            },
+            {
+              "id": "1131D",
+              "name": "Gourmet choice",
+              "difficulty": 2000,
+              "tags": [
+                "dfs and similar",
+                "dp",
+                "dsu",
+                "graphs",
+                "greedy"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1131/D",
+              "note": "经典拓扑排序应用，通过不等式关系建立有向图并检测环"
+            },
+            {
+              "id": "1000E",
+              "name": "We Need More Bosses",
+              "difficulty": 2100,
+              "tags": [
+                "dfs and similar",
+                "graphs",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1000/E",
+              "note": "边双连通分量缩点后求树的直径"
+            },
+            {
+              "id": "382D",
+              "name": "Ksenia and Pawns",
+              "difficulty": 2200,
+              "tags": [
+                "dfs and similar",
+                "graphs",
+                "implementation",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/382/D",
+              "note": "有向图上的DFS，处理特殊移动规则"
+            },
+            {
+              "id": "1403A",
+              "name": "The Potion of Great Power",
+              "difficulty": 2400,
+              "tags": [
+                "*special",
+                "2-sat",
+                "binary search",
+                "data structures",
+                "graphs",
+                "interactive",
+                "sortings",
+                "two pointers"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1403/A",
+              "note": "2-SAT问题，需要处理交互查询"
+            },
+            {
+              "id": "1023F",
+              "name": "Mobile Phone Network",
+              "difficulty": 2600,
+              "tags": [
+                "dfs and similar",
+                "dsu",
+                "graphs",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1023/F",
+              "note": "最小生成树+并查集+树上路径处理，综合性强"
+            }
+          ]
+        },
+        {
+          "title": "§7 网络流",
+          "code_template": "#include <bits/stdc++.h>\nusing namespace std;\n\nstruct Edge {\n    int to, rev;\n    long long cap;\n    Edge(int to, int rev, long long cap) : to(to), rev(rev), cap(cap) {}\n};\n\nclass Dinic {\n    int n;\n    vector<vector<Edge>> g;\n    vector<int> level, iter;\n    \n    void bfs(int s) {\n        level.assign(n, -1);\n        queue<int> q;\n        level[s] = 0;\n        q.push(s);\n        while (!q.empty()) {\n            int v = q.front(); q.pop();\n            for (auto &e : g[v]) {\n                if (e.cap > 0 && level[e.to] < 0) {\n                    level[e.to] = level[v] + 1;\n                    q.push(e.to);\n                }\n            }\n        }\n    }\n    \n    long long dfs(int v, int t, long long f) {\n        if (v == t) return f;\n        for (int &i = iter[v]; i < (int)g[v].size(); i++) {\n            Edge &e = g[v][i];\n            if (e.cap > 0 && level[v] < level[e.to]) {\n                long long d = dfs(e.to, t, min(f, e.cap));\n                if (d > 0) {\n                    e.cap -= d;\n                    g[e.to][e.rev].cap += d;\n                    return d;\n                }\n            }\n        }\n        return 0;\n    }\n    \npublic:\n    Dinic(int n) : n(n), g(n) {}\n    \n    void add_edge(int from, int to, long long cap) {\n        g[from].emplace_back(to, g[to].size(), cap);\n        g[to].emplace_back(from, g[from].size() - 1, 0);\n    }\n    \n    long long max_flow(int s, int t) {\n        long long flow = 0;\n        while (true) {\n            bfs(s);\n            if (level[t] < 0) return flow;\n            iter.assign(n, 0);\n            long long f;\n            while ((f = dfs(s, t, 1e18)) > 0) {\n                flow += f;\n            }\n        }\n    }\n};\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    \n    // 示例：读取n个点，m条边，源点s，汇点t\n    int n, m, s, t;\n    cin >> n >> m >> s >> t;\n    s--; t--;\n    \n    Dinic dinic(n);\n    for (int i = 0; i < m; i++) {\n        int u, v, c;\n        cin >> u >> v >> c;\n        u--; v--;\n        dinic.add_edge(u, v, c);\n    }\n    \n    cout << dinic.max_flow(s, t) << '\\n';\n    return 0;\n}",
+          "idea": "网络流是图论中的重要分支，主要解决资源分配、路径规划等问题。核心概念包括：\n1. 最大流：在容量网络中从源点到汇点的最大流量。常用算法有Dinic、Edmonds-Karp等。\n2. 最小割：将图分为两个集合，使得割边容量之和最小。根据最大流最小割定理，最小割等于最大流。\n3. 费用流：在最大流基础上考虑边费用，求最小费用最大流。常用算法有SPFA+EK、Primal-Dual等。\n\n解题思路：\n- 建模是关键：将实际问题转化为网络流模型（点、边、容量、费用）。\n- 常用技巧：\n  1. 拆点：将点拆分为入点和出点，处理点容量限制。\n  2. 超级源汇：添加虚拟源点和汇点，统一处理多源多汇问题。\n  3. 二分答案：结合二分查找确定满足条件的最大/最小值。\n  4. 最小割建模：选择问题常转化为最小割，割边表示代价。\n- 复杂度分析：Dinic算法在一般图上O(V²E)，在二分图上O(√VE)。\n\n注意：网络流问题通常数据规模较大，需要合理设计图结构，避免超时。",
+          "problems": [
+            {
+              "id": "1549B",
+              "name": "Gregor and the Pawn Game",
+              "difficulty": 800,
+              "tags": [
+                "dfs and similar",
+                "dp",
+                "flows",
+                "graph matchings",
+                "graphs",
+                "greedy",
+                "implementation"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1549/B",
+              "note": "虽然标签包含flows，但实际可用贪心解决。可作为网络流思想的引入：将棋子移动视为流，目标位置视为汇点。"
+            },
+            {
+              "id": "1065B",
+              "name": "Vasya and Isolated Vertices",
+              "difficulty": 1300,
+              "tags": [
+                "constructive algorithms",
+                "graphs"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1065/B",
+              "note": "图构造问题，理解图的基本性质。网络流问题中经常需要分析图的连通性和度分布。"
+            },
+            {
+              "id": "1056D",
+              "name": "Decorate Apple Tree",
+              "difficulty": 1600,
+              "tags": [
+                "constructive algorithms",
+                "dfs and similar",
+                "dp",
+                "graphs",
+                "greedy",
+                "sortings",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1056/D",
+              "note": "树形DP问题，为网络流中的树结构处理打下基础。理解如何在树上分配资源。"
+            },
+            {
+              "id": "1009D",
+              "name": "Relatively Prime Graph",
+              "difficulty": 1700,
+              "tags": [
+                "brute force",
+                "constructive algorithms",
+                "graphs",
+                "greedy",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1009/D",
+              "note": "图构造问题，涉及图的连通性和边数限制。网络流建模时经常需要构造满足特定条件的图。"
+            },
+            {
+              "id": "1272E",
+              "name": "Nearest Opposite Parity",
+              "difficulty": 1900,
+              "tags": [
+                "dfs and similar",
+                "graphs",
+                "shortest paths"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1272/E",
+              "note": "多源BFS问题，为理解网络流中的多源多汇问题做准备。"
+            },
+            {
+              "id": "1102F",
+              "name": "Elongated Matrix",
+              "difficulty": 2000,
+              "tags": [
+                "binary search",
+                "bitmasks",
+                "brute force",
+                "dp",
+                "graphs"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1102/F",
+              "note": "状态压缩DP与图论结合，理解哈密顿路径问题。网络流中的路径问题常与此相关。"
+            },
+            {
+              "id": "1000E",
+              "name": "We Need More Bosses",
+              "difficulty": 2100,
+              "tags": [
+                "dfs and similar",
+                "graphs",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1000/E",
+              "note": "无向图边双连通分量缩点后求树的直径。网络流问题中经常需要先进行图缩点简化模型。"
+            },
+            {
+              "id": "553C",
+              "name": "Love Triangles",
+              "difficulty": 2200,
+              "tags": [
+                "dfs and similar",
+                "dsu",
+                "graphs"
+              ],
+              "url": "https://codeforces.com/problemset/problem/553/C",
+              "note": "二分图染色问题，为网络流中的二分图匹配问题做铺垫。理解奇偶约束的建模方法。"
+            },
+            {
+              "id": "1408E",
+              "name": "Avoid Rainbow Cycles",
+              "difficulty": 2400,
+              "tags": [
+                "data structures",
+                "dsu",
+                "graphs",
+                "greedy",
+                "sortings",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1408/E",
+              "note": "最小生成树变形，理解如何避免环的形成。网络流中的最小割问题常涉及环的消除。"
+            },
+            {
+              "id": "1023F",
+              "name": "Mobile Phone Network",
+              "difficulty": 2600,
+              "tags": [
+                "dfs and similar",
+                "dsu",
+                "graphs",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1023/F",
+              "note": "最小生成树与树链剖分结合，涉及边权分配。这是网络流中资源分配问题的进阶版本，需要深入理解图的结构性质。"
+            }
+          ]
+        },
+        {
+          "title": "§8 DFS/BFS",
+          "code_template": "#include <bits/stdc++.h>\nusing namespace std;\n\n// DFS 递归模板\nvoid dfs(int u, vector<vector<int>>& graph, vector<bool>& visited) {\n    visited[u] = true;\n    // 处理当前节点\n    for (int v : graph[u]) {\n        if (!visited[v]) {\n            dfs(v, graph, visited);\n        }\n    }\n}\n\n// DFS 栈实现（非递归）\nvoid dfs_stack(int start, vector<vector<int>>& graph) {\n    vector<bool> visited(graph.size(), false);\n    stack<int> stk;\n    stk.push(start);\n    visited[start] = true;\n    \n    while (!stk.empty()) {\n        int u = stk.top();\n        stk.pop();\n        // 处理节点 u\n        for (int v : graph[u]) {\n            if (!visited[v]) {\n                visited[v] = true;\n                stk.push(v);\n            }\n        }\n    }\n}\n\n// BFS 队列实现\nvoid bfs(int start, vector<vector<int>>& graph) {\n    int n = graph.size();\n    vector<bool> visited(n, false);\n    queue<int> q;\n    q.push(start);\n    visited[start] = true;\n    \n    while (!q.empty()) {\n        int u = q.front();\n        q.pop();\n        // 处理节点 u\n        for (int v : graph[u]) {\n            if (!visited[v]) {\n                visited[v] = true;\n                q.push(v);\n            }\n        }\n    }\n}\n\n// Flood Fill 示例（网格DFS）\nint dx[4] = {1, -1, 0, 0};\nint dy[4] = {0, 0, 1, -1};\n\nvoid floodFill(int x, int y, vector<vector<char>>& grid, vector<vector<bool>>& visited) {\n    int n = grid.size(), m = grid[0].size();\n    visited[x][y] = true;\n    \n    for (int i = 0; i < 4; i++) {\n        int nx = x + dx[i], ny = y + dy[i];\n        if (nx >= 0 && nx < n && ny >= 0 && ny < m && \n            !visited[nx][ny] && grid[nx][ny] == '.') {\n            floodFill(nx, ny, grid, visited);\n        }\n    }\n}\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    \n    // 根据具体问题实现\n    return 0;\n}",
+          "idea": "DFS（深度优先搜索）和BFS（广度优先搜索）是图论中最基础的遍历算法。\n\n**核心思想：**\n1. **DFS**：沿着一条路径深入探索到底，然后回溯到上一个分叉点继续探索其他分支。适合解决连通性问题、拓扑排序、寻找路径等。\n2. **BFS**：从起点开始，逐层向外扩展，先访问所有距离为1的节点，再访问距离为2的节点，依此类推。适合解决最短路径问题（无权图）、层次遍历等。\n\n**常见应用场景：**\n- **连通性判断**：判断图中两点是否连通，或统计连通分量数量\n- **Flood Fill**：在网格中填充连通区域，常用于图像处理、迷宫求解\n- **迷宫问题**：寻找从起点到终点的路径，判断是否有解\n- **树/图的遍历**：获取所有节点的访问顺序\n- **拓扑排序**：对有向无环图进行排序（DFS或BFS均可实现）\n\n**实现要点：**\n1. 必须记录已访问节点，避免重复访问和死循环\n2. DFS通常用递归或栈实现，BFS用队列实现\n3. 对于网格问题，注意边界检查和方向数组的定义\n4. 根据问题需求，可以在遍历过程中记录额外信息（如距离、父节点等）\n\n**复杂度分析：**\n- 时间复杂度：O(V+E)，其中V为顶点数，E为边数\n- 空间复杂度：O(V)，用于存储访问标记和数据结构（栈/队列）",
+          "problems": [
+            {
+              "id": "1549B",
+              "name": "Gregor and the Pawn Game",
+              "difficulty": 800,
+              "tags": [
+                "dfs and similar",
+                "dp",
+                "flows",
+                "graph matchings",
+                "graphs",
+                "greedy",
+                "implementation"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1549/B",
+              "note": "网格上的BFS/DFS应用，模拟棋子移动过程，判断可达位置"
+            },
+            {
+              "id": "2155B",
+              "name": "Abraham's Great Escape",
+              "difficulty": 1100,
+              "tags": [
+                "constructive algorithms",
+                "graphs"
+              ],
+              "url": "https://codeforces.com/problemset/problem/2155/B",
+              "note": "图连通性问题，通过BFS/DFS判断是否存在满足条件的路径"
+            },
+            {
+              "id": "1065B",
+              "name": "Vasya and Isolated Vertices",
+              "difficulty": 1300,
+              "tags": [
+                "constructive algorithms",
+                "graphs"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1065/B",
+              "note": "图构造问题，涉及连通分量的概念，需要理解孤立点的最小和最大可能数量"
+            },
+            {
+              "id": "277A",
+              "name": "Learning Languages",
+              "difficulty": 1400,
+              "tags": [
+                "dfs and similar",
+                "dsu"
+              ],
+              "url": "https://codeforces.com/problemset/problem/277/A",
+              "note": "连通分量计数问题，可以通过DFS或并查集解决，计算需要学习的最少语言数"
+            },
+            {
+              "id": "1098A",
+              "name": "Sum in the tree",
+              "difficulty": 1600,
+              "tags": [
+                "constructive algorithms",
+                "dfs and similar",
+                "greedy",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1098/A",
+              "note": "树上的DFS遍历，自顶向下或自底向上传递信息，贪心构造合法解"
+            },
+            {
+              "id": "1009D",
+              "name": "Relatively Prime Graph",
+              "difficulty": 1700,
+              "tags": [
+                "brute force",
+                "constructive algorithms",
+                "graphs",
+                "greedy",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1009/D",
+              "note": "图构造问题，需要构建连通图，DFS/BFS用于验证连通性"
+            },
+            {
+              "id": "1244D",
+              "name": "Paint the Tree",
+              "difficulty": 1800,
+              "tags": [
+                "brute force",
+                "constructive algorithms",
+                "dp",
+                "graphs",
+                "implementation",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1244/D",
+              "note": "树上的DFS遍历，结合动态规划或暴力枚举所有染色方案"
+            },
+            {
+              "id": "1601B",
+              "name": "Frog Traveler",
+              "difficulty": 1900,
+              "tags": [
+                "data structures",
+                "dfs and similar",
+                "dp",
+                "graphs",
+                "shortest paths",
+                "two pointers"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1601/B",
+              "note": "BFS求最短路径问题，状态转移有特殊规则，需要记录路径"
+            },
+            {
+              "id": "1280C",
+              "name": "Jeremy Bearimy",
+              "difficulty": 2000,
+              "tags": [
+                "dfs and similar",
+                "graphs",
+                "greedy",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1280/C",
+              "note": "树上的DFS，计算所有点对距离的最小和最大可能值，需要分析子树贡献"
+            },
+            {
+              "id": "1000E",
+              "name": "We Need More Bosses",
+              "difficulty": 2100,
+              "tags": [
+                "dfs and similar",
+                "graphs",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1000/E",
+              "note": "无向图缩点后求树的直径，需要两次DFS/BFS"
+            },
+            {
+              "id": "354E",
+              "name": "Lucky Number Representation",
+              "difficulty": 2200,
+              "tags": [
+                "constructive algorithms",
+                "dfs and similar",
+                "dp"
+              ],
+              "url": "https://codeforces.com/problemset/problem/354/E",
+              "note": "DFS搜索构造解，剪枝优化，数位处理"
+            },
+            {
+              "id": "1499F",
+              "name": "Diameter Cuts",
+              "difficulty": 2400,
+              "tags": [
+                "combinatorics",
+                "dfs and similar",
+                "dp",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1499/F",
+              "note": "树形DP结合DFS，统计满足直径限制的切割方案数"
+            },
+            {
+              "id": "1016F",
+              "name": "Road Projects",
+              "difficulty": 2600,
+              "tags": [
+                "dfs and similar",
+                "dp",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1016/F",
+              "note": "树上的DFS预处理，分析添加边对最短路径的影响，需要维护路径信息"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

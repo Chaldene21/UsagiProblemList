@@ -12,8 +12,21 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- M+ Fonts 日文可爱字体 -->
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- 防止背景闪烁：在CSS加载前尽早设置背景状态 -->
+    <script>
+        if (localStorage.getItem('bgEnabled') !== 'false') {
+            document.documentElement.classList.add('bg-preset');
+        }
+    </script>
+    <style>
+        /* 预设背景状态，防止闪烁 - 默认显示背景 */
+        html.bg-preset body { background: transparent; }
+        html.bg-preset .bg-layer { opacity: 0.3; }
+    </style>
 </head>
 <body>
+    <!-- 背景图片层 -->
+    <div class="bg-layer" id="bgLayer"></div>
     <div id="app">
         <!-- 导航栏 -->
         <nav class="navbar">
@@ -50,6 +63,6 @@
         </footer>
     </div>
 
-    <script src="/static/js/app.js"></script>
+    <script src="/static/js/app.js?v=20240310"></script>
 </body>
 </html>

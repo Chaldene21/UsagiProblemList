@@ -161,3 +161,35 @@ type UpdateProgressRequest struct {
 type ProgressResponse struct {
 	IsCompleted bool `json:"is_completed"`
 }
+
+// HeatmapData 热力图数据
+type HeatmapData struct {
+	Date      string `json:"date"`       // 日期 YYYY-MM-DD
+	Count     int    `json:"count"`      // 当天完成数量
+	Level     int    `json:"level"`      // 热度等级 0-4
+	Timestamp int64  `json:"timestamp"`  // Unix 时间戳
+}
+
+// DetailedStats 详细统计数据
+type DetailedStats struct {
+	TotalCompleted   int            `json:"total_completed"`
+	TotalProblems    int            `json:"total_problems"`
+	EasyCompleted    int            `json:"easy_completed"`
+	EasyTotal        int            `json:"easy_total"`
+	MediumCompleted  int            `json:"medium_completed"`
+	MediumTotal      int            `json:"medium_total"`
+	HardCompleted    int            `json:"hard_completed"`
+	HardTotal        int            `json:"hard_total"`
+	CurrentStreak    int            `json:"current_streak"`    // 当前连续天数
+	MaxStreak        int            `json:"max_streak"`        // 最大连续天数
+	TotalDays        int            `json:"total_days"`        // 总刷题天数
+	RecentActivities []ActivityItem `json:"recent_activities"` // 最近活动
+}
+
+// ActivityItem 活动记录
+type ActivityItem struct {
+	ProblemID   string    `json:"problem_id"`
+	ProblemName string    `json:"problem_name"`
+	Difficulty  int       `json:"difficulty"`
+	CompletedAt time.Time `json:"completed_at"`
+}

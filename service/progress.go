@@ -2,6 +2,8 @@ package service
 
 import (
 	"cfProblemList/models"
+	"fmt"
+	"sort"
 	"time"
 
 	"gorm.io/gorm"
@@ -126,12 +128,31 @@ func (s *ProgressService) GetProblemSetProgress(userID uint, problemSetID string
 		return nil, err
 	}
 
-	// 简化：不查询具体进度，直接返回基本信息
-	totalProblems := 0
+	// 获取所有题目
+	var allProblems []models.Problem
+	var completedIDs []string
 	for _, section := range ps.Sections {
 		for _, content := range section.Content {
-			totalProblems += len(content.Problems)
+			allProblems = append(allProblems, content.Problems...)
 		}
+	}
+
+	// 获取用户完成的题目
+	var progressList []models.ProblemProgress
+	s.db.Where("user_id = ? AND problemset_id = ? AND is_completed = ?", userID, problemSetID, true).
+		Find(&progressList)
+
+	completedMap := make(map[string]bool)
+	for _, p := range progressList {
+		completedMap[p.ProblemID] = true
+		completedIDs = append(completedIDs, p.ProblemID)
+	}
+
+	completedCount := len(completedIDs)
+	totalProblems := len(allProblems)
+	percentage := 0
+	if totalProblems > 0 {
+		percentage = (completedCount * 100) / totalProblems
 	}
 
 	return &models.ProblemSetProgress{
@@ -139,9 +160,9 @@ func (s *ProgressService) GetProblemSetProgress(userID uint, problemSetID string
 		ProblemSetTitle:   ps.Title,
 		Category:          ps.Category,
 		TotalProblems:     totalProblems,
-		CompletedProblems: 0,
-		Percentage:        0,
-		CompletedIDs:      []string{},
+		CompletedProblems: completedCount,
+		Percentage:        percentage,
+		CompletedIDs:      completedIDs,
 	}, nil
 }
 
@@ -227,4 +248,239 @@ func (s *ProgressService) GetCategoryProgress(userID uint) ([]models.CategoryPro
 	}
 
 	return result, nil
+}
+
+// GetHeatmapData 获取热力图数据（最近一年）
+func (s *ProgressService) GetHeatmapData(userID uint) ([]models.HeatmapData, error) {
+	// 获取最近一年的完成记录
+	oneYearAgo := time.Now().AddDate(-1, 0, 0)
+
+	var progressList []models.ProblemProgress
+	err := s.db.Where("user_id = ? AND is_completed = ? AND completed_at > ?",
+		userID, true, oneYearAgo).
+		Order("completed_at ASC").
+		Find(&progressList).Error
+	if err != nil {
+		return nil, err
+	}
+
+	// 按日期统计
+	dateCount := make(map[string]int)
+	for _, p := range progressList {
+		if !p.CompletedAt.IsZero() {
+			date := p.CompletedAt.Format("2006-01-02")
+			dateCount[date]++
+		}
+	}
+
+	// 生成最近365天的数据
+	var result []models.HeatmapData
+	now := time.Now()
+
+	// 计算最大值用于确定热度等级
+	maxCount := 0
+	for _, count := range dateCount {
+		if count > maxCount {
+			maxCount = count
+		}
+	}
+
+	for i := 364; i >= 0; i-- {
+		date := now.AddDate(0, 0, -i)
+		dateStr := date.Format("2006-01-02")
+		count := dateCount[dateStr]
+
+		// 计算热度等级 (0-4)
+		level := 0
+		if maxCount > 0 && count > 0 {
+			level = (count * 4) / maxCount
+			if level > 4 {
+				level = 4
+			}
+			if level == 0 && count > 0 {
+				level = 1
+			}
+		}
+
+		result = append(result, models.HeatmapData{
+			Date:      dateStr,
+			Count:     count,
+			Level:     level,
+			Timestamp: date.Unix(),
+		})
+	}
+
+	return result, nil
+}
+
+// GetDetailedStats 获取详细统计数据
+func (s *ProgressService) GetDetailedStats(userID uint) (*models.DetailedStats, error) {
+	stats := &models.DetailedStats{}
+
+	// 获取所有题单的题目信息
+	psService := NewProblemSetService()
+	summaries, err := psService.GetProblemSetList()
+	if err != nil {
+		return nil, err
+	}
+
+	// 统计所有题目及其难度
+	allProblems := make(map[string]models.Problem) // problemID -> Problem
+	for _, summary := range summaries {
+		ps, err := psService.GetProblemSetByID(summary.ID)
+		if err != nil {
+			continue
+		}
+		for _, section := range ps.Sections {
+			for _, content := range section.Content {
+				for _, problem := range content.Problems {
+					allProblems[problem.ID] = problem
+				}
+			}
+		}
+	}
+
+	stats.TotalProblems = len(allProblems)
+
+	// 统计各难度总数
+	for _, p := range allProblems {
+		if p.Difficulty < 1300 {
+			stats.EasyTotal++
+		} else if p.Difficulty < 1700 {
+			stats.MediumTotal++
+		} else {
+			stats.HardTotal++
+		}
+	}
+
+	// 获取用户完成的题目
+	var progressList []models.ProblemProgress
+	s.db.Where("user_id = ? AND is_completed = ?", userID, true).
+		Order("completed_at DESC").
+		Find(&progressList)
+
+	completedMap := make(map[string]bool)
+	var recentActivities []models.ActivityItem
+
+	for _, p := range progressList {
+		if completedMap[p.ProblemID] {
+			continue
+		}
+		completedMap[p.ProblemID] = true
+		stats.TotalCompleted++
+
+		// 统计各难度完成数
+		if problem, exists := allProblems[p.ProblemID]; exists {
+			if problem.Difficulty < 1300 {
+				stats.EasyCompleted++
+			} else if problem.Difficulty < 1700 {
+				stats.MediumCompleted++
+			} else {
+				stats.HardCompleted++
+			}
+
+			// 收集最近活动
+			if len(recentActivities) < 10 && !p.CompletedAt.IsZero() {
+				recentActivities = append(recentActivities, models.ActivityItem{
+					ProblemID:   p.ProblemID,
+					ProblemName: problem.Name,
+					Difficulty:  problem.Difficulty,
+					CompletedAt: p.CompletedAt,
+				})
+			}
+		}
+	}
+	stats.RecentActivities = recentActivities
+
+	// 计算连续天数
+	stats.CurrentStreak, stats.MaxStreak, stats.TotalDays = s.calculateStreaks(progressList)
+
+	return stats, nil
+}
+
+// calculateStreaks 计算连续刷题天数
+func (s *ProgressService) calculateStreaks(progressList []models.ProblemProgress) (currentStreak, maxStreak, totalDays int) {
+	if len(progressList) == 0 {
+		return 0, 0, 0
+	}
+
+	// 按日期分组
+	dateSet := make(map[string]bool)
+	for _, p := range progressList {
+		if !p.CompletedAt.IsZero() {
+			date := p.CompletedAt.Format("2006-01-02")
+			dateSet[date] = true
+		}
+	}
+
+	totalDays = len(dateSet)
+
+	// 获取所有日期并排序
+	var dates []time.Time
+	for dateStr := range dateSet {
+		t, _ := time.Parse("2006-01-02", dateStr)
+		dates = append(dates, t)
+	}
+	sort.Slice(dates, func(i, j int) bool {
+		return dates[i].Before(dates[j])
+	})
+
+	if len(dates) == 0 {
+		return 0, 0, 0
+	}
+
+	// 计算最大连续天数
+	maxStreak = 1
+	currentStreak = 1
+	for i := 1; i < len(dates); i++ {
+		if dates[i].Sub(dates[i-1]) == 24*time.Hour {
+			currentStreak++
+			if currentStreak > maxStreak {
+				maxStreak = currentStreak
+			}
+		} else {
+			currentStreak = 1
+		}
+	}
+
+	// 计算当前连续天数（从今天往前数）
+	now := time.Now()
+	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+
+	currentStreak = 0
+	for i := 0; i <= 365; i++ {
+		checkDate := today.AddDate(0, 0, -i)
+		dateStr := checkDate.Format("2006-01-02")
+		if dateSet[dateStr] {
+			currentStreak++
+		} else if i > 0 { // 允许今天还没做题
+			break
+		}
+	}
+
+	// 如果今天没做题，检查昨天开始的连续
+	if currentStreak == 0 {
+		yesterday := today.AddDate(0, 0, -1)
+		for i := 0; i <= 365; i++ {
+			checkDate := yesterday.AddDate(0, 0, -i)
+			dateStr := checkDate.Format("2006-01-02")
+			if dateSet[dateStr] {
+				currentStreak++
+			} else {
+				break
+			}
+		}
+	}
+
+	return currentStreak, maxStreak, totalDays
+}
+
+// Debug function
+func (s *ProgressService) DebugPrintProgress(userID uint) {
+	var progressList []models.ProblemProgress
+	s.db.Where("user_id = ?", userID).Find(&progressList)
+	fmt.Printf("Found %d progress records for user %d\n", len(progressList), userID)
+	for _, p := range progressList {
+		fmt.Printf("  ProblemID: %s, Completed: %v, CompletedAt: %v\n", p.ProblemID, p.IsCompleted, p.CompletedAt)
+	}
 }
