@@ -138,8 +138,8 @@ func (s *FollowService) SearchUsers(viewerID uint, keyword string, page, pageSiz
 		return nil, err
 	}
 
-	// 构建返回结果
-	var profiles []models.UserProfile
+	// 确保返回空数组而不是 null
+	profiles := make([]models.UserProfile, 0)
 	for _, user := range users {
 		profile := models.UserProfile{
 			ID:        user.ID,
@@ -194,7 +194,8 @@ func (s *FollowService) GetFollowers(viewerID, targetUserID uint, page, pageSize
 		return nil, err
 	}
 
-	var profiles []models.UserProfile
+	// 确保返回空数组而不是 null
+	profiles := make([]models.UserProfile, 0)
 	for _, follow := range follows {
 		profile, err := s.GetUserProfile(viewerID, follow.FollowerID)
 		if err != nil {
@@ -232,7 +233,8 @@ func (s *FollowService) GetFollowings(viewerID, targetUserID uint, page, pageSiz
 		return nil, err
 	}
 
-	var profiles []models.UserProfile
+	// 确保返回空数组而不是 null
+	profiles := make([]models.UserProfile, 0)
 	for _, follow := range follows {
 		profile, err := s.GetUserProfile(viewerID, follow.FollowingID)
 		if err != nil {
