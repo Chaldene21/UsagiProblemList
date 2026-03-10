@@ -1,7 +1,0 @@
-{
-  "contest_id": 1281,
-  "url": "https://codeforces.com/blog/entry/72212",
-  "content": "I hope you enjoyed the problems! Thanks to the onsite teams and coaches who gave feedback; I'm glad the reception was positive.\n\nInterestingly, in the onsite ICPC round, while \"Kirchhoff\" got several accepted solutions, \"Miss Punyverse\" got no accepted submissions at all! It is the reverse here. (Kirchhoff even has a trickier output format in the onsite round compared to the version presented in Codeforces.) It seems the ICPC scoreboard really affects the results greatly; what the top few teams are working on influences what everyone else will be working on.\n\nI am planning on releasing the full, untouched ICPC Manila 2019 problem set in the gym sometime in the future, so you can see which problems you missed. The Intergalactic Sliding Puzzle is not the hardest problem in the round!\n\n1281A - Suffix Three\n Solution SketchTutorial is loading...",
-  "problems": {},
-  "fetched_at": "2026-03-04 23:37:16"
-}

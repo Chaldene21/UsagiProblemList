@@ -1,9 +1,0 @@
-{
-  "contest_id": 2180,
-  "url": "https://codeforces.com/blog/entry/149318",
-  "content": "Salam !\n\nHere is the editorial for Codeforces Global Round 31. We hope you find these solutions helpful. We also have prepared a special editorial with step by step hint, examples, tables, and walkthroughs which is available here.\n2180A - Carnival Wheel\nIdea: AmirrzwM, MohammadParsaElahimanesh — Preparation: MohammadParsaElahimanesh\n SolutionSimple Simulation (Brute force)\nSince constraints are small, we can simulate the spins directly:\n    \n• Start from section $a$.   \n• Move the pointer by adding $b$ modulo $l$ repeatedly.   \n• Stop when we return to a previously visited section.   \n• Among all visited sections, select the section with the highest prize. \nIt runs in $\\mathcal{O}(l)$ as we mark each section at most once.\n Mathematical Solution (Using GCD)\nIt's easy to see that the pointer can land on section $c$ if $c \\equiv a \\pmod{d}$, where $d = \\gcd(l, b)$. By Bézout's lemma, all such $c$ are indeed reachable. Hence, the maximum attainable section is:\n $ l - d + (a \\bmod d). $",
-  "problems": {
-    "A": "Idea: AmirrzwM, MohammadParsaElahimanesh — Preparation: MohammadParsaElahimanesh\n SolutionSimple Simulation (Brute force)\nSince constraints are small, we can simulate the spins directly:\n    \n• Start from section $a$.   \n• Move the pointer by adding $b$ modulo $l$ repeatedly.   \n• Stop when we return to a previously visited section.   \n• Among all visited sections, select the section with the highest prize. \nIt runs in $\\mathcal{O}(l)$ as we mark each section at most once.\n Mathematical Solution (Using GCD)\nIt's easy to see that the pointer can land on section $c$ if $c \\equiv a \\pmod{d}$, where $d = \\gcd(l, b)$. By Bézout's lemma, all such $c$ are indeed reachable. Hence, the maximum attainable section is:\n $ l - d + (a \\bmod d). $"
-  },
-  "fetched_at": "2026-03-04 23:38:42"
-}

@@ -1,9 +1,0 @@
-{
-  "contest_id": 1957,
-  "url": "https://codeforces.com/blog/entry/128716",
-  "content": "## 1957A - Stickogon\n\nIdea: keyurchd_11\nProblem Setting: shakr lezirtin\nEditorial: shakr TheRaja \n\nThere were a few solutions which passes pre-tests with the assumption that $a_i \\leq n$. We apologize for the pre-tests on A not including this case. \n Hint 1\nTo create the most polygons, you should use as few sticks as possible per polygon. What polygon has the least number of sides? \n SolutionTutorial is loading...",
-  "problems": {
-    "A": "Idea: keyurchd_11\nProblem Setting: shakr lezirtin\nEditorial: shakr TheRaja \n\nThere were a few solutions which passes pre-tests with the assumption that $a_i \\leq n$. We apologize for the pre-tests on A not including this case. \n Hint 1\nTo create the most polygons, you should use as few sticks as possible per polygon. What polygon has the least number of sides? \n SolutionTutorial is loading..."
-  },
-  "fetched_at": "2026-03-04 20:01:28"
-}

@@ -1,7 +1,0 @@
-{
-  "contest_id": 762,
-  "url": "https://codeforces.com/blog/entry/50010",
-  "content": "Task A\nIf you find all the small divisors of n that are less than sqrt(n), you can find the rest of them dividing n by the small ones.\n\nBy the way, this problem is widely known and googlable :) You can, for example, check out this link: http://stackoverflow.com/questions/26753839/efficiently-getting-all-divisors-of-a-given-number\n Task B\nTry coming up either with greedy algorithm or with two pointers algorithm.\n Spoiler\nTry to prove the following greedy: in each step we can choose the cheapest remaining mouse. If there is a computer left that has only one type of port suitable for this mouse, plug it there. Else if there is a computer with both types, plug it there. Else discard this mouse.\n\nTry to also come up with the two pointers solution. If you cannot, it is described under the next spoiler.\n Spoiler\nSort all of the USB mouses and all of the PS/2 mouses so that the price is non-descending. Then you will need to buy some prefix of USB mouses and some prefix of PS/2 mouses. Iterate over the number of USB mouses from 0 to their count. Now, the more USB mouses you buy and plug into computers, the less PS/2 mouses you will be able to buy, because the number of computers will only be decreasing. So you should move the first pointer forward, and in every iteration move the second pointer backwards until you reach such amount that it is possible to plug both USB and PC/2 mouses in.",
-  "problems": {},
-  "fetched_at": "2026-03-04 23:39:15"
-}
