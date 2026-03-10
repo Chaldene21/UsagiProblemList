@@ -79,7 +79,7 @@ body.bg-enabled {
 
 /* 🐰✨ 导航栏 - Rabbit House 风格 ✨🐰 */
 .navbar {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.85), rgba(255, 248, 245, 0.85));
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 248, 245, 0.3));
     padding: 1rem 2rem;
     border-bottom: 3px solid transparent;
     border-image: linear-gradient(90deg, var(--kokoa-pink), var(--chino-blue), var(--rize-purple), var(--chiya-green), var(--syaro-yellow)) 1;
@@ -87,7 +87,8 @@ body.bg-enabled {
     top: 0;
     z-index: 100;
     box-shadow: 0 4px 25px rgba(255, 158, 172, 0.15);
-    backdrop-filter: blur(15px);
+    backdrop-filter: blur(12px) saturate(180%) brightness(1.1);
+    -webkit-backdrop-filter: blur(12px) saturate(180%) brightness(1.1);
     display: flex;
     justify-content: space-between;
     align-items: center;
