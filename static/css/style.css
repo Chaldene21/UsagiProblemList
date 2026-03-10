@@ -79,7 +79,7 @@ body.bg-enabled {
 
 /* 🐰✨ 导航栏 - Rabbit House 风格 ✨🐰 */
 .navbar {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 248, 245, 0.95));
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.85), rgba(255, 248, 245, 0.85));
     padding: 1rem 2rem;
     border-bottom: 3px solid transparent;
     border-image: linear-gradient(90deg, var(--kokoa-pink), var(--chino-blue), var(--rize-purple), var(--chiya-green), var(--syaro-yellow)) 1;
@@ -3128,11 +3128,11 @@ body.bg-enabled {
 .search-box input {
     flex: 1;
     padding: 1rem 1.5rem;
-    border: 2px solid var(--border-color);
+    border: 2px solid rgba(255, 158, 172, 0.2);
     border-radius: 12px;
     font-size: 1rem;
-    background: var(--card-bg);
-    color: var(--text-primary);
+    background: rgba(255,255,255,0.95);
+    color: var(--text-dark);
     transition: all 0.3s ease;
 }
 
@@ -3173,7 +3173,7 @@ body.bg-enabled {
 
 /* 用户卡片 */
 .user-card {
-    background: var(--card-bg);
+    background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(255,250,252,0.98));
     border-radius: 16px;
     padding: 1.5rem;
     display: flex;
@@ -3181,7 +3181,7 @@ body.bg-enabled {
     gap: 1rem;
     cursor: pointer;
     transition: all 0.3s ease;
-    border: 2px solid transparent;
+    border: 2px solid rgba(255, 158, 172, 0.2);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
@@ -3213,14 +3213,14 @@ body.bg-enabled {
 .user-card-name {
     font-weight: 600;
     font-size: 1.1rem;
-    color: var(--text-primary);
+    color: var(--text-dark);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .user-card-username {
-    color: var(--text-secondary);
+    color: var(--text-light);
     font-size: 0.85rem;
     margin-top: 0.2rem;
 }
@@ -3228,11 +3228,11 @@ body.bg-enabled {
 .user-card-stats {
     margin-top: 0.5rem;
     font-size: 0.85rem;
-    color: var(--text-secondary);
+    color: var(--text-light);
 }
 
 .user-card-stats i {
-    color: var(--primary-pink);
+    color: var(--kokoa-pink);
     margin-right: 0.3rem;
 }
 
@@ -3248,18 +3248,18 @@ body.bg-enabled {
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
-    border: 2px solid var(--primary-pink);
+    border: 2px solid var(--kokoa-pink);
     background: transparent;
-    color: var(--primary-pink);
+    color: var(--kokoa-pink);
 }
 
 .btn-follow:hover {
-    background: var(--primary-pink);
+    background: var(--kokoa-pink);
     color: white;
 }
 
 .btn-follow.following {
-    background: var(--primary-pink);
+    background: var(--kokoa-pink);
     color: white;
 }
 
@@ -3277,8 +3277,8 @@ body.bg-enabled {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    border: 2px solid var(--primary-pink);
-    background: var(--primary-pink);
+    border: 2px solid var(--kokoa-pink);
+    background: var(--kokoa-pink);
     color: white;
     display: flex;
     align-items: center;
@@ -3294,7 +3294,7 @@ body.bg-enabled {
 
 .btn-follow-large.following {
     background: white;
-    color: var(--primary-pink);
+    color: var(--kokoa-pink);
 }
 
 .btn-follow-large.following:hover {
@@ -3333,12 +3333,12 @@ body.bg-enabled {
 .profile-stat-card .stat-value {
     font-size: 1.5rem;
     font-weight: 700;
-    color: var(--text-primary);
+    color: var(--text-dark);
 }
 
 .profile-stat-card .stat-label {
     font-size: 0.85rem;
-    color: var(--text-secondary);
+    color: var(--text-light);
 }
 
 /* 关注统计区域 */
@@ -3366,12 +3366,12 @@ body.bg-enabled {
 .follow-stat-count {
     font-size: 1.8rem;
     font-weight: 700;
-    color: var(--text-primary);
+    color: var(--text-dark);
 }
 
 .follow-stat-label {
     font-size: 0.9rem;
-    color: var(--text-secondary);
+    color: var(--text-light);
 }
 
 /* 可点击的统计项 */
@@ -3395,20 +3395,20 @@ body.bg-enabled {
 .profile-actions {
     margin-top: 1.5rem;
     padding-top: 1.5rem;
-    border-top: 1px solid var(--border-color);
+    border-top: 1px solid rgba(255, 158, 172, 0.2);
 }
 
 /* 空状态 */
 .empty-state {
     text-align: center;
     padding: 3rem;
-    color: var(--text-secondary);
+    color: var(--text-light);
 }
 
 .empty-state i {
     font-size: 3rem;
     margin-bottom: 1rem;
-    color: var(--border-color);
+    color: var(--kokoa-pink);
 }
 
 .empty-state p {

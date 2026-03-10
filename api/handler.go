@@ -394,6 +394,42 @@ func (h *Handler) GetUserProfile(c *gin.Context) {
 	successResponse(c, profile)
 }
 
+// GetUserHeatmap 获取用户热力图（公开）
+func (h *Handler) GetUserHeatmap(c *gin.Context) {
+	targetUserIDStr := c.Param("id")
+	var targetUserID uint
+	if _, err := fmt.Sscanf(targetUserIDStr, "%d", &targetUserID); err != nil {
+		errorResponse(c, http.StatusBadRequest, "无效的用户ID")
+		return
+	}
+
+	data, err := h.progressService.GetHeatmapData(targetUserID)
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	successResponse(c, data)
+}
+
+// GetUserDetailStats 获取用户详细统计（公开）
+func (h *Handler) GetUserDetailStats(c *gin.Context) {
+	targetUserIDStr := c.Param("id")
+	var targetUserID uint
+	if _, err := fmt.Sscanf(targetUserIDStr, "%d", &targetUserID); err != nil {
+		errorResponse(c, http.StatusBadRequest, "无效的用户ID")
+		return
+	}
+
+	stats, err := h.progressService.GetDetailedStats(targetUserID)
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	successResponse(c, stats)
+}
+
 // FollowUser 关注用户
 func (h *Handler) FollowUser(c *gin.Context) {
 	userID, exists := c.Get("userID")
