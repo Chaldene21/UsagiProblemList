@@ -1,0 +1,498 @@
+{
+  "id": "greedy_master",
+  "title": "贪心算法专题训练",
+  "description": "本专题系统性地训练贪心算法，涵盖从基础到高级的各种贪心策略。贪心算法的核心在于每一步都做出当前最优的选择，从而希望得到全局最优解。本专题按贪心策略类型划分章节，每章包含典型例题、解题思路和代码模板，帮助学习者掌握贪心思想的本质和应用技巧。",
+  "category": "greedy",
+  "sections": [
+    {
+      "title": "排序贪心",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "排序贪心是最常见的贪心策略之一，通过对数据进行排序，然后按照特定顺序处理，从而得到最优解。常用于区间调度、活动选择等问题。"
+        },
+        {
+          "title": "§1.1 区间调度与活动选择",
+          "code_template": "// 典型问题：选择最多互不重叠的区间\n// 输入：intervals = [[l1, r1], [l2, r2], ...]\n// 输出：最多能选择多少个互不重叠的区间\nint maxNonOverlappingIntervals(vector<vector<int>>& intervals) {\n    // 按右端点排序\n    sort(intervals.begin(), intervals.end(), [](const vector<int>& a, const vector<int>& b) {\n        return a[1] < b[1];\n    });\n    int count = 0, lastEnd = -1e9;\n    for (auto& interval : intervals) {\n        if (interval[0] > lastEnd) {\n            count++;\n            lastEnd = interval[1];\n        }\n    }\n    return count;\n}",
+          "idea": "贪心策略：总是选择结束时间最早的区间，这样可以为后续区间留下更多空间。证明：如果存在最优解，第一个选择的区间不是结束最早的，那么可以用结束最早的区间替换它，不会减少选择数量。",
+          "problems": [
+            {
+              "id": "1041A",
+              "name": "Heist",
+              "difficulty": 800,
+              "tags": [
+                "greedy",
+                "implementation",
+                "sortings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1041/A",
+              "note": "简单排序后计算缺失的键盘数量"
+            },
+            {
+              "id": "762B",
+              "name": "USB vs. PS/2",
+              "difficulty": 1400,
+              "tags": [
+                "greedy",
+                "implementation",
+                "sortings",
+                "two pointers"
+              ],
+              "url": "https://codeforces.com/problemset/problem/762/B",
+              "note": "对两种鼠标分别排序，贪心选择最便宜的"
+            },
+            {
+              "id": "416C",
+              "name": "Booking System",
+              "difficulty": 1600,
+              "tags": [
+                "binary search",
+                "dp",
+                "greedy",
+                "implementation"
+              ],
+              "url": "https://codeforces.com/problemset/problem/416C",
+              "note": "将请求按人数排序，贪心匹配桌子"
+            },
+            {
+              "id": "612D",
+              "name": "The Union of k-Segments",
+              "difficulty": 1800,
+              "tags": [
+                "greedy",
+                "sortings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/612/D",
+              "note": "扫描线算法，按点排序处理区间覆盖"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "区间问题",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "区间问题包括区间覆盖、区间选点、区间分组等，通常需要巧妙的贪心策略。"
+        },
+        {
+          "title": "§2.1 区间覆盖与选点",
+          "code_template": "// 典型问题：用最少的点覆盖所有区间\n// 输入：intervals = [[l1, r1], [l2, r2], ...]\n// 输出：最少需要多少个点，使得每个区间至少包含一个点\nint minPointsCoverIntervals(vector<vector<int>>& intervals) {\n    // 按右端点排序\n    sort(intervals.begin(), intervals.end(), [](const vector<int>& a, const vector<int>& b) {\n        return a[1] < b[1];\n    });\n    int points = 0, lastPoint = -1e9;\n    for (auto& interval : intervals) {\n        if (interval[0] > lastPoint) {\n            points++;\n            lastPoint = interval[1];\n        }\n    }\n    return points;\n}",
+          "idea": "贪心策略：将所有区间按右端点排序，每次选择当前区间的右端点作为放置点，然后跳过所有包含这个点的区间。证明：如果存在最优解，第一个点不是放在某个区间右端点，可以调整到该右端点而不增加点数。",
+          "problems": [
+            {
+              "id": "1364B",
+              "name": "Most socially-distanced subsequence",
+              "difficulty": 1300,
+              "tags": [
+                "greedy",
+                "two pointers"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1364/B",
+              "note": "选择极值点构造子序列，使相邻差绝对值之和最大"
+            },
+            {
+              "id": "1621B",
+              "name": "Integers Shop",
+              "difficulty": 1500,
+              "tags": [
+                "data structures",
+                "greedy",
+                "implementation"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1621/B",
+              "note": "维护当前覆盖区间的最小成本，动态更新"
+            },
+            {
+              "id": "1630B",
+              "name": "Range and Partition",
+              "difficulty": 1800,
+              "tags": [
+                "binary search",
+                "constructive algorithms",
+                "data structures",
+                "greedy",
+                "two pointers"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1630/B",
+              "note": "选择最优区间，然后贪心划分使每个段内特定元素占多数"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "构造贪心",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "构造贪心要求按照特定规则构造解，通常需要观察规律并设计贪心策略。"
+        },
+        {
+          "title": "§3.1 按规则构造",
+          "code_template": "// 典型问题：构造特定序列\n// 输入：n, k 等参数\n// 输出：满足条件的序列\nvector<int> constructSequence(int n, int k) {\n    vector<int> res;\n    // 根据题目规则构造\n    // 例如：交替放置大小值使相邻乘积最大\n    for (int i = 1; i <= n/2; i++) {\n        res.push_back(i);\n        res.push_back(n - i + 1);\n    }\n    if (n % 2) res.push_back(n/2 + 1);\n    return res;\n}",
+          "idea": "构造贪心的关键是发现题目隐藏的规律或性质，然后设计简单的构造方法。通常需要尝试小规模情况，归纳出通用构造策略。",
+          "problems": [
+            {
+              "id": "1554A",
+              "name": "Cherry",
+              "difficulty": 800,
+              "tags": [
+                "greedy"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1554/A",
+              "note": "最大乘积由相邻两个元素决定，遍历即可"
+            },
+            {
+              "id": "1205A",
+              "name": "Almost Equal",
+              "difficulty": 1200,
+              "tags": [
+                "constructive algorithms",
+                "greedy",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1205/A",
+              "note": "构造环形排列，使任意连续n个元素和相差不超过1"
+            },
+            {
+              "id": "1004B",
+              "name": "Sonya and Exhibition",
+              "difficulty": 1300,
+              "tags": [
+                "constructive algorithms",
+                "greedy",
+                "implementation",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1004/B",
+              "note": "交替放置0和1使区间内乘积和最大"
+            },
+            {
+              "id": "1371D",
+              "name": "Grid-00100",
+              "difficulty": 1600,
+              "tags": [
+                "constructive algorithms",
+                "greedy",
+                "implementation"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1371/D",
+              "note": "构造01矩阵使行和列和的方差最小"
+            },
+            {
+              "id": "27C",
+              "name": "Unordered Subsequence",
+              "difficulty": 1900,
+              "tags": [
+                "constructive algorithms",
+                "greedy"
+              ],
+              "url": "https://codeforces.com/problemset/problem/27/C",
+              "note": "寻找最短的无序子序列，只需检查前三个元素"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "反悔贪心",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "反悔贪心允许在后续步骤中撤销之前的选择，通常用优先队列维护当前选择，当有更优选择时进行替换。"
+        },
+        {
+          "title": "§4.1 优先队列反悔",
+          "code_template": "// 典型问题：选择k个元素使和最大，但有选择限制\n// 输入：数组a, 限制条件\n// 输出：最大和\nlong long maxSumWithLimits(vector<int>& a, int k) {\n    priority_queue<int, vector<int>, greater<int>> pq; // 小顶堆\n    long long sum = 0;\n    for (int i = 0; i < a.size(); i++) {\n        pq.push(a[i]);\n        sum += a[i];\n        if (pq.size() > k) {\n            sum -= pq.top(); // 反悔：移除最小的\n            pq.pop();\n        }\n    }\n    return sum;\n}",
+          "idea": "维护一个大小为k的优先队列（小顶堆），当需要加入新元素时，如果队列已满，则比较新元素与堆顶，如果新元素更大，则替换堆顶（反悔）。这样可以保证始终保留最大的k个元素。",
+          "problems": [
+            {
+              "id": "1443C",
+              "name": "The Delivery Dilemma",
+              "difficulty": 1400,
+              "tags": [
+                "binary search",
+                "greedy",
+                "sortings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1443/C",
+              "note": "二分答案，贪心检查是否可行"
+            },
+            {
+              "id": "1394A",
+              "name": "Boboniu Chats with Du",
+              "difficulty": 1800,
+              "tags": [
+                "dp",
+                "greedy",
+                "sortings",
+                "two pointers"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1394/A",
+              "note": "排序后枚举选择的大值数量，贪心选择剩余的小值"
+            },
+            {
+              "id": "1764E",
+              "name": "Doremy's Number Line",
+              "difficulty": 2400,
+              "tags": [
+                "dp",
+                "greedy",
+                "sortings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1764/E",
+              "note": "排序后贪心尝试染色，需要反悔策略"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "数学贪心",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "数学贪心涉及数论、模运算、整除性等数学性质，需要结合数学知识设计贪心策略。"
+        },
+        {
+          "title": "§5.1 取模与整除最优",
+          "code_template": "// 典型问题：通过操作使数组元素满足整除条件\n// 输入：数组a, 目标模数m\n// 输出：最小操作次数\nint minOperationsForMod(vector<int>& a, int m) {\n    // 统计余数\n    vector<int> cnt(m, 0);\n    for (int x : a) cnt[x % m]++;\n    \n    int ans = 0;\n    // 根据题目规则贪心配对余数\n    for (int i = 1; i < m; i++) {\n        int j = m - i;\n        if (i > j) break;\n        if (i == j) {\n            // 特殊处理\n        } else {\n            // 贪心配对\n        }\n    }\n    return ans;\n}",
+          "idea": "利用模运算的性质，将问题转化为余数的配对或调整。常见的贪心策略包括：优先处理余数大的、对称配对余数等。",
+          "problems": [
+            {
+              "id": "1593B",
+              "name": "Make it Divisible by 25",
+              "difficulty": 900,
+              "tags": [
+                "dfs and similar",
+                "dp",
+                "greedy",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1593/B",
+              "note": "删除最少数字使能被25整除，贪心检查最后两位"
+            },
+            {
+              "id": "1051B",
+              "name": "Relatively Prime Pairs",
+              "difficulty": 1000,
+              "tags": [
+                "greedy",
+                "math",
+                "number theory"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1051/B",
+              "note": "相邻自然数互质，直接配对即可"
+            },
+            {
+              "id": "246B",
+              "name": "Increase and Decrease",
+              "difficulty": 1300,
+              "tags": [
+                "greedy",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/246/B",
+              "note": "通过操作使所有元素相等，取决于总和是否能被n整除"
+            },
+            {
+              "id": "1278B",
+              "name": "A and B",
+              "difficulty": 1500,
+              "tags": [
+                "greedy",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1278B",
+              "note": "找到最小k使1到k的和与差值的奇偶性匹配"
+            },
+            {
+              "id": "1009C",
+              "name": "Annoying Present",
+              "difficulty": 1700,
+              "tags": [
+                "greedy",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1009C",
+              "note": "计算每次操作对总和的贡献，贪心选择最大贡献的位置"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "博弈贪心",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "博弈贪心结合了博弈论和贪心策略，通常涉及双方最优决策。"
+        },
+        {
+          "title": "§6.1 取石子游戏与公平组合",
+          "code_template": "// 典型问题：Nim游戏变种\n// 输入：石子堆数组a\n// 输出：先手是否必胜\nbool canWinNim(vector<int>& a) {\n    int xor_sum = 0;\n    for (int x : a) xor_sum ^= x;\n    return xor_sum != 0; // 异或和非0则先手必胜\n}",
+          "idea": "博弈贪心需要分析游戏的状态和必胜策略。对于公平组合游戏，常用SG函数或寻找必胜态。贪心策略通常体现在每一步都选择将对手推向必败态的操作。",
+          "problems": [
+            {
+              "id": "1966A",
+              "name": "Card Exchange",
+              "difficulty": 800,
+              "tags": [
+                "constructive algorithms",
+                "games",
+                "greedy"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1966/A",
+              "note": "简单博弈，检查是否有至少k张相同牌"
+            },
+            {
+              "id": "2004C",
+              "name": "Splitting Items",
+              "difficulty": 1100,
+              "tags": [
+                "games",
+                "greedy",
+                "sortings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/2004/C",
+              "note": "两人轮流操作，贪心选择最优分割"
+            },
+            {
+              "id": "1965A",
+              "name": "Everything Nim",
+              "difficulty": 1400,
+              "tags": [
+                "games",
+                "greedy",
+                "math",
+                "sortings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1965/A",
+              "note": "Nim游戏变种，分析先手必胜条件"
+            },
+            {
+              "id": "1495B",
+              "name": "Let's Go Hiking",
+              "difficulty": 1900,
+              "tags": [
+                "games",
+                "greedy"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1495/B",
+              "note": "博弈问题，分析山峰山谷性质确定必胜位置"
+            },
+            {
+              "id": "2005E1",
+              "name": "Subtangle Game (Easy Version)",
+              "difficulty": 2100,
+              "tags": [
+                "dp",
+                "games",
+                "greedy",
+                "implementation"
+              ],
+              "url": "https://codeforces.com/problemset/problem/2005/E1",
+              "note": "复杂博弈，需要贪心选择切割策略"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "高级贪心综合",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "高级贪心问题通常结合多种策略，需要更深入的分析和证明。"
+        },
+        {
+          "title": "§7.1 复杂贪心策略",
+          "code_template": "// 典型问题：需要多步贪心决策\n// 框架代码\nvoid solveComplexGreedy() {\n    // 步骤1：预处理排序\n    sort(data.begin(), data.end());\n    \n    // 步骤2：多阶段贪心\n    priority_queue<int> pq;\n    long long ans = 0;\n    for (auto& item : data) {\n        pq.push(item.value);\n        // 根据条件调整\n        if (pq.size() > limit) {\n            pq.pop();\n        }\n    }\n    \n    // 步骤3：计算答案\n    while (!pq.empty()) {\n        ans += pq.top();\n        pq.pop();\n    }\n    cout << ans << endl;\n}",
+          "idea": "复杂贪心问题可能需要多阶段处理：先排序，再用数据结构维护当前最优选择，可能还需要反悔机制。关键是识别问题中的贪心性质和设计合适的数据结构。",
+          "problems": [
+            {
+              "id": "1003D",
+              "name": "Coins and Queries",
+              "difficulty": 1600,
+              "tags": [
+                "greedy"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1003/D",
+              "note": "用2的幂次硬币组成面值，贪心从大到小使用"
+            },
+            {
+              "id": "1077E",
+              "name": "Thematic Contests",
+              "difficulty": 1800,
+              "tags": [
+                "greedy",
+                "sortings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1077/E",
+              "note": "排序后贪心选择比赛主题，每次数量翻倍"
+            },
+            {
+              "id": "1303D",
+              "name": "Fill The Bag",
+              "difficulty": 1900,
+              "tags": [
+                "bitmasks",
+                "greedy"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1303/D",
+              "note": "用2的幂次物品填充背包，贪心拆分大物品"
+            },
+            {
+              "id": "571B",
+              "name": "Minimization",
+              "difficulty": 2000,
+              "tags": [
+                "dp",
+                "greedy",
+                "sortings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/571/B",
+              "note": "排序后DP，贪心分组使相邻差之和最小"
+            },
+            {
+              "id": "551C",
+              "name": "GukiZ hates Boxes",
+              "difficulty": 2200,
+              "tags": [
+                "binary search",
+                "greedy"
+              ],
+              "url": "https://codeforces.com/problemset/problem/551/C",
+              "note": "二分答案，贪心检查是否能在限定时间内搬完箱子"
+            },
+            {
+              "id": "1091F",
+              "name": "New Year and the Mallard Expedition",
+              "difficulty": 2600,
+              "tags": [
+                "constructive algorithms",
+                "greedy"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1091/F",
+              "note": "复杂贪心，管理能量在不同地形间转换"
+            },
+            {
+              "id": "1637G",
+              "name": "Birthday",
+              "difficulty": 3000,
+              "tags": [
+                "constructive algorithms",
+                "greedy",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1637/G",
+              "note": "通过操作使所有数相等，需要巧妙的贪心构造"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

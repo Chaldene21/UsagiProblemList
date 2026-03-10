@@ -262,6 +262,40 @@ func (h *Handler) GetCategoryProgress(c *gin.Context) {
 	successResponse(c, progress)
 }
 
+// GetHeatmapData 获取热力图数据
+func (h *Handler) GetHeatmapData(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		errorResponse(c, http.StatusUnauthorized, "未登录")
+		return
+	}
+
+	data, err := h.progressService.GetHeatmapData(userID.(uint))
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	successResponse(c, data)
+}
+
+// GetDetailedStats 获取详细统计
+func (h *Handler) GetDetailedStats(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		errorResponse(c, http.StatusUnauthorized, "未登录")
+		return
+	}
+
+	stats, err := h.progressService.GetDetailedStats(userID.(uint))
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	successResponse(c, stats)
+}
+
 // ==================== 中间件 ====================
 
 // AuthMiddleware JWT认证中间件

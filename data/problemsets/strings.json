@@ -1,0 +1,1015 @@
+{
+  "id": "strings",
+  "title": "字符串题单",
+  "description": "本题单包含字符串的7个知识点，涵盖从入门到挑战的各难度题目。",
+  "category": "字符串",
+  "sections": [
+    {
+      "title": "一、字符串基础",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "本题单按知识点划分为7个部分，每个部分包含该知识点的解题思路、代码模板和精选练习题。"
+        }
+      ]
+    },
+    {
+      "title": "二、知识点详解",
+      "content": [
+        {
+          "title": "§1 字符串哈希",
+          "code_template": "#include <bits/stdc++.h>\nusing namespace std;\n\n// 单哈希模板\nstruct SingleHash {\n    const int base = 131;          // 常用质数: 131, 13331, 10007\n    const int mod = 1e9 + 7;       // 常用模数: 1e9+7, 1e9+9, 998244353\n    vector<long long> pow, pre;\n    \n    void init(const string &s) {\n        int n = s.length();\n        pow.resize(n + 1);\n        pre.resize(n + 1);\n        pow[0] = 1;\n        for (int i = 1; i <= n; i++) {\n            pow[i] = pow[i-1] * base % mod;\n            pre[i] = (pre[i-1] * base + s[i-1]) % mod;\n        }\n    }\n    \n    // 获取子串s[l..r]的哈希值 (0-indexed)\n    long long get_hash(int l, int r) {\n        return (pre[r+1] - pre[l] * pow[r-l+1] % mod + mod) % mod;\n    }\n};\n\n// 双哈希模板（减少碰撞概率）\nstruct DoubleHash {\n    const int base1 = 131, base2 = 13331;\n    const int mod1 = 1e9 + 7, mod2 = 1e9 + 9;\n    vector<long long> pow1, pow2, pre1, pre2;\n    \n    void init(const string &s) {\n        int n = s.length();\n        pow1.resize(n + 1);\n        pow2.resize(n + 1);\n        pre1.resize(n + 1);\n        pre2.resize(n + 1);\n        pow1[0] = pow2[0] = 1;\n        for (int i = 1; i <= n; i++) {\n            pow1[i] = pow1[i-1] * base1 % mod1;\n            pow2[i] = pow2[i-1] * base2 % mod2;\n            pre1[i] = (pre1[i-1] * base1 + s[i-1]) % mod1;\n            pre2[i] = (pre2[i-1] * base2 + s[i-1]) % mod2;\n        }\n    }\n    \n    pair<long long, long long> get_hash(int l, int r) {\n        long long h1 = (pre1[r+1] - pre1[l] * pow1[r-l+1] % mod1 + mod1) % mod1;\n        long long h2 = (pre2[r+1] - pre2[l] * pow2[r-l+1] % mod2 + mod2) % mod2;\n        return {h1, h2};\n    }\n};\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    \n    string s;\n    cin >> s;\n    \n    // 使用示例\n    DoubleHash dh;\n    dh.init(s);\n    \n    // 比较子串是否相等\n    int l1, r1, l2, r2;\n    cin >> l1 >> r1 >> l2 >> r2;\n    if (dh.get_hash(l1, r1) == dh.get_hash(l2, r2)) {\n        cout << \"Substrings are equal\\n\";\n    }\n    \n    return 0;\n}",
+          "idea": "字符串哈希（Rolling Hash）的核心思想是将字符串映射为一个数值（哈希值），通过比较哈希值来判断字符串是否相等。\n\n**核心原理：**\n1. 将字符串视为一个base进制的数，每个字符对应一个数字（如ASCII码）\n2. 预处理前缀哈希：hash[i] = (hash[i-1] * base + s[i]) % mod\n3. 通过前缀哈希计算任意子串哈希：hash(l,r) = (hash[r] - hash[l-1] * pow[r-l+1] % mod + mod) % mod\n\n**双哈希技巧：**\n- 使用两个不同的base和mod分别计算哈希值\n- 只有当两个哈希值都相等时才认为字符串相等\n- 极大降低哈希碰撞概率\n\n**应用场景：**\n1. 快速判断两个子串是否相等 - O(1)时间\n2. 字符串匹配（替代KMP的部分场景）\n3. 最长回文子串（结合二分）\n4. 字符串周期判断\n5. 字符串集合去重\n\n**注意事项：**\n1. base和mod的选择很重要，通常使用质数\n2. 注意取模运算的负数处理\n3. 双哈希虽然安全但计算量加倍\n4. 在极端数据下仍可能碰撞，但概率极低",
+          "problems": [
+            {
+              "id": "1038A",
+              "name": "Equality",
+              "difficulty": 800,
+              "tags": [
+                "implementation",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1038/A",
+              "note": "基础字符串计数，理解字符频率概念"
+            },
+            {
+              "id": "1941C",
+              "name": "Rudolf and the Ugly String",
+              "difficulty": 900,
+              "tags": [
+                "dp",
+                "greedy",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1941/C",
+              "note": "简单模式匹配，可练习字符串查找"
+            },
+            {
+              "id": "1029A",
+              "name": "Many Equal Substrings",
+              "difficulty": 1300,
+              "tags": [
+                "implementation",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1029/A",
+              "note": "寻找最长公共前后缀，哈希可快速判断子串相等"
+            },
+            {
+              "id": "1800E1",
+              "name": "Unforgivable Curse (easy version)",
+              "difficulty": 1400,
+              "tags": [
+                "brute force",
+                "constructive algorithms",
+                "dsu",
+                "graphs",
+                "greedy",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1800/E1",
+              "note": "字符串可达性判断，哈希可用于状态去重"
+            },
+            {
+              "id": "574B",
+              "name": "Bear and Three Musketeers",
+              "difficulty": 1500,
+              "tags": [
+                "brute force",
+                "dfs and similar",
+                "graphs",
+                "hashing"
+              ],
+              "url": "https://codeforces.com/problemset/problem/574/B",
+              "note": "图论问题，哈希用于快速判断边是否存在"
+            },
+            {
+              "id": "1092C",
+              "name": "Prefixes and Suffixes",
+              "difficulty": 1700,
+              "tags": [
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1092/C",
+              "note": "字符串拼接验证，哈希可快速比较前后缀"
+            },
+            {
+              "id": "827A",
+              "name": "String Reconstruction",
+              "difficulty": 1700,
+              "tags": [
+                "data structures",
+                "greedy",
+                "sortings",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/827/A",
+              "note": "字符串填充问题，哈希可用于验证冲突"
+            },
+            {
+              "id": "923C",
+              "name": "Perfect Security",
+              "difficulty": 1800,
+              "tags": [
+                "data structures",
+                "greedy",
+                "strings",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/923/C",
+              "note": "01字典树应用，哈希可作为替代方案"
+            },
+            {
+              "id": "722D",
+              "name": "Generating Sets",
+              "difficulty": 1900,
+              "tags": [
+                "binary search",
+                "data structures",
+                "dfs and similar",
+                "greedy",
+                "strings",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/722/D",
+              "note": "集合变换问题，哈希用于字符串集合操作"
+            },
+            {
+              "id": "1056E",
+              "name": "Check Transcription",
+              "difficulty": 2100,
+              "tags": [
+                "brute force",
+                "data structures",
+                "hashing",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1056/E",
+              "note": "核心哈希应用题，需要双哈希确保正确性"
+            },
+            {
+              "id": "1996G",
+              "name": "Penacony",
+              "difficulty": 2200,
+              "tags": [
+                "brute force",
+                "data structures",
+                "graphs",
+                "greedy",
+                "hashing"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1996/G",
+              "note": "复杂字符串处理，哈希用于模式匹配和去重"
+            },
+            {
+              "id": "1166F",
+              "name": "Vicky's Delivery Service",
+              "difficulty": 2400,
+              "tags": [
+                "data structures",
+                "dsu",
+                "graphs",
+                "hashing"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1166/F",
+              "note": "图论与哈希结合，维护连通分量信息"
+            },
+            {
+              "id": "1051E",
+              "name": "Vasya and Big Integers",
+              "difficulty": 2600,
+              "tags": [
+                "binary search",
+                "data structures",
+                "dp",
+                "hashing",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1051/E",
+              "note": "高级哈希应用，结合DP和二分，需要处理大数比较"
+            }
+          ]
+        },
+        {
+          "title": "§2 KMP与模式匹配",
+          "code_template": "#include <bits/stdc++.h>\nusing namespace std;\n\n// KMP算法：计算next数组\nvector<int> getNext(const string &pattern) {\n    int n = pattern.size();\n    vector<int> next(n, 0);\n    for (int i = 1, j = 0; i < n; i++) {\n        while (j > 0 && pattern[i] != pattern[j]) {\n            j = next[j - 1];\n        }\n        if (pattern[i] == pattern[j]) {\n            j++;\n        }\n        next[i] = j;\n    }\n    return next;\n}\n\n// KMP算法：在文本中搜索模式串\nvector<int> kmpSearch(const string &text, const string &pattern) {\n    vector<int> next = getNext(pattern);\n    vector<int> positions;\n    int n = text.size(), m = pattern.size();\n    \n    for (int i = 0, j = 0; i < n; i++) {\n        while (j > 0 && text[i] != pattern[j]) {\n            j = next[j - 1];\n        }\n        if (text[i] == pattern[j]) {\n            j++;\n        }\n        if (j == m) {\n            positions.push_back(i - m + 1); // 记录匹配起始位置\n            j = next[j - 1]; // 继续寻找下一个匹配\n        }\n    }\n    return positions;\n}\n\n// 计算字符串的最小周期长度\nint minPeriod(const string &s) {\n    int n = s.size();\n    vector<int> next = getNext(s);\n    int period = n - next[n - 1];\n    return (n % period == 0) ? period : n;\n}\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    \n    // 示例：KMP基本用法\n    string text, pattern;\n    cin >> text >> pattern;\n    \n    vector<int> matches = kmpSearch(text, pattern);\n    cout << \"匹配位置：\";\n    for (int pos : matches) {\n        cout << pos << \" \";\n    }\n    cout << endl;\n    \n    // 示例：计算最小周期\n    string s;\n    cin >> s;\n    cout << \"最小周期长度：\" << minPeriod(s) << endl;\n    \n    return 0;\n}",
+          "idea": "KMP算法是字符串匹配的高效算法，核心在于预处理模式串得到next数组（也称部分匹配表）。\n\n**核心思想**：\n1. **next数组**：next[i]表示模式串前缀p[0..i]的最长相同前后缀长度（不包括自身）。\n   - 意义：当匹配失败时，利用已匹配部分的信息，避免从头开始比较。\n   - 计算：利用递推思想，已知next[0..i-1]求next[i]。\n\n2. **匹配过程**：\n   - 维护两个指针i（文本串）和j（模式串）。\n   - 当字符匹配时，i和j同时前进。\n   - 当字符不匹配时，j回退到next[j-1]（如果j>0），否则i前进。\n   - 当j达到模式串长度时，记录匹配位置，然后j回退继续匹配。\n\n**关键应用**：\n- 字符串匹配：O(n+m)时间复杂度。\n- 循环节判断：若n % (n - next[n-1]) == 0，则字符串有周期。\n- 前缀函数应用：统计每个前缀的出现次数、构建自动机等。\n\n**解题技巧**：\n1. 理解next数组的物理意义，能灵活应用于各种变形问题。\n2. 注意边界情况：空字符串、单字符、全相同字符等。\n3. 结合其他数据结构（如哈希、DP）解决复杂问题。",
+          "problems": [
+            {
+              "id": "1038A",
+              "name": "Equality",
+              "difficulty": 800,
+              "tags": [
+                "implementation",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1038/A",
+              "note": "简单字符串计数，理解前缀概念即可。"
+            },
+            {
+              "id": "1927B",
+              "name": "Following the String",
+              "difficulty": 900,
+              "tags": [
+                "constructive algorithms",
+                "greedy",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1927/B",
+              "note": "构造字符串，需要理解字符出现频率与前缀的关系。"
+            },
+            {
+              "id": "1029A",
+              "name": "Many Equal Substrings",
+              "difficulty": 1300,
+              "tags": [
+                "implementation",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1029/A",
+              "note": "利用KMP的next数组求字符串的最长前后缀，构造重复字符串的最小长度。"
+            },
+            {
+              "id": "1735C",
+              "name": "Phase Shift",
+              "difficulty": 1400,
+              "tags": [
+                "dfs and similar",
+                "dsu",
+                "graphs",
+                "greedy",
+                "implementation",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1735/C",
+              "note": "字符串替换问题，需要维护字符映射关系，涉及环检测。"
+            },
+            {
+              "id": "550A",
+              "name": "Two Substrings",
+              "difficulty": 1500,
+              "tags": [
+                "brute force",
+                "dp",
+                "greedy",
+                "implementation",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/550/A",
+              "note": "寻找两个不重叠子串，可用KMP思想优化匹配过程。"
+            },
+            {
+              "id": "1092C",
+              "name": "Prefixes and Suffixes",
+              "difficulty": 1700,
+              "tags": [
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1092/C",
+              "note": "根据前缀后缀信息还原字符串，需要理解字符串的边界关系。"
+            },
+            {
+              "id": "827A",
+              "name": "String Reconstruction",
+              "difficulty": 1700,
+              "tags": [
+                "data structures",
+                "greedy",
+                "sortings",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/827/A",
+              "note": "字符串填充问题，可结合并查集优化，避免重复填充。"
+            },
+            {
+              "id": "923C",
+              "name": "Perfect Security",
+              "difficulty": 1800,
+              "tags": [
+                "data structures",
+                "greedy",
+                "strings",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/923/C",
+              "note": "01字典树应用，通过异或操作实现最小匹配。"
+            },
+            {
+              "id": "757C",
+              "name": "Felicity is Coming!",
+              "difficulty": 1900,
+              "tags": [
+                "data structures",
+                "hashing",
+                "sortings",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/757/C",
+              "note": "统计每种宝可梦在道馆中的出现模式，通过哈希比较模式是否相同。"
+            },
+            {
+              "id": "1056E",
+              "name": "Check Transcription",
+              "difficulty": 2100,
+              "tags": [
+                "brute force",
+                "data structures",
+                "hashing",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1056/E",
+              "note": "将01串映射为字符串，需要枚举长度并验证，结合哈希加速。"
+            },
+            {
+              "id": "1575H",
+              "name": "Holiday Wall Ornaments",
+              "difficulty": 2200,
+              "tags": [
+                "dp",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1575/H",
+              "note": "DP与KMP自动机结合，状态定义为位置和匹配进度。"
+            },
+            {
+              "id": "985F",
+              "name": "Isomorphic Strings",
+              "difficulty": 2300,
+              "tags": [
+                "hashing",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/985/F",
+              "note": "判断字符串子串是否同构，需要对每个字符位置单独哈希。"
+            },
+            {
+              "id": "1051E",
+              "name": "Vasya and Big Integers",
+              "difficulty": 2600,
+              "tags": [
+                "binary search",
+                "data structures",
+                "dp",
+                "hashing",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1051/E",
+              "note": "大整数分割问题，需要比较字符串大小，结合DP和哈希或后缀数组优化。"
+            }
+          ]
+        },
+        {
+          "title": "§3 字典树/Trie",
+          "code_template": "#include <bits/stdc++.h>\nusing namespace std;\n\nconst int ALPHABET_SIZE = 26; // 根据字符集调整\n\nstruct TrieNode {\n    TrieNode* children[ALPHABET_SIZE];\n    bool isEndOfWord;          // 标记单词结束\n    int count;                 // 统计前缀出现次数\n    \n    TrieNode() {\n        isEndOfWord = false;\n        count = 0;\n        for (int i = 0; i < ALPHABET_SIZE; i++) {\n            children[i] = nullptr;\n        }\n    }\n};\n\nclass Trie {\nprivate:\n    TrieNode* root;\n    \n    int charToIndex(char ch) {\n        return ch - 'a'; // 小写字母映射\n    }\n    \npublic:\n    Trie() {\n        root = new TrieNode();\n    }\n    \n    // 插入字符串\n    void insert(const string& word) {\n        TrieNode* node = root;\n        for (char ch : word) {\n            int index = charToIndex(ch);\n            if (!node->children[index]) {\n                node->children[index] = new TrieNode();\n            }\n            node = node->children[index];\n            node->count++; // 前缀计数增加\n        }\n        node->isEndOfWord = true;\n    }\n    \n    // 搜索完整单词\n    bool search(const string& word) {\n        TrieNode* node = root;\n        for (char ch : word) {\n            int index = charToIndex(ch);\n            if (!node->children[index]) {\n                return false;\n            }\n            node = node->children[index];\n        }\n        return node->isEndOfWord;\n    }\n    \n    // 统计前缀出现次数\n    int countPrefix(const string& prefix) {\n        TrieNode* node = root;\n        for (char ch : prefix) {\n            int index = charToIndex(ch);\n            if (!node->children[index]) {\n                return 0;\n            }\n            node = node->children[index];\n        }\n        return node->count;\n    }\n    \n    // 删除字符串（可选实现）\n    void remove(const string& word) {\n        if (!search(word)) return;\n        TrieNode* node = root;\n        for (char ch : word) {\n            int index = charToIndex(ch);\n            node = node->children[index];\n            node->count--;\n        }\n        node->isEndOfWord = false;\n    }\n};\n\nint main() {\n    Trie trie;\n    // 示例用法\n    trie.insert(\"apple\");\n    trie.insert(\"app\");\n    cout << trie.search(\"app\") << endl;      // 1\n    cout << trie.countPrefix(\"app\") << endl; // 2\n    return 0;\n}",
+          "idea": "字典树（Trie）是一种用于高效存储和检索字符串集合的树形数据结构。核心思想是利用字符串的公共前缀来减少存储空间，同时支持快速查询。\n\n解题思路：\n1. **基本结构**：每个节点包含指向子节点的指针数组（大小等于字符集），以及标记单词结束的布尔值。\n2. **插入操作**：从根节点开始，按字符顺序遍历字符串，为每个字符创建对应的子节点（如果不存在），最后标记单词结束。\n3. **查询操作**：\n   - 完整单词查询：遍历字符串，如果路径存在且最后一个节点标记为单词结束，则存在。\n   - 前缀查询：遍历前缀，如果路径存在，则前缀存在。\n4. **前缀统计**：在节点中维护一个计数器，插入时沿途增加计数，查询时返回对应节点的计数值。\n5. **多模式匹配**：将多个模式串插入Trie中，然后对文本串进行扫描，利用Trie进行并行匹配。\n6. **优化技巧**：\n   - 压缩Trie：合并只有一个子节点的路径，节省空间。\n   - 动态分配 vs 静态数组：根据问题规模选择。\n   - 二进制Trie：用于处理位运算相关的问题。\n7. **常见应用场景**：\n   - 自动补全和拼写检查\n   - IP路由表的最长前缀匹配\n   - 词频统计和前缀查询\n   - 字符串集合的排序（按字典序）\n8. **时间复杂度**：插入、查询、删除均为O(L)，其中L是字符串长度。",
+          "problems": [
+            {
+              "id": "1038A",
+              "name": "Equality",
+              "difficulty": 800,
+              "tags": [
+                "implementation",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1038/A",
+              "note": "统计前k个字母的出现次数，取最小值乘以k。虽然简单，但可以引入字符统计的思想。"
+            },
+            {
+              "id": "1927B",
+              "name": "Following the String",
+              "difficulty": 900,
+              "tags": [
+                "constructive algorithms",
+                "greedy",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1927/B",
+              "note": "根据前缀相同次数构造字符串，可以用数组统计字符使用次数。"
+            },
+            {
+              "id": "1029A",
+              "name": "Many Equal Substrings",
+              "difficulty": 1300,
+              "tags": [
+                "implementation",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1029/A",
+              "note": "寻找最长前后缀重叠部分，可以用KMP或简单循环实现。"
+            },
+            {
+              "id": "1735C",
+              "name": "Phase Shift",
+              "difficulty": 1400,
+              "tags": [
+                "dfs and similar",
+                "dsu",
+                "graphs",
+                "greedy",
+                "implementation",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1735/C",
+              "note": "构建字符映射关系，避免形成环，可以用并查集或贪心解决。"
+            },
+            {
+              "id": "550A",
+              "name": "Two Substrings",
+              "difficulty": 1500,
+              "tags": [
+                "brute force",
+                "dp",
+                "greedy",
+                "implementation",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/550/A",
+              "note": "检查字符串中是否同时包含不重叠的\"AB\"和\"BA\"子串。"
+            },
+            {
+              "id": "1092C",
+              "name": "Prefixes and Suffixes",
+              "difficulty": 1700,
+              "tags": [
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1092/C",
+              "note": "根据所有前缀和后缀推断原字符串，需要仔细分析长度关系。"
+            },
+            {
+              "id": "827A",
+              "name": "String Reconstruction",
+              "difficulty": 1700,
+              "tags": [
+                "data structures",
+                "greedy",
+                "sortings",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/827/A",
+              "note": "合并多个子串到指定位置，可以用并查集优化填充过程。"
+            },
+            {
+              "id": "923C",
+              "name": "Perfect Security",
+              "difficulty": 1800,
+              "tags": [
+                "data structures",
+                "greedy",
+                "strings",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/923/C",
+              "note": "经典Trie应用，对每个数在Trie中寻找异或最小的匹配，需要二进制Trie。"
+            },
+            {
+              "id": "757C",
+              "name": "Felicity is Coming!",
+              "difficulty": 1900,
+              "tags": [
+                "data structures",
+                "hashing",
+                "sortings",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/757/C",
+              "note": "统计每个宝可梦在不同场馆的出现位置模式，相同模式的可以互换。"
+            },
+            {
+              "id": "1056E",
+              "name": "Check Transcription",
+              "difficulty": 2100,
+              "tags": [
+                "brute force",
+                "data structures",
+                "hashing",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1056/E",
+              "note": "将二进制串映射到字符串，需要枚举0和1对应的子串并验证。"
+            },
+            {
+              "id": "1575H",
+              "name": "Holiday Wall Ornaments",
+              "difficulty": 2200,
+              "tags": [
+                "dp",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1575/H",
+              "note": "带通配符的字符串匹配，结合KMP和DP，状态包含匹配位置和修改次数。"
+            },
+            {
+              "id": "985F",
+              "name": "Isomorphic Strings",
+              "difficulty": 2300,
+              "tags": [
+                "hashing",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/985/F",
+              "note": "判断子串是否同构，可以用哈希记录每个字母的位置分布。"
+            },
+            {
+              "id": "1051E",
+              "name": "Vasya and Big Integers",
+              "difficulty": 2600,
+              "tags": [
+                "binary search",
+                "data structures",
+                "dp",
+                "hashing",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1051/E",
+              "note": "大整数分割问题，需要比较字符串大小，可以用后缀数组或Z函数优化。"
+            }
+          ]
+        },
+        {
+          "title": "§4 后缀数组/后缀自动机",
+          "code_template": "// 后缀数组模板 (倍增法)\n#include <bits/stdc++.h>\nusing namespace std;\n\nconst int N = 1e6 + 10;\nchar s[N];\nint n, m;\nint sa[N], rk[N], height[N];\nint oldrk[N << 1], id[N], cnt[N];\n\nvoid buildSA() {\n    m = 256;\n    for (int i = 1; i <= n; i++) cnt[rk[i] = s[i]]++;\n    for (int i = 1; i <= m; i++) cnt[i] += cnt[i - 1];\n    for (int i = n; i >= 1; i--) sa[cnt[rk[i]]--] = i;\n    \n    for (int w = 1; w < n; w <<= 1) {\n        memset(cnt, 0, sizeof(cnt));\n        for (int i = 1; i <= n; i++) id[i] = sa[i];\n        for (int i = 1; i <= n; i++) cnt[rk[id[i] + w]]++;\n        for (int i = 1; i <= m; i++) cnt[i] += cnt[i - 1];\n        for (int i = n; i >= 1; i--) sa[cnt[rk[id[i] + w]]--] = id[i];\n        \n        memset(cnt, 0, sizeof(cnt));\n        for (int i = 1; i <= n; i++) id[i] = sa[i];\n        for (int i = 1; i <= n; i++) cnt[rk[id[i]]]++;\n        for (int i = 1; i <= m; i++) cnt[i] += cnt[i - 1];\n        for (int i = n; i >= 1; i--) sa[cnt[rk[id[i]]]--] = id[i];\n        \n        memcpy(oldrk, rk, sizeof(rk));\n        int p = 0;\n        for (int i = 1; i <= n; i++) {\n            if (oldrk[sa[i]] == oldrk[sa[i - 1]] && \n                oldrk[sa[i] + w] == oldrk[sa[i - 1] + w]) {\n                rk[sa[i]] = p;\n            } else {\n                rk[sa[i]] = ++p;\n            }\n        }\n        m = p;\n        if (m == n) break;\n    }\n}\n\nvoid getHeight() {\n    for (int i = 1, k = 0; i <= n; i++) {\n        if (k) k--;\n        while (s[i + k] == s[sa[rk[i] - 1] + k]) k++;\n        height[rk[i]] = k;\n    }\n}\n\nint main() {\n    scanf(\"%s\", s + 1);\n    n = strlen(s + 1);\n    buildSA();\n    getHeight();\n    // 输出后缀数组\n    for (int i = 1; i <= n; i++) printf(\"%d \", sa[i]);\n    return 0;\n}",
+          "idea": "后缀数组（SA）和后缀自动机（SAM）是处理字符串问题的两大核心数据结构。\n\n**后缀数组（SA）**：\n1. 将字符串的所有后缀按字典序排序，得到sa数组（排名第i的后缀起始位置）和rk数组（位置i的后缀排名）\n2. 通过height数组（相邻排名的后缀的最长公共前缀LCP）可以高效解决：\n   - 求任意两个后缀的LCP（RMQ查询height数组）\n   - 求不同子串数量（总子串数减去height数组和）\n   - 求最长重复子串（height数组最大值）\n   - 求多个字符串的公共子串（拼接后求height）\n\n**后缀自动机（SAM）**：\n1. 有向无环图，每个节点代表一个endpos等价类，边表示字符转移\n2. 核心性质：\n   - 从根节点出发的路径对应所有子串\n   - 每个节点对应的子串长度区间为[link.len+1, len]\n   - 可以处理子串出现次数、所有不同子串等\n3. 常见应用：\n   - 求最小循环移位（构造S+S的SAM）\n   - 求两个字符串的最长公共子串（对第一个建SAM，第二个在上面匹配）\n   - 求第k小子串（DP统计路径数）\n\n**解题思路**：\n1. 判断问题是否涉及子串统计、匹配、公共部分\n2. 单字符串问题优先考虑SA（实现相对简单），多字符串或动态问题考虑SAM\n3. 最长公共子串问题：拼接字符串用SA求height，或用SAM在线匹配\n4. 注意边界处理和字符集大小",
+          "problems": [
+            {
+              "id": "1029A",
+              "name": "Many Equal Substrings",
+              "difficulty": 1300,
+              "tags": [
+                "implementation",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1029/A",
+              "note": "求字符串的最长border（既是前缀又是后缀），可以用KMP的next数组，也可以使用后缀数组计算LCP"
+            },
+            {
+              "id": "1092C",
+              "name": "Prefixes and Suffixes",
+              "difficulty": 1700,
+              "tags": [
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1092/C",
+              "note": "给定所有前缀和后缀，重构原字符串。可以通过长度排序和字符串匹配解决，涉及前缀后缀关系"
+            },
+            {
+              "id": "827A",
+              "name": "String Reconstruction",
+              "difficulty": 1700,
+              "tags": [
+                "data structures",
+                "greedy",
+                "sortings",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/827/A",
+              "note": "字符串拼接问题，可以用并查集或直接贪心填充，虽然不是直接SA/SAM但训练字符串处理能力"
+            },
+            {
+              "id": "985F",
+              "name": "Isomorphic Strings",
+              "difficulty": 2300,
+              "tags": [
+                "hashing",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/985/F",
+              "note": "判断子串是否同构。可以对每个字母建立位置集合的哈希，比较字母映射关系"
+            },
+            {
+              "id": "1051E",
+              "name": "Vasya and Big Integers",
+              "difficulty": 2600,
+              "tags": [
+                "binary search",
+                "data structures",
+                "dp",
+                "hashing",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1051/E",
+              "note": "大整数分割问题，需要比较子串与给定边界的大小。可以用后缀数组或Z函数快速比较子串字典序"
+            }
+          ]
+        },
+        {
+          "title": "§5 AC自动机",
+          "code_template": "#include <bits/stdc++.h>\nusing namespace std;\n\nconst int MAXN = 1e6 + 5;\nconst int ALPHABET = 26;\n\nstruct AC_Automaton {\n    int tr[MAXN][ALPHABET];\n    int fail[MAXN];\n    int cnt[MAXN]; // 记录模式串出现次数\n    int idx; // 节点编号\n    \n    void init() {\n        memset(tr[0], 0, sizeof(tr[0]));\n        memset(cnt, 0, sizeof(cnt));\n        idx = 0;\n    }\n    \n    void insert(const string &s) {\n        int p = 0;\n        for (char ch : s) {\n            int c = ch - 'a';\n            if (!tr[p][c]) {\n                tr[p][c] = ++idx;\n                memset(tr[idx], 0, sizeof(tr[idx]));\n            }\n            p = tr[p][c];\n        }\n        cnt[p]++; // 模式串终点标记\n    }\n    \n    void build() {\n        queue<int> q;\n        for (int i = 0; i < ALPHABET; i++) {\n            if (tr[0][i]) {\n                fail[tr[0][i]] = 0;\n                q.push(tr[0][i]);\n            }\n        }\n        \n        while (!q.empty()) {\n            int u = q.front();\n            q.pop();\n            \n            for (int i = 0; i < ALPHABET; i++) {\n                if (tr[u][i]) {\n                    fail[tr[u][i]] = tr[fail[u]][i];\n                    q.push(tr[u][i]);\n                } else {\n                    tr[u][i] = tr[fail[u]][i];\n                }\n            }\n            // 如果需要累加所有后缀模式串的贡献\n            // cnt[u] += cnt[fail[u]];\n        }\n    }\n    \n    int query(const string &s) {\n        int p = 0, res = 0;\n        for (char ch : s) {\n            p = tr[p][ch - 'a'];\n            // 遍历所有后缀模式串\n            for (int j = p; j && cnt[j] != -1; j = fail[j]) {\n                res += cnt[j];\n                cnt[j] = -1; // 防止重复计数\n            }\n        }\n        return res;\n    }\n} ac;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    \n    int n;\n    cin >> n;\n    ac.init();\n    \n    for (int i = 0; i < n; i++) {\n        string s;\n        cin >> s;\n        ac.insert(s);\n    }\n    \n    ac.build();\n    \n    string text;\n    cin >> text;\n    cout << ac.query(text) << endl;\n    \n    return 0;\n}",
+          "idea": "AC自动机（Aho-Corasick Automaton）是用于多模式匹配的经典数据结构，结合了Trie树和KMP算法的思想。\n\n核心思想：\n1. 构建Trie树：将所有模式串插入到一棵Trie树中\n2. 构建fail指针：类似于KMP的next数组，fail指针指向当前节点代表字符串的最长后缀节点\n3. 匹配过程：在文本串上遍历，利用fail指针进行状态转移\n\n关键点：\n- fail指针构建：BFS层次遍历，子节点的fail指向父节点fail指针对应字符的节点\n- 路径压缩：通过tr[u][i] = tr[fail[u]][i]优化状态转移\n- 统计方式：可以统计出现次数、出现位置等\n\n常见应用：\n1. 多模式串匹配\n2. 统计每个模式串出现次数\n3. 结合DP解决复杂计数问题\n4. 处理带通配符的匹配\n\n优化技巧：\n- 使用数组而非指针提高效率\n- 预处理转移表加速匹配\n- 拓扑排序优化fail树上的信息传递",
+          "problems": [
+            {
+              "id": "1029A",
+              "name": "Many Equal Substrings",
+              "difficulty": 1300,
+              "tags": [
+                "implementation",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1029/A",
+              "note": "KMP next数组的应用，可以看作AC自动机的简化版，理解前缀后缀关系"
+            },
+            {
+              "id": "550A",
+              "name": "Two Substrings",
+              "difficulty": 1500,
+              "tags": [
+                "brute force",
+                "dp",
+                "greedy",
+                "implementation",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/550A",
+              "note": "字符串匹配基础题，练习处理重叠子串的情况"
+            },
+            {
+              "id": "1092C",
+              "name": "Prefixes and Suffixes",
+              "difficulty": 1700,
+              "tags": [
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1092/C",
+              "note": "前缀后缀匹配问题，理解字符串的border概念"
+            },
+            {
+              "id": "827A",
+              "name": "String Reconstruction",
+              "difficulty": 1700,
+              "tags": [
+                "data structures",
+                "greedy",
+                "sortings",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/827A",
+              "note": "字符串填充问题，练习处理多个子串在文本中的位置"
+            },
+            {
+              "id": "923C",
+              "name": "Perfect Security",
+              "difficulty": 1800,
+              "tags": [
+                "data structures",
+                "greedy",
+                "strings",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/923/C",
+              "note": "Trie树应用，为AC自动机的基础结构做准备"
+            },
+            {
+              "id": "757C",
+              "name": "Felicity is Coming!",
+              "difficulty": 1900,
+              "tags": [
+                "data structures",
+                "hashing",
+                "sortings",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/757/C",
+              "note": "字符串分组问题，理解字符映射关系"
+            },
+            {
+              "id": "1056E",
+              "name": "Check Transcription",
+              "difficulty": 2100,
+              "tags": [
+                "brute force",
+                "data structures",
+                "hashing",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1056/E",
+              "note": "字符串编码验证，练习复杂匹配逻辑"
+            },
+            {
+              "id": "1575H",
+              "name": "Holiday Wall Ornaments",
+              "difficulty": 2200,
+              "tags": [
+                "dp",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1575/H",
+              "note": "AC自动机与DP结合，统计特定模式串出现次数"
+            },
+            {
+              "id": "985F",
+              "name": "Isomorphic Strings",
+              "difficulty": 2300,
+              "tags": [
+                "hashing",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/985/F",
+              "note": "字符串同构问题，扩展对匹配的理解"
+            },
+            {
+              "id": "1051E",
+              "name": "Vasya and Big Integers",
+              "difficulty": 2600,
+              "tags": [
+                "binary search",
+                "data structures",
+                "dp",
+                "hashing",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1051/E",
+              "note": "复杂字符串分割问题，需要结合多种字符串算法"
+            }
+          ]
+        },
+        {
+          "title": "§6 回文串",
+          "code_template": "// Manacher算法模板\nvector<int> manacher(string s) {\n    string t = \"#\";\n    for (char c : s) {\n        t += c;\n        t += '#';\n    }\n    int n = t.size();\n    vector<int> p(n, 0);\n    int center = 0, right = 0;\n    for (int i = 1; i < n; i++) {\n        int mirror = 2 * center - i;\n        if (i < right) {\n            p[i] = min(right - i, p[mirror]);\n        }\n        while (i + p[i] + 1 < n && i - p[i] - 1 >= 0 && t[i + p[i] + 1] == t[i - p[i] - 1]) {\n            p[i]++;\n        }\n        if (i + p[i] > right) {\n            center = i;\n            right = i + p[i];\n        }\n    }\n    return p;\n}\n\n// 回文自动机模板\nstruct PalindromicTree {\n    struct Node {\n        int len, link;\n        map<char, int> next;\n        int cnt; // 出现次数\n    };\n    vector<Node> tree;\n    string s;\n    int last, size;\n    \n    PalindromicTree(string str) : s(str) {\n        tree.resize(str.size() + 3);\n        tree[0].len = -1; tree[0].link = 0;\n        tree[1].len = 0; tree[1].link = 0;\n        last = 1;\n        size = 2;\n        for (int i = 0; i < s.size(); i++) {\n            addChar(i);\n        }\n    }\n    \n    void addChar(int pos) {\n        char c = s[pos];\n        int cur = last;\n        while (true) {\n            int curLen = tree[cur].len;\n            if (pos - curLen - 1 >= 0 && s[pos - curLen - 1] == c) break;\n            cur = tree[cur].link;\n        }\n        if (tree[cur].next.count(c)) {\n            last = tree[cur].next[c];\n            tree[last].cnt++;\n            return;\n        }\n        int newNode = size++;\n        tree[newNode].len = tree[cur].len + 2;\n        tree[cur].next[c] = newNode;\n        if (tree[newNode].len == 1) {\n            tree[newNode].link = 1;\n        } else {\n            int link = tree[cur].link;\n            while (true) {\n                int linkLen = tree[link].len;\n                if (pos - linkLen - 1 >= 0 && s[pos - linkLen - 1] == c) break;\n                link = tree[link].link;\n            }\n            tree[newNode].link = tree[link].next[c];\n        }\n        tree[newNode].cnt = 1;\n        last = newNode;\n    }\n};",
+          "idea": "回文串处理是字符串算法中的重要专题，主要涉及两种核心算法：Manacher算法和回文自动机。\n\n1. **Manacher算法**：用于在线性时间内求出字符串所有位置为中心的最长回文半径。算法核心思想是利用回文串的对称性，通过维护当前已知的最右回文边界来加速计算。预处理时在字符间插入特殊字符（如'#'）统一处理奇偶长度回文串。\n\n2. **回文自动机（PAM）**：也称为回文树，是一种专门处理回文串的数据结构。它包含两个根节点（分别对应长度为-1和0的回文串），每个节点代表一个本质不同的回文子串。通过增量构建，可以在O(n)时间内处理字符串的所有回文子串信息，包括计数、长度分布等。\n\n解题思路：\n- 当需要统计所有回文子串数量或最长回文子串时，优先考虑Manacher算法\n- 当需要处理多个回文串相关查询，或需要维护回文串的计数信息时，使用回文自动机\n- 回文自动机还可以结合DP解决复杂的回文分割、回文对等问题",
+          "problems": [
+            {
+              "id": "550A",
+              "name": "Two Substrings",
+              "difficulty": 1500,
+              "tags": [
+                "brute force",
+                "dp",
+                "greedy",
+                "implementation",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/550/A",
+              "note": "虽然不是直接的回文串问题，但涉及子串查找，可作为字符串基础练习"
+            },
+            {
+              "id": "1092C",
+              "name": "Prefixes and Suffixes",
+              "difficulty": 1700,
+              "tags": [
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1092/C",
+              "note": "字符串前后缀匹配问题，锻炼字符串处理能力"
+            },
+            {
+              "id": "827A",
+              "name": "String Reconstruction",
+              "difficulty": 1700,
+              "tags": [
+                "data structures",
+                "greedy",
+                "sortings",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/827/A",
+              "note": "字符串重构问题，需要高效处理字符串覆盖"
+            },
+            {
+              "id": "923C",
+              "name": "Perfect Security",
+              "difficulty": 1800,
+              "tags": [
+                "data structures",
+                "greedy",
+                "strings",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/923/C",
+              "note": "涉及字符串匹配和贪心，使用Trie树优化"
+            },
+            {
+              "id": "757C",
+              "name": "Felicity is Coming!",
+              "difficulty": 1900,
+              "tags": [
+                "data structures",
+                "hashing",
+                "sortings",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/757/C",
+              "note": "字符串映射和等价关系，需要良好的抽象能力"
+            },
+            {
+              "id": "1056E",
+              "name": "Check Transcription",
+              "difficulty": 2100,
+              "tags": [
+                "brute force",
+                "data structures",
+                "hashing",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1056/E",
+              "note": "字符串编码验证，需要哈希和枚举技巧"
+            },
+            {
+              "id": "1575H",
+              "name": "Holiday Wall Ornaments",
+              "difficulty": 2200,
+              "tags": [
+                "dp",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1575/H",
+              "note": "字符串匹配与DP结合，需要KMP自动机状态转移"
+            },
+            {
+              "id": "985F",
+              "name": "Isomorphic Strings",
+              "difficulty": 2300,
+              "tags": [
+                "hashing",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/985/F",
+              "note": "字符串同构判断，需要巧妙设计哈希函数"
+            },
+            {
+              "id": "1051E",
+              "name": "Vasya and Big Integers",
+              "difficulty": 2600,
+              "tags": [
+                "binary search",
+                "data structures",
+                "dp",
+                "hashing",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1051/E",
+              "note": "大整数分割问题，综合运用字符串哈希、二分和DP"
+            }
+          ]
+        },
+        {
+          "title": "§7 Z函数",
+          "code_template": "#include <bits/stdc++.h>\nusing namespace std;\n\n// Z函数模板\nvector<int> z_function(const string &s) {\n    int n = (int)s.length();\n    vector<int> z(n);\n    for (int i = 1, l = 0, r = 0; i < n; ++i) {\n        if (i <= r)\n            z[i] = min(r - i + 1, z[i - l]);\n        while (i + z[i] < n && s[z[i]] == s[i + z[i]])\n            ++z[i];\n        if (i + z[i] - 1 > r) {\n            l = i;\n            r = i + z[i] - 1;\n        }\n    }\n    return z;\n}\n\n// 前缀函数模板（KMP）\nvector<int> prefix_function(const string &s) {\n    int n = (int)s.length();\n    vector<int> pi(n);\n    for (int i = 1; i < n; ++i) {\n        int j = pi[i - 1];\n        while (j > 0 && s[i] != s[j])\n            j = pi[j - 1];\n        if (s[i] == s[j])\n            ++j;\n        pi[i] = j;\n    }\n    return pi;\n}\n\n// 使用Z函数进行模式匹配\nvoid pattern_matching(const string &text, const string &pattern) {\n    string combined = pattern + \"#\" + text;\n    vector<int> z = z_function(combined);\n    int m = pattern.length();\n    for (int i = m + 1; i < combined.length(); ++i) {\n        if (z[i] == m) {\n            // 在位置 i-m-1 处找到匹配\n            cout << \"Found at index: \" << i - m - 1 << endl;\n        }\n    }\n}\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    \n    string s;\n    cin >> s;\n    \n    // 计算Z函数\n    vector<int> z = z_function(s);\n    \n    // 输出结果\n    for (int i = 0; i < z.size(); ++i) {\n        cout << z[i] << \" \";\n    }\n    cout << endl;\n    \n    return 0;\n}",
+          "idea": "Z函数（Z-algorithm）是一种高效的字符串处理算法，用于计算字符串每个后缀与整个字符串的最长公共前缀长度。核心思想是维护一个匹配窗口[l, r]，表示当前已知的最右匹配区间。算法时间复杂度为O(n)。\n\n主要应用场景：\n1. 字符串匹配：将模式串与文本串用特殊字符连接，计算Z函数，Z值等于模式串长度时即为匹配位置\n2. 寻找循环节：通过Z函数可以判断字符串是否由某个前缀重复构成\n3. 字符串压缩：利用Z函数进行字符串的压缩表示\n4. 回文相关：结合其他技巧处理回文问题\n\n与KMP的前缀函数对比：\n- Z函数：z[i]表示从i开始的后缀与整个字符串的最长公共前缀\n- 前缀函数：π[i]表示前缀s[0..i]的最长相等真前后缀长度\n两者可以相互转化，但Z函数在某些问题中实现更简洁直观。\n\n解题思路：\n1. 识别问题是否涉及字符串匹配、周期判断或前后缀关系\n2. 考虑使用Z函数或前缀函数简化问题\n3. 注意边界情况和特殊字符的处理\n4. 结合其他数据结构（如哈希、DP）解决复杂问题",
+          "problems": [
+            {
+              "id": "1038A",
+              "name": "Equality",
+              "difficulty": 800,
+              "tags": [
+                "implementation",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1038/A",
+              "note": "基础字符串计数，理解字符串基本操作"
+            },
+            {
+              "id": "1927B",
+              "name": "Following the String",
+              "difficulty": 900,
+              "tags": [
+                "constructive algorithms",
+                "greedy",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1927/B",
+              "note": "构造字符串，理解字符频率与位置关系"
+            },
+            {
+              "id": "1029A",
+              "name": "Many Equal Substrings",
+              "difficulty": 1300,
+              "tags": [
+                "implementation",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1029/A",
+              "note": "寻找字符串的最长border，应用前缀函数或Z函数"
+            },
+            {
+              "id": "1735C",
+              "name": "Phase Shift",
+              "difficulty": 1400,
+              "tags": [
+                "dfs and similar",
+                "dsu",
+                "graphs",
+                "greedy",
+                "implementation",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1735/C",
+              "note": "字符串替换问题，需要处理循环依赖"
+            },
+            {
+              "id": "550A",
+              "name": "Two Substrings",
+              "difficulty": 1500,
+              "tags": [
+                "brute force",
+                "dp",
+                "greedy",
+                "implementation",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/550/A",
+              "note": "查找两个不重叠子串，需要仔细处理边界情况"
+            },
+            {
+              "id": "1092C",
+              "name": "Prefixes and Suffixes",
+              "difficulty": 1700,
+              "tags": [
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1092/C",
+              "note": "根据前后缀信息重构字符串，考验对前后缀关系的理解"
+            },
+            {
+              "id": "827A",
+              "name": "String Reconstruction",
+              "difficulty": 1700,
+              "tags": [
+                "data structures",
+                "greedy",
+                "sortings",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/827/A",
+              "note": "字符串重构问题，需要高效处理重叠部分"
+            },
+            {
+              "id": "923C",
+              "name": "Perfect Security",
+              "difficulty": 1800,
+              "tags": [
+                "data structures",
+                "greedy",
+                "strings",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/923/C",
+              "note": "异或加密问题，结合Trie树和字符串处理"
+            },
+            {
+              "id": "757C",
+              "name": "Felicity is Coming!",
+              "difficulty": 1900,
+              "tags": [
+                "data structures",
+                "hashing",
+                "sortings",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/757/C",
+              "note": "字符串映射计数，需要分析等价关系"
+            },
+            {
+              "id": "1056E",
+              "name": "Check Transcription",
+              "difficulty": 2100,
+              "tags": [
+                "brute force",
+                "data structures",
+                "hashing",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1056/E",
+              "note": "二进制字符串编码验证，需要结合哈希和Z函数"
+            },
+            {
+              "id": "1575H",
+              "name": "Holiday Wall Ornaments",
+              "difficulty": 2200,
+              "tags": [
+                "dp",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1575/H",
+              "note": "字符串匹配与动态规划结合，使用KMP自动机"
+            },
+            {
+              "id": "985F",
+              "name": "Isomorphic Strings",
+              "difficulty": 2300,
+              "tags": [
+                "hashing",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/985/F",
+              "note": "同构字符串判断，需要巧妙设计哈希函数"
+            },
+            {
+              "id": "1051E",
+              "name": "Vasya and Big Integers",
+              "difficulty": 2600,
+              "tags": [
+                "binary search",
+                "data structures",
+                "dp",
+                "hashing",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1051/E",
+              "note": "大整数分割问题，综合运用Z函数、哈希和DP"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,816 @@
+{
+  "id": "binary-search-master",
+  "title": "二分查找与二分答案专题训练",
+  "description": "本专题系统性地训练二分查找与二分答案算法，涵盖从基础到高级的各种应用场景。二分查找不仅是高效的查找算法，更是解决最优化问题的核心思想。通过本专题的学习，你将掌握二分答案的经典模型、判定函数设计技巧，以及二分与其他算法的结合应用。",
+  "category": "binary-search",
+  "sections": [
+    {
+      "title": "基础二分查找",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "二分查找是计算机科学中最基础的算法之一，核心思想是通过不断缩小搜索范围来快速定位目标。本节重点训练在有序数组上的标准二分查找、下界查找和上界查找。"
+        },
+        {
+          "title": "§1.1 标准二分查找",
+          "code_template": "int binary_search(vector<int>& arr, int target) {\n    int l = 0, r = arr.size() - 1;\n    while (l <= r) {\n        int mid = l + (r - l) / 2;\n        if (arr[mid] == target) return mid;\n        else if (arr[mid] < target) l = mid + 1;\n        else r = mid - 1;\n    }\n    return -1; // 未找到\n}",
+          "idea": "在有序数组中查找特定元素，每次比较中间元素与目标值，根据比较结果缩小搜索区间。注意循环条件和边界处理。",
+          "problems": [
+            {
+              "id": "1195B",
+              "name": "Sport Mafia",
+              "difficulty": 1000,
+              "tags": [
+                "binary search",
+                "brute force",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1195/B",
+              "note": "通过二分查找确定操作次数，验证糖果数量是否符合条件。"
+            },
+            {
+              "id": "195A",
+              "name": "Let's Watch Football",
+              "difficulty": 1000,
+              "tags": [
+                "binary search",
+                "brute force",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/195/A",
+              "note": "二分查找最小延迟时间，确保在总时间内能下载完视频。"
+            },
+            {
+              "id": "1345B",
+              "name": "Card Constructions",
+              "difficulty": 1100,
+              "tags": [
+                "binary search",
+                "brute force",
+                "dp",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1345/B",
+              "note": "预处理卡片金字塔所需卡片数，二分查找最多能搭建的金字塔数量。"
+            },
+            {
+              "id": "1850E",
+              "name": "Cardboard for Pictures",
+              "difficulty": 1100,
+              "tags": [
+                "binary search",
+                "geometry",
+                "implementation",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1850/E",
+              "note": "二分查找正方形边长，计算总周长是否等于给定值。"
+            }
+          ]
+        },
+        {
+          "title": "§1.2 Lower/Upper Bound",
+          "code_template": "// lower_bound: 第一个≥target的位置\nint lower_bound(vector<int>& arr, int target) {\n    int l = 0, r = arr.size();\n    while (l < r) {\n        int mid = l + (r - l) / 2;\n        if (arr[mid] >= target) r = mid;\n        else l = mid + 1;\n    }\n    return l;\n}\n\n// upper_bound: 第一个>target的位置\nint upper_bound(vector<int>& arr, int target) {\n    int l = 0, r = arr.size();\n    while (l < r) {\n        int mid = l + (r - l) / 2;\n        if (arr[mid] > target) r = mid;\n        else l = mid + 1;\n    }\n    return l;\n}",
+          "idea": "下界查找返回第一个大于等于目标值的位置，上界查找返回第一个大于目标值的位置。常用于统计某个值出现的次数或范围查询。",
+          "problems": [
+            {
+              "id": "1742E",
+              "name": "Scuza",
+              "difficulty": 1200,
+              "tags": [
+                "binary search",
+                "greedy",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1742/E",
+              "note": "预处理前缀最大值，对每个查询二分查找能到达的最远台阶。"
+            },
+            {
+              "id": "975C",
+              "name": "Valhalla Siege",
+              "difficulty": 1400,
+              "tags": [
+                "binary search"
+              ],
+              "url": "https://codeforces.com/problemset/problem/975/C",
+              "note": "预处理战士生命值前缀和，二分查找每次攻击后剩余的战士数量。"
+            },
+            {
+              "id": "380A",
+              "name": "Sereja and Prefixes",
+              "difficulty": 1600,
+              "tags": [
+                "binary search",
+                "brute force"
+              ],
+              "url": "https://codeforces.com/problemset/problem/380/A",
+              "note": "通过二分查找确定查询位置对应的原始元素，需要处理复制操作。"
+            },
+            {
+              "id": "756B",
+              "name": "Travel Card",
+              "difficulty": 1600,
+              "tags": [
+                "binary search",
+                "dp"
+              ],
+              "url": "https://codeforces.com/problemset/problem/756/B",
+              "note": "DP优化，对每个时间点二分查找90分钟和1440分钟前的费用。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "二分答案基础",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "二分答案是将最优化问题转化为判定问题的经典技巧。通过二分猜测答案，设计判定函数检查是否可行，从而找到最优解。本节训练基本的二分答案模型。"
+        },
+        {
+          "title": "§2.1 最大化最小值/最小化最大值",
+          "code_template": "long long l = 0, r = 1e18; // 根据问题确定边界\nwhile (l < r) {\n    long long mid = l + (r - l + 1) / 2; // 最大化用上取整\n    if (check(mid)) l = mid;\n    else r = mid - 1;\n}\nreturn l;\n\n// 最小化最大值模板\nlong long l = 0, r = 1e18;\nwhile (l < r) {\n    long long mid = l + (r - l) / 2;\n    if (check(mid)) r = mid;\n    else l = mid + 1;\n}\nreturn l;",
+          "idea": "最大化最小值问题通常用上取整的mid计算，满足条件时尝试更大的值；最小化最大值问题用下取整，满足条件时尝试更小的值。关键是设计高效的check函数。",
+          "problems": [
+            {
+              "id": "1566A",
+              "name": "Median Maximization",
+              "difficulty": 800,
+              "tags": [
+                "binary search",
+                "greedy",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1566/A",
+              "note": "二分中位数的最大值，检查是否能用剩余数字构造满足条件的数组。"
+            },
+            {
+              "id": "2008C",
+              "name": "Longest Good Array",
+              "difficulty": 800,
+              "tags": [
+                "binary search",
+                "brute force",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/2008/C",
+              "note": "二分好数组的最大长度，检查是否存在满足条件的连续子数组。"
+            },
+            {
+              "id": "1221C",
+              "name": "Perfect Team",
+              "difficulty": 1200,
+              "tags": [
+                "binary search",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1221/C",
+              "note": "二分最多能组成的完美队伍数量，检查三种程序员数量是否足够。"
+            },
+            {
+              "id": "1119B",
+              "name": "Alyona and a Narrow Fridge",
+              "difficulty": 1300,
+              "tags": [
+                "binary search",
+                "flows",
+                "greedy",
+                "sortings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1119/B",
+              "note": "二分最多能放入冰箱的瓶子数量，贪心检查是否可行。"
+            },
+            {
+              "id": "1561C",
+              "name": "Deep Down Below",
+              "difficulty": 1300,
+              "tags": [
+                "binary search",
+                "greedy",
+                "sortings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1561/C",
+              "note": "二分初始攻击力，贪心通过所有洞穴，按最大需求排序。"
+            }
+          ]
+        },
+        {
+          "title": "§2.2 第K小/第K大问题",
+          "code_template": "// 在值域上二分，统计≤mid的元素数量\nlong long l = min_val, r = max_val;\nwhile (l < r) {\n    long long mid = l + (r - l) / 2;\n    if (count_leq(mid) >= k) r = mid;\n    else l = mid + 1;\n}\nreturn l;",
+          "idea": "在值域上二分答案，统计小于等于mid的元素数量。如果数量≥k，说明第k小元素在左侧；否则在右侧。需要高效实现count_leq函数。",
+          "problems": [
+            {
+              "id": "2014C",
+              "name": "Robin Hood in Town",
+              "difficulty": 1100,
+              "tags": [
+                "binary search",
+                "greedy",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/2014/C",
+              "note": "二分最小化最大差值，贪心分配财富。"
+            },
+            {
+              "id": "1975C",
+              "name": "Chamo and Mocha's Array",
+              "difficulty": 1200,
+              "tags": [
+                "binary search",
+                "brute force",
+                "greedy"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1975/C",
+              "note": "通过分析数组性质，二分查找可能的中位数候选值。"
+            },
+            {
+              "id": "2091D",
+              "name": "Place of the Olympiad",
+              "difficulty": 1200,
+              "tags": [
+                "binary search",
+                "greedy",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/2091/D",
+              "note": "二分排名位置，检查分数是否满足条件。"
+            },
+            {
+              "id": "1175C",
+              "name": "Electrification",
+              "difficulty": 1600,
+              "tags": [
+                "binary search",
+                "brute force",
+                "greedy"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1175/C",
+              "note": "二分最小距离d，检查是否存在点使得k+1个最近点距离≤d。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "二分答案进阶应用",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "二分答案常与其他算法结合，形成强大的解题框架。本节训练二分答案与贪心、DP、数据结构的结合应用，解决更复杂的最优化问题。"
+        },
+        {
+          "title": "§3.1 二分+贪心",
+          "code_template": "bool check(long long x) {\n    // 贪心算法验证答案x是否可行\n    // 通常需要排序或维护某些数据结构\n    return feasible;\n}",
+          "idea": "二分猜测答案，用贪心算法验证。贪心策略需要证明正确性，通常涉及排序后按某种规则选择或分配。",
+          "problems": [
+            {
+              "id": "2193D",
+              "name": "Monster Game",
+              "difficulty": 1100,
+              "tags": [
+                "binary search",
+                "sortings",
+                "two pointers"
+              ],
+              "url": "https://codeforces.com/problemset/problem/2193/D",
+              "note": "二分最小攻击力，贪心检查是否能击败所有怪物。"
+            },
+            {
+              "id": "1760F",
+              "name": "Quests",
+              "difficulty": 1500,
+              "tags": [
+                "binary search",
+                "greedy",
+                "sortings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1760/F",
+              "note": "二分最大间隔天数k，贪心选择收益最高的任务。"
+            },
+            {
+              "id": "1665C",
+              "name": "Tree Infection",
+              "difficulty": 1600,
+              "tags": [
+                "binary search",
+                "greedy",
+                "sortings",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1665/C",
+              "note": "二分感染所需时间，贪心安排感染顺序。"
+            },
+            {
+              "id": "1156C",
+              "name": "Match Points",
+              "difficulty": 2000,
+              "tags": [
+                "binary search",
+                "greedy",
+                "sortings",
+                "ternary search",
+                "two pointers"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1156/C",
+              "note": "二分最多匹配对数，贪心配对距离≥z的点。"
+            },
+            {
+              "id": "567D",
+              "name": "One-Dimensional Battle Ships",
+              "difficulty": 1700,
+              "tags": [
+                "binary search",
+                "data structures",
+                "greedy",
+                "sortings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/567/D",
+              "note": "二分最早无法放置所有战舰的时刻，用set维护空闲区间。"
+            }
+          ]
+        },
+        {
+          "title": "§3.2 二分+DP",
+          "code_template": "bool check(long long x) {\n    // DP验证答案x是否可行\n    vector<long long> dp(n, INF);\n    // 状态转移\n    return dp[n-1] <= limit;\n}",
+          "idea": "二分答案后，用动态规划验证可行性。DP状态设计需要能够检查在限制条件x下是否能达到目标。",
+          "problems": [
+            {
+              "id": "2106D",
+              "name": "Flower Boy",
+              "difficulty": 1500,
+              "tags": [
+                "binary search",
+                "dp",
+                "greedy",
+                "two pointers"
+              ],
+              "url": "https://codeforces.com/problemset/problem/2106/D",
+              "note": "二分最小化最大段和，DP检查是否能分成k段。"
+            },
+            {
+              "id": "676C",
+              "name": "Vasya and String",
+              "difficulty": 1500,
+              "tags": [
+                "binary search",
+                "dp",
+                "strings",
+                "two pointers"
+              ],
+              "url": "https://codeforces.com/problemset/problem/676/C",
+              "note": "二分最大长度，滑动窗口检查最多修改k个字符能否得到全相同子串。"
+            },
+            {
+              "id": "489E",
+              "name": "Hiking",
+              "difficulty": 2300,
+              "tags": [
+                "binary search",
+                "dp"
+              ],
+              "url": "https://codeforces.com/problemset/problem/489/E",
+              "note": "二分最小化疲惫值，DP计算最小代价并记录路径。"
+            },
+            {
+              "id": "1101F",
+              "name": "Trucks and Cities",
+              "difficulty": 2400,
+              "tags": [
+                "binary search",
+                "dp"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1101/F",
+              "note": "二分卡车油箱容量，DP验证所有运输是否可行。"
+            }
+          ]
+        },
+        {
+          "title": "§3.3 二分+数据结构",
+          "code_template": "bool check(long long x) {\n    // 使用数据结构（线段树、树状数组、set等）\n    // 高效验证答案x是否可行\n    return feasible;\n}",
+          "idea": "二分答案后，需要用数据结构快速验证。常见的数据结构包括线段树维护区间信息、树状数组统计前缀、set维护有序集合等。",
+          "problems": [
+            {
+              "id": "1870C",
+              "name": "Colorful Table",
+              "difficulty": 1300,
+              "tags": [
+                "binary search",
+                "data structures",
+                "dp",
+                "implementation",
+                "math",
+                "two pointers"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1870/C",
+              "note": "对每个颜色二分查找在矩阵中的出现范围。"
+            },
+            {
+              "id": "1985F",
+              "name": "Final Boss",
+              "difficulty": 1500,
+              "tags": [
+                "binary search",
+                "data structures"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1985/F",
+              "note": "二分击败BOSS所需时间，用优先队列模拟技能冷却。"
+            },
+            {
+              "id": "101B",
+              "name": "Buses",
+              "difficulty": 1700,
+              "tags": [
+                "binary search",
+                "data structures",
+                "dp"
+              ],
+              "url": "https://codeforces.com/problemset/problem/101/B",
+              "note": "离散化+树状数组优化DP，二分查找可用的公交车。"
+            },
+            {
+              "id": "474E",
+              "name": "Pillars",
+              "difficulty": 2000,
+              "tags": [
+                "binary search",
+                "data structures",
+                "dp",
+                "sortings",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/474/E",
+              "note": "离散化高度，线段树优化DP求最长子序列。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "特殊二分技巧",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "除了标准的二分查找和二分答案，还有一些特殊的二分技巧和变种。本节训练三分查找、交互题中的二分、二分结合数学等高级技巧。"
+        },
+        {
+          "title": "§4.1 三分查找",
+          "code_template": "double l = left, r = right;\nfor (int i = 0; i < 100; i++) { // 迭代足够次数\n    double m1 = l + (r - l) / 3;\n    double m2 = r - (r - l) / 3;\n    if (f(m1) < f(m2)) r = m2; // 求最小值\n    else l = m1;\n}\nreturn f(l);",
+          "idea": "三分查找用于求解单峰函数的极值。每次将区间分成三份，通过比较两个中间点的函数值，缩小搜索范围。适用于凸函数或凹函数。",
+          "problems": [
+            {
+              "id": "2157D",
+              "name": "Billion Players Game",
+              "difficulty": 1600,
+              "tags": [
+                "binary search",
+                "greedy",
+                "math",
+                "sortings",
+                "ternary search",
+                "two pointers"
+              ],
+              "url": "https://codeforces.com/problemset/problem/2157/D",
+              "note": "三分查找最优参数，最大化玩家收益。"
+            },
+            {
+              "id": "2132E",
+              "name": "Arithmetics Competition",
+              "difficulty": 1700,
+              "tags": [
+                "binary search",
+                "data structures",
+                "greedy",
+                "sortings",
+                "ternary search"
+              ],
+              "url": "https://codeforces.com/problemset/problem/2132/E",
+              "note": "三分查找最佳阈值，平衡题目难度和数量。"
+            }
+          ]
+        },
+        {
+          "title": "§4.2 交互题中的二分",
+          "code_template": "int l = 1, r = n;\nwhile (l < r) {\n    int mid = (l + r) / 2;\n    cout << \"? \" << mid << endl;\n    int response;\n    cin >> response;\n    if (response == 0) r = mid;\n    else l = mid + 1;\n}\ncout << \"! \" << l << endl;",
+          "idea": "在交互题中使用二分查找，每次询问中间位置，根据响应调整搜索区间。需要注意询问次数限制和边界处理。",
+          "problems": [
+            {
+              "id": "2162D",
+              "name": "Beautiful Permutation",
+              "difficulty": 1400,
+              "tags": [
+                "binary search",
+                "interactive"
+              ],
+              "url": "https://codeforces.com/problemset/problem/2162/D",
+              "note": "通过二分查找确定排列中的特定元素。"
+            },
+            {
+              "id": "1063C",
+              "name": "Dwarves, Hats and Extrasensory Abilities",
+              "difficulty": 1900,
+              "tags": [
+                "binary search",
+                "constructive algorithms",
+                "geometry",
+                "interactive"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1063/C",
+              "note": "在坐标轴上二分查找分界线，分离两种颜色的点。"
+            },
+            {
+              "id": "1039B",
+              "name": "Subway Pursuit",
+              "difficulty": 2100,
+              "tags": [
+                "binary search",
+                "interactive",
+                "probabilities"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1039/B",
+              "note": "二分查找火车位置，结合随机扰动避免被预测。"
+            },
+            {
+              "id": "1129E",
+              "name": "Legendary Tree",
+              "difficulty": 3100,
+              "tags": [
+                "binary search",
+                "interactive",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1129/E",
+              "note": "通过二分查找确定树的边，交互式构造树结构。"
+            }
+          ]
+        },
+        {
+          "title": "§4.3 二分结合数学",
+          "code_template": "bool check(long long x) {\n    // 数学公式推导，计算在x条件下是否满足要求\n    // 可能涉及数论、组合数学等知识\n    return formula(x) >= target;\n}",
+          "idea": "二分答案结合数学推导，通过公式直接计算判定函数，避免模拟或复杂算法。需要较强的数学分析能力。",
+          "problems": [
+            {
+              "id": "1436C",
+              "name": "Binary Search",
+              "difficulty": 1500,
+              "tags": [
+                "binary search",
+                "combinatorics"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1436/C",
+              "note": "模拟二分查找过程，组合数学计算排列数量。"
+            },
+            {
+              "id": "1301C",
+              "name": "Ayoub's function",
+              "difficulty": 1700,
+              "tags": [
+                "binary search",
+                "combinatorics",
+                "greedy",
+                "math",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1301/C",
+              "note": "二分最大化包含至少一个1的子串数量，数学推导最优1的分布。"
+            },
+            {
+              "id": "1670D",
+              "name": "Very Suspicious",
+              "difficulty": 1700,
+              "tags": [
+                "binary search",
+                "brute force",
+                "geometry",
+                "greedy",
+                "implementation",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1670/D",
+              "note": "二分最少直线数，数学公式计算最大区域数。"
+            },
+            {
+              "id": "1971F",
+              "name": "Circle Perimeter",
+              "difficulty": 1600,
+              "tags": [
+                "binary search",
+                "brute force",
+                "dfs and similar",
+                "geometry",
+                "implementation",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1971/F",
+              "note": "二分半径，数学计算圆内整点数量。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "综合挑战",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "本节包含难度较高的综合题目，需要灵活运用二分查找和二分答案技巧，结合多种算法和数据结构解决复杂问题。适合想要挑战高难度的学习者。"
+        },
+        {
+          "title": "§5.1 困难题（2000-2500）",
+          "code_template": "// 综合运用各种技巧\nlong long l = min_val, r = max_val;\nwhile (l < r) {\n    long long mid = (l + r) / 2;\n    if (complex_check(mid)) r = mid;\n    else l = mid + 1;\n}\n// check函数可能包含贪心、DP、数据结构等多种算法",
+          "idea": "这些题目需要设计复杂的判定函数，可能结合多种算法。重点在于问题转化和判定函数的设计优化。",
+          "problems": [
+            {
+              "id": "1284B",
+              "name": "New Year and Ascent Sequence",
+              "difficulty": 1400,
+              "tags": [
+                "binary search",
+                "combinatorics",
+                "data structures",
+                "dp",
+                "implementation",
+                "sortings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1284/B",
+              "note": "统计序列对数量，二分查找满足条件的配对。"
+            },
+            {
+              "id": "1904C",
+              "name": "Array Game",
+              "difficulty": 1400,
+              "tags": [
+                "binary search",
+                "brute force",
+                "data structures",
+                "sortings",
+                "two pointers"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1904/C",
+              "note": "二分最小绝对值差，枚举操作后的可能值。"
+            },
+            {
+              "id": "1697C",
+              "name": "awoo's Favorite Problem",
+              "difficulty": 1400,
+              "tags": [
+                "binary search",
+                "constructive algorithms",
+                "data structures",
+                "greedy",
+                "implementation",
+                "strings",
+                "two pointers"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1697/C",
+              "note": "通过分析字符变换规则，二分查找可行变换位置。"
+            },
+            {
+              "id": "2145C",
+              "name": "Monocarp's String",
+              "difficulty": 1300,
+              "tags": [
+                "binary search",
+                "greedy",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/2145/C",
+              "note": "二分最小操作次数，贪心检查是否能得到目标字符串。"
+            },
+            {
+              "id": "1493C",
+              "name": "K-beautiful Strings",
+              "difficulty": 2000,
+              "tags": [
+                "binary search",
+                "brute force",
+                "constructive algorithms",
+                "greedy",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1493/C",
+              "note": "二分字典序最小的美丽字符串，从后往前构造。"
+            },
+            {
+              "id": "1712D",
+              "name": "Empty Graph",
+              "difficulty": 2000,
+              "tags": [
+                "binary search",
+                "constructive algorithms",
+                "data structures",
+                "greedy",
+                "shortest paths"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1712/D",
+              "note": "二分最小直径，贪心修改数组元素。"
+            },
+            {
+              "id": "1437E",
+              "name": "Make It Increasing",
+              "difficulty": 2200,
+              "tags": [
+                "binary search",
+                "constructive algorithms",
+                "data structures",
+                "dp",
+                "implementation"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1437/E",
+              "note": "二分最长递增子序列，处理固定位置约束。"
+            },
+            {
+              "id": "1834E",
+              "name": "MEX of LCM",
+              "difficulty": 2300,
+              "tags": [
+                "binary search",
+                "data structures",
+                "implementation",
+                "math",
+                "number theory"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1834/E",
+              "note": "二分MEX值，用set维护所有子数组的LCM。"
+            }
+          ]
+        },
+        {
+          "title": "§5.2 挑战题（2500+）",
+          "code_template": "// 极高难度的二分应用\n// 需要深刻的洞察力和算法优化\nlong long solve() {\n    // 往往需要多级二分或二分结合高级数据结构\n    return answer;\n}",
+          "idea": "这些题目将二分技巧发挥到极致，可能需要多级二分、二分结合高级数据结构（如持久化线段树、分块等），或者需要非常巧妙的转化。",
+          "problems": [
+            {
+              "id": "1771F",
+              "name": "Hossam and Range Minimum Query",
+              "difficulty": 2500,
+              "tags": [
+                "binary search",
+                "bitmasks",
+                "data structures",
+                "hashing",
+                "probabilities",
+                "strings",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1771/F",
+              "note": "二分+可持久化线段树求区间mex，需要处理强制在线查询。"
+            },
+            {
+              "id": "1051E",
+              "name": "Vasya and Big Integers",
+              "difficulty": 2600,
+              "tags": [
+                "binary search",
+                "data structures",
+                "dp",
+                "hashing",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1051/E",
+              "note": "二分最长前缀匹配，字符串哈希优化DP。"
+            },
+            {
+              "id": "1799F",
+              "name": "Halve or Subtract",
+              "difficulty": 2700,
+              "tags": [
+                "binary search",
+                "brute force",
+                "dp",
+                "greedy",
+                "sortings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1799/F",
+              "note": "二分最优操作策略，复杂的状态设计和优化。"
+            },
+            {
+              "id": "623C",
+              "name": "Electric Charges",
+              "difficulty": 2900,
+              "tags": [
+                "binary search",
+                "dp"
+              ],
+              "url": "https://codeforces.com/problemset/problem/623/C",
+              "note": "二分最小包围正方形边长，复杂几何转化和DP验证。"
+            },
+            {
+              "id": "1601F",
+              "name": "Two Sorts",
+              "difficulty": 3400,
+              "tags": [
+                "binary search",
+                "dfs and similar",
+                "math",
+                "meet-in-the-middle"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1601/F",
+              "note": "二分查找字典序排列，结合DFS和折半搜索优化。"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

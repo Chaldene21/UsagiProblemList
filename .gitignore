@@ -24,3 +24,12 @@ go.work
 # Database files (if any)
 *.db
 *.sqlite
+
+# Compiled binary
+cfProblemList
+
+# Logs
+logs/
+
+# macOS
+.DS_Store

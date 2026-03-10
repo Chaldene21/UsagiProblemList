@@ -1,0 +1,1166 @@
+{
+  "id": "dp",
+  "title": "动态规划题单",
+  "description": "本题单包含动态规划的8个知识点，涵盖从入门到挑战的各难度题目。",
+  "category": "动态规划",
+  "sections": [
+    {
+      "title": "一、动态规划基础",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "本题单按知识点划分为8个部分，每个部分包含该知识点的解题思路、代码模板和精选练习题。"
+        }
+      ]
+    },
+    {
+      "title": "二、知识点详解",
+      "content": [
+        {
+          "title": "§1 线性DP",
+          "code_template": "#include <bits/stdc++.h>\nusing namespace std;\n\n// 最长上升子序列 (LIS) - O(n^2)\nint lis_n2(vector<int>& a) {\n    int n = a.size();\n    vector<int> dp(n, 1); // dp[i]: 以a[i]结尾的LIS长度\n    int ans = 0;\n    for (int i = 0; i < n; i++) {\n        for (int j = 0; j < i; j++) {\n            if (a[j] < a[i]) {\n                dp[i] = max(dp[i], dp[j] + 1);\n            }\n        }\n        ans = max(ans, dp[i]);\n    }\n    return ans;\n}\n\n// 最长上升子序列 (LIS) - O(nlogn)\nint lis_nlogn(vector<int>& a) {\n    vector<int> d; // d[k]: 长度为k的上升子序列的最小末尾值\n    for (int x : a) {\n        auto it = lower_bound(d.begin(), d.end(), x);\n        if (it == d.end()) d.push_back(x);\n        else *it = x;\n    }\n    return d.size();\n}\n\n// 最长公共子序列 (LCS) - O(nm)\nint lcs(string& s, string& t) {\n    int n = s.size(), m = t.size();\n    vector<vector<int>> dp(n+1, vector<int>(m+1, 0));\n    for (int i = 1; i <= n; i++) {\n        for (int j = 1; j <= m; j++) {\n            if (s[i-1] == t[j-1]) {\n                dp[i][j] = dp[i-1][j-1] + 1;\n            } else {\n                dp[i][j] = max(dp[i-1][j], dp[i][j-1]);\n            }\n        }\n    }\n    return dp[n][m];\n}\n\n// 数字三角形 - 自底向上\nint triangle(vector<vector<int>>& a) {\n    int n = a.size();\n    vector<vector<int>> dp = a;\n    for (int i = n-2; i >= 0; i--) {\n        for (int j = 0; j <= i; j++) {\n            dp[i][j] += max(dp[i+1][j], dp[i+1][j+1]);\n        }\n    }\n    return dp[0][0];\n}\n\nint main() {\n    // 示例用法\n    vector<int> arr = {10, 9, 2, 5, 3, 7, 101, 18};\n    cout << \"LIS (O(n^2)): \" << lis_n2(arr) << endl;\n    cout << \"LIS (O(nlogn)): \" << lis_nlogn(arr) << endl;\n    \n    string s = \"abcde\", t = \"ace\";\n    cout << \"LCS: \" << lcs(s, t) << endl;\n    \n    vector<vector<int>> tri = {{7}, {3,8}, {8,1,0}, {2,7,4,4}, {4,5,2,6,5}};\n    cout << \"Triangle max path: \" << triangle(tri) << endl;\n    \n    return 0;\n}",
+          "idea": "线性DP是动态规划中最基础的一类问题，其特点是状态转移沿着某个线性方向进行。主要包含三类经典模型：\n\n1. **最长上升子序列 (LIS)**\n   - 问题：给定序列，求最长的严格递增子序列长度\n   - 解法1：O(n²) DP，dp[i]表示以a[i]结尾的LIS长度\n   - 解法2：O(nlogn) 贪心+二分，维护d数组表示长度为k的LIS的最小末尾值\n\n2. **最长公共子序列 (LCS)**\n   - 问题：给定两个序列，求它们的最长公共子序列长度\n   - 解法：O(nm) DP，dp[i][j]表示s前i个和t前j个的LCS长度\n   - 状态转移：若s[i-1]==t[j-1]，dp[i][j]=dp[i-1][j-1]+1；否则取max(dp[i-1][j], dp[i][j-1])\n\n3. **数字三角形**\n   - 问题：从三角形顶部到底部，每次只能向下或右下走，求最大路径和\n   - 解法：自底向上DP，dp[i][j]表示从(i,j)到底部的最大路径和\n   - 状态转移：dp[i][j] = a[i][j] + max(dp[i+1][j], dp[i+1][j+1])\n\n**解题技巧**：\n- 确定状态表示：通常用dp[i]表示以第i个元素结尾的某种最优解\n- 分析状态转移：考虑如何从之前的状态推导出当前状态\n- 注意边界条件和初始化\n- 对于LIS的O(nlogn)解法，理解d数组的单调性很关键",
+          "problems": [
+            {
+              "id": "1180A",
+              "name": "Alex and a Rhombus",
+              "difficulty": 800,
+              "tags": [
+                "dp",
+                "implementation",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1180/A",
+              "note": "简单递推问题，可以看作线性DP的入门题。第n层菱形需要的小方块数满足递推关系：f(n)=f(n-1)+4*(n-1)"
+            },
+            {
+              "id": "1807G2",
+              "name": "Subsequence Addition (Hard Version)",
+              "difficulty": 1100,
+              "tags": [
+                "bitmasks",
+                "dp",
+                "greedy",
+                "implementation",
+                "sortings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1807/G2",
+              "note": "背包DP的变种，需要判断能否用已有的数组成目标序列。先排序，然后贪心检查每个数是否小于等于当前可表示的和"
+            },
+            {
+              "id": "1037C",
+              "name": "Equalize",
+              "difficulty": 1300,
+              "tags": [
+                "dp",
+                "greedy",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1037/C",
+              "note": "字符串变换的最小代价问题。可以线性扫描，当相邻两个字符都需要交换时，考虑一起操作更优"
+            },
+            {
+              "id": "505B",
+              "name": "Mr. Kitayuta's Colorful Graph",
+              "difficulty": 1400,
+              "tags": [
+                "dfs and similar",
+                "dp",
+                "dsu",
+                "graphs"
+              ],
+              "url": "https://codeforces.com/problemset/problem/505/B",
+              "note": "多颜色图连通性问题。对每种颜色分别处理，可以用DFS或并查集维护连通性"
+            },
+            {
+              "id": "891A",
+              "name": "Pride",
+              "difficulty": 1500,
+              "tags": [
+                "brute force",
+                "dp",
+                "greedy",
+                "math",
+                "number theory"
+              ],
+              "url": "https://codeforces.com/problemset/problem/891/A",
+              "note": "通过相邻元素的GCD操作使数组全为1。需要找到最短的操作序列，可以枚举区间进行DP"
+            },
+            {
+              "id": "1015E1",
+              "name": "Stars Drawing (Easy Edition)",
+              "difficulty": 1700,
+              "tags": [
+                "brute force",
+                "dp",
+                "greedy"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1015E1",
+              "note": "在网格中画星形图案。需要预处理每个点向四个方向能延伸的最大长度，然后DP选择最优的星形"
+            },
+            {
+              "id": "1509C",
+              "name": "The Sports Festival",
+              "difficulty": 1800,
+              "tags": [
+                "dp",
+                "greedy"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1509/C",
+              "note": "区间DP经典题。先排序，然后dp[l][r]表示区间[l,r]的最小代价，转移考虑最后加入的是最小值还是最大值"
+            },
+            {
+              "id": "14D",
+              "name": "Two Paths",
+              "difficulty": 1900,
+              "tags": [
+                "dfs and similar",
+                "dp",
+                "graphs",
+                "shortest paths",
+                "trees",
+                "two pointers"
+              ],
+              "url": "https://codeforces.com/problemset/problem/14D",
+              "note": "在树中找两条不相交路径的最大乘积。可以枚举删除的边将树分成两棵子树，分别求每棵树的直径"
+            },
+            {
+              "id": "119C",
+              "name": "Education Reform",
+              "difficulty": 2000,
+              "tags": [
+                "dp"
+              ],
+              "url": "https://codeforces.com/problemset/problem/119C",
+              "note": "复杂的线性DP，需要记录路径。dp[i][j][k]表示前i天，最后一天做第j门课，难度为k的最大得分"
+            },
+            {
+              "id": "1006F",
+              "name": "Xor-Paths",
+              "difficulty": 2100,
+              "tags": [
+                "bitmasks",
+                "brute force",
+                "dp",
+                "meet-in-the-middle"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1006/F",
+              "note": "双向搜索+DP。从起点和终点同时进行DFS，记录路径异或值，最后在中点处合并结果"
+            },
+            {
+              "id": "2065H",
+              "name": "Bro Thinks He's Him",
+              "difficulty": 2200,
+              "tags": [
+                "combinatorics",
+                "data structures",
+                "divide and conquer",
+                "dp",
+                "math",
+                "matrices"
+              ],
+              "url": "https://codeforces.com/problemset/problem/2065/H",
+              "note": "组合计数DP。需要处理矩阵上的路径计数问题，可能涉及容斥原理和组合数学"
+            },
+            {
+              "id": "1750E",
+              "name": "Bracket Cost",
+              "difficulty": 2400,
+              "tags": [
+                "binary search",
+                "data structures",
+                "divide and conquer",
+                "dp",
+                "greedy",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1750/E",
+              "note": "括号序列相关DP。需要计算所有子串的代价和，涉及栈维护和贡献计算技巧"
+            },
+            {
+              "id": "1016F",
+              "name": "Road Projects",
+              "difficulty": 2600,
+              "tags": [
+                "dfs and similar",
+                "dp",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1016/F",
+              "note": "树形DP难题。需要在树上添加一条边来最小化特定点对距离的最大值，需要预处理很多信息"
+            }
+          ]
+        },
+        {
+          "title": "§2 背包DP",
+          "code_template": "#include <bits/stdc++.h>\nusing namespace std;\n\n// 01背包模板\nint knapsack_01(int n, int W, vector<int>& wt, vector<int>& val) {\n    vector<int> dp(W + 1, 0);\n    for (int i = 0; i < n; i++) {\n        for (int j = W; j >= wt[i]; j--) {  // 逆序枚举容量\n            dp[j] = max(dp[j], dp[j - wt[i]] + val[i]);\n        }\n    }\n    return dp[W];\n}\n\n// 完全背包模板\nint knapsack_complete(int n, int W, vector<int>& wt, vector<int>& val) {\n    vector<int> dp(W + 1, 0);\n    for (int i = 0; i < n; i++) {\n        for (int j = wt[i]; j <= W; j++) {  // 正序枚举容量\n            dp[j] = max(dp[j], dp[j - wt[i]] + val[i]);\n        }\n    }\n    return dp[W];\n}\n\n// 多重背包模板（二进制优化）\nint knapsack_multiple(int n, int W, vector<int>& wt, vector<int>& val, vector<int>& cnt) {\n    vector<pair<int, int>> items;  // (重量, 价值)\n    for (int i = 0; i < n; i++) {\n        int k = 1;\n        while (cnt[i] > 0) {\n            int take = min(k, cnt[i]);\n            items.push_back({wt[i] * take, val[i] * take});\n            cnt[i] -= take;\n            k <<= 1;\n        }\n    }\n    // 转化为01背包\n    vector<int> dp(W + 1, 0);\n    for (auto& [w, v] : items) {\n        for (int j = W; j >= w; j--) {\n            dp[j] = max(dp[j], dp[j - w] + v);\n        }\n    }\n    return dp[W];\n}\n\nint main() {\n    // 示例用法\n    int n = 5, W = 10;\n    vector<int> wt = {2, 3, 4, 5, 6};\n    vector<int> val = {3, 4, 5, 6, 7};\n    vector<int> cnt = {1, 2, 3, 4, 5};\n    \n    cout << \"01背包结果: \" << knapsack_01(n, W, wt, val) << endl;\n    cout << \"完全背包结果: \" << knapsack_complete(n, W, wt, val) << endl;\n    cout << \"多重背包结果: \" << knapsack_multiple(n, W, wt, val, cnt) << endl;\n    \n    return 0;\n}",
+          "idea": "背包DP是动态规划中的经典问题，核心思想是在有限容量的背包中选择物品使得总价值最大。\n\n1. **01背包**：每种物品最多选一次。状态定义为 dp[j] 表示容量为 j 的背包能获得的最大价值。转移时逆序枚举容量，确保每个物品只被考虑一次。\n\n2. **完全背包**：每种物品可以选无限次。与01背包的区别在于正序枚举容量，这样每个物品可以在当前容量下被重复选择。\n\n3. **多重背包**：每种物品有数量限制。可以通过二进制优化将多重背包转化为01背包：将数量拆分为 1,2,4,... 的幂次组合，这样可以用 log(cnt) 个物品表示所有选择可能。\n\n关键技巧：\n- 空间优化：使用一维数组滚动更新\n- 初始化：根据问题要求设置 dp[0]=0 或负无穷\n- 变形问题：求方案数、恰好装满、最小价值等",
+          "problems": [
+            {
+              "id": "1180A",
+              "name": "Alex and a Rhombus",
+              "difficulty": 800,
+              "tags": [
+                "dp",
+                "implementation",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1180/A",
+              "note": "简单DP计数问题，可以看作特殊的背包问题，计算菱形格子的数量"
+            },
+            {
+              "id": "1807G2",
+              "name": "Subsequence Addition (Hard Version)",
+              "difficulty": 1100,
+              "tags": [
+                "bitmasks",
+                "dp",
+                "greedy",
+                "implementation",
+                "sortings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1807/G2",
+              "note": "本质是判断数组能否通过子集和构造，类似背包可行性问题"
+            },
+            {
+              "id": "1037C",
+              "name": "Equalize",
+              "difficulty": 1300,
+              "tags": [
+                "dp",
+                "greedy",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1037/C",
+              "note": "字符串转换的最小代价，可以使用DP决策相邻字符的交换"
+            },
+            {
+              "id": "505B",
+              "name": "Mr. Kitayuta's Colorful Graph",
+              "difficulty": 1400,
+              "tags": [
+                "dfs and similar",
+                "dp",
+                "dsu",
+                "graphs"
+              ],
+              "url": "https://codeforces.com/problemset/problem/505/B",
+              "note": "图上的颜色连通性问题，可以用DP思想记录状态转移"
+            },
+            {
+              "id": "891A",
+              "name": "Pride",
+              "difficulty": 1500,
+              "tags": [
+                "brute force",
+                "dp",
+                "greedy",
+                "math",
+                "number theory"
+              ],
+              "url": "https://codeforces.com/problemset/problem/891/A",
+              "note": "求数组全部变为1的最小操作次数，区间GCD的DP问题"
+            },
+            {
+              "id": "1015E1",
+              "name": "Stars Drawing (Easy Edition)",
+              "difficulty": 1700,
+              "tags": [
+                "brute force",
+                "dp",
+                "greedy"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1015E1",
+              "note": "网格中绘制星星的问题，需要DP预处理四个方向的连续长度"
+            },
+            {
+              "id": "1509C",
+              "name": "The Sports Festival",
+              "difficulty": 1800,
+              "tags": [
+                "dp",
+                "greedy"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1509/C",
+              "note": "区间DP问题，通过排序后DP计算最小差值总和"
+            },
+            {
+              "id": "14D",
+              "name": "Two Paths",
+              "difficulty": 1900,
+              "tags": [
+                "dfs and similar",
+                "dp",
+                "graphs",
+                "shortest paths",
+                "trees",
+                "two pointers"
+              ],
+              "url": "https://codeforces.com/problemset/problem/14/D",
+              "note": "树形DP，求两条不相交路径的最大乘积"
+            },
+            {
+              "id": "119C",
+              "name": "Education Reform",
+              "difficulty": 2000,
+              "tags": [
+                "dp"
+              ],
+              "url": "https://codeforces.com/problemset/problem/119/C",
+              "note": "复杂的背包DP变形，需要记录路径和满足特定条件"
+            },
+            {
+              "id": "1006F",
+              "name": "Xor-Paths",
+              "difficulty": 2100,
+              "tags": [
+                "bitmasks",
+                "brute force",
+                "dp",
+                "meet-in-the-middle"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1006F",
+              "note": "双向搜索+DP，计算从起点到终点异或值为特定值的路径数"
+            },
+            {
+              "id": "2065H",
+              "name": "Bro Thinks He's Him",
+              "difficulty": 2200,
+              "tags": [
+                "combinatorics",
+                "data structures",
+                "divide and conquer",
+                "dp",
+                "math",
+                "matrices"
+              ],
+              "url": "https://codeforces.com/problemset/problem/2065/H",
+              "note": "组合计数DP问题，需要处理复杂的转移和矩阵优化"
+            },
+            {
+              "id": "1750E",
+              "name": "Bracket Cost",
+              "difficulty": 2400,
+              "tags": [
+                "binary search",
+                "data structures",
+                "divide and conquer",
+                "dp",
+                "greedy",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1750/E",
+              "note": "括号序列的代价计算，需要巧妙的DP设计和数据结构优化"
+            },
+            {
+              "id": "1016F",
+              "name": "Road Projects",
+              "difficulty": 2600,
+              "tags": [
+                "dfs and similar",
+                "dp",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1016/F",
+              "note": "树形DP的高级应用，需要在树上添加边以最大化特定路径"
+            }
+          ]
+        },
+        {
+          "title": "§3 区间DP",
+          "code_template": "#include <bits/stdc++.h>\nusing namespace std;\n\nconst int N = 310;\nint n;\nint a[N], prefix[N];\nint dp[N][N]; // dp[l][r] 表示合并区间 [l, r] 的最小代价\n\nint main() {\n    cin >> n;\n    for (int i = 1; i <= n; i++) {\n        cin >> a[i];\n        prefix[i] = prefix[i - 1] + a[i]; // 前缀和用于快速求区间和\n    }\n    \n    // 初始化dp数组\n    for (int i = 1; i <= n; i++) {\n        for (int j = 1; j <= n; j++) {\n            if (i == j) dp[i][j] = 0; // 单个石子不需要合并\n            else dp[i][j] = 1e9; // 初始化为极大值\n        }\n    }\n    \n    // 区间DP核心：枚举区间长度\n    for (int len = 2; len <= n; len++) { // 区间长度从2开始\n        for (int l = 1; l + len - 1 <= n; l++) { // 左端点\n            int r = l + len - 1; // 右端点\n            // 枚举分割点k，将区间[l, r]分成[l, k]和[k+1, r]\n            for (int k = l; k < r; k++) {\n                // 状态转移：合并[l, k]的代价 + 合并[k+1, r]的代价 + 合并这两堆的代价\n                dp[l][r] = min(dp[l][r], dp[l][k] + dp[k + 1][r] + prefix[r] - prefix[l - 1]);\n            }\n        }\n    }\n    \n    cout << dp[1][n] << endl;\n    return 0;\n}\n\n/*\n区间DP模板总结：\n1. 状态定义：dp[l][r] 表示区间 [l, r] 的最优解\n2. 初始化：对角线元素（单个元素）通常有初始值\n3. 枚举顺序：\n   - 先枚举区间长度 len\n   - 再枚举左端点 l\n   - 计算右端点 r = l + len - 1\n   - 最后枚举分割点 k\n4. 状态转移：根据具体问题设计\n5. 答案：通常是 dp[1][n] 或类似形式\n*/",
+          "idea": "区间DP是动态规划的一种重要类型，用于解决涉及区间操作的问题。核心思想是将大区间的最优解通过小区间的最优解组合得到。\n\n解题思路：\n1. 状态定义：通常定义 dp[l][r] 表示区间 [l, r] 上的最优解（如最小代价、最大得分等）\n2. 状态转移：考虑将区间 [l, r] 通过分割点 k 分成两个子区间 [l, k] 和 [k+1, r]，然后组合子区间的解\n   - 通用形式：dp[l][r] = min/max(dp[l][k] + dp[k+1][r] + cost(l, r, k))\n   - cost(l, r, k) 表示合并两个子区间的额外代价\n3. 枚举顺序：必须按照区间长度从小到大的顺序计算，确保子问题先被求解\n4. 初始化：单个元素的区间（l == r）通常有明确的初始值\n\n常见应用：\n1. 石子合并：求合并一堆石子的最小/最大代价\n2. 矩阵链乘法：求矩阵连乘的最优计算顺序\n3. 括号匹配：求最长合法括号子序列\n4. 回文相关：求最长回文子序列等\n\n时间复杂度：通常为 O(n³)，可通过四边形不等式优化到 O(n²)",
+          "problems": [
+            {
+              "id": "1180A",
+              "name": "Alex and a Rhombus",
+              "difficulty": 800,
+              "tags": [
+                "dp",
+                "implementation",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1180/A",
+              "note": "简单的递推问题，可以看作区间DP的入门，通过小规模推导公式"
+            },
+            {
+              "id": "1807G2",
+              "name": "Subsequence Addition (Hard Version)",
+              "difficulty": 1100,
+              "tags": [
+                "bitmasks",
+                "dp",
+                "greedy",
+                "implementation",
+                "sortings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1807/G2",
+              "note": "背包DP思想，判断能否用已有数构造目标数，与区间DP的递推思想相通"
+            },
+            {
+              "id": "1037C",
+              "name": "Equalize",
+              "difficulty": 1300,
+              "tags": [
+                "dp",
+                "greedy",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1037/C",
+              "note": "字符串变换的最小代价，涉及相邻位置的操作，可以看作一维区间操作"
+            },
+            {
+              "id": "505B",
+              "name": "Mr. Kitayuta's Colorful Graph",
+              "difficulty": 1400,
+              "tags": [
+                "dfs and similar",
+                "dp",
+                "dsu",
+                "graphs"
+              ],
+              "url": "https://codeforces.com/problemset/problem/505/B",
+              "note": "图上的连通性问题，可以用DP思想记录状态转移"
+            },
+            {
+              "id": "891A",
+              "name": "Pride",
+              "difficulty": 1500,
+              "tags": [
+                "brute force",
+                "dp",
+                "greedy",
+                "math",
+                "number theory"
+              ],
+              "url": "https://codeforces.com/problemset/problem/891/A",
+              "note": "求数组所有元素变为1的最小操作次数，涉及区间gcd的计算"
+            },
+            {
+              "id": "1015E1",
+              "name": "Stars Drawing (Easy Edition)",
+              "difficulty": 1700,
+              "tags": [
+                "brute force",
+                "dp",
+                "greedy"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1015E1",
+              "note": "预处理每个点向四个方向延伸的长度，类似区间扩展的思想"
+            },
+            {
+              "id": "1509C",
+              "name": "The Sports Festival",
+              "difficulty": 1800,
+              "tags": [
+                "dp",
+                "greedy"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1509/C",
+              "note": "经典区间DP问题，需要先排序，然后DP计算最小极差和"
+            },
+            {
+              "id": "14D",
+              "name": "Two Paths",
+              "difficulty": 1900,
+              "tags": [
+                "dfs and similar",
+                "dp",
+                "graphs",
+                "shortest paths",
+                "trees",
+                "two pointers"
+              ],
+              "url": "https://codeforces.com/problemset/problem/14/D",
+              "note": "树形DP与区间DP的结合，求两条不相交路径的最大乘积"
+            },
+            {
+              "id": "119C",
+              "name": "Education Reform",
+              "difficulty": 2000,
+              "tags": [
+                "dp"
+              ],
+              "url": "https://codeforces.com/problemset/problem/119/C",
+              "note": "复杂的DP问题，需要记录路径和状态，涉及区间选择"
+            },
+            {
+              "id": "1006F",
+              "name": "Xor-Paths",
+              "difficulty": 2100,
+              "tags": [
+                "bitmasks",
+                "brute force",
+                "dp",
+                "meet-in-the-middle"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1006F",
+              "note": "双向搜索+DP，将路径分成两半分别计算"
+            },
+            {
+              "id": "2065H",
+              "name": "Bro Thinks He's Him",
+              "difficulty": 2200,
+              "tags": [
+                "combinatorics",
+                "data structures",
+                "divide and conquer",
+                "dp",
+                "math",
+                "matrices"
+              ],
+              "url": "https://codeforces.com/problemset/problem/2065/H",
+              "note": "矩阵相关的高难度DP，需要结合组合数学和数据结构"
+            },
+            {
+              "id": "1750E",
+              "name": "Bracket Cost",
+              "difficulty": 2400,
+              "tags": [
+                "binary search",
+                "data structures",
+                "divide and conquer",
+                "dp",
+                "greedy",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1750/E",
+              "note": "括号序列的代价计算，需要深入理解区间DP和前缀和技巧"
+            },
+            {
+              "id": "1016F",
+              "name": "Road Projects",
+              "difficulty": 2600,
+              "tags": [
+                "dfs and similar",
+                "dp",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1016/F",
+              "note": "树形DP的变种，需要处理路径和区间的最优化"
+            }
+          ]
+        },
+        {
+          "title": "§4 树形DP",
+          "code_template": "#include <bits/stdc++.h>\nusing namespace std;\n\nconst int N = 2e5 + 5;\nvector<int> g[N];\nint dp[N]; // dp[u] 表示以 u 为根的子树中的某种最优值\nint ans = 0;\n\nvoid dfs(int u, int p) {\n    // 初始化或处理叶子节点\n    for (int v : g[u]) {\n        if (v == p) continue;\n        dfs(v, u);\n        // 根据子节点的 dp 值更新当前节点的 dp 值\n        // dp[u] = max(dp[u], dp[v] + 1);\n    }\n    // 可能还需要后处理或更新答案\n    // ans = max(ans, dp[u]);\n}\n\n// 换根DP模板\nint f[N]; // f[u] 表示以 u 为根时的全局答案\nvoid dfs1(int u, int p) {\n    // 第一次DFS，计算子树信息\n    for (int v : g[u]) {\n        if (v == p) continue;\n        dfs1(v, u);\n        // 更新 dp[u]\n    }\n}\n\nvoid dfs2(int u, int p) {\n    // 第二次DFS，进行换根\n    f[u] = dp[u]; // 初始化为以 u 为根的子树信息\n    for (int v : g[u]) {\n        if (v == p) continue;\n        // 临时修改 dp[u]，移除 v 子树的影响\n        // int old_u = dp[u], old_v = dp[v];\n        // dp[u] = ... (去掉 v 后的新值)\n        // dp[v] = ... (加上 u 作为子节点后的新值)\n        dfs2(v, u);\n        // 恢复 dp[u] 和 dp[v]\n        // dp[u] = old_u; dp[v] = old_v;\n    }\n}\n\nint main() {\n    int n;\n    cin >> n;\n    for (int i = 1; i < n; i++) {\n        int u, v;\n        cin >> u >> v;\n        g[u].push_back(v);\n        g[v].push_back(u);\n    }\n    dfs(1, 0);\n    // 或进行换根DP\n    // dfs1(1, 0);\n    // dfs2(1, 0);\n    cout << ans << endl;\n    return 0;\n}",
+          "idea": "树形DP是在树结构上进行动态规划的方法。通常使用DFS遍历树，在递归返回时从子节点向父节点传递信息并更新状态。\n\n**常见技巧：**\n1. **状态设计**：dp[u] 表示以 u 为根的子树中的最优解，有时需要设计多维状态（如 dp[u][0/1] 表示选/不选 u 节点）。\n2. **转移方程**：根据子节点的 dp 值计算当前节点的 dp 值，通常为 dp[u] = f(dp[v1], dp[v2], ...)。\n3. **树的直径**：可以通过两次DFS/BFS（从任意点出发找到最远点，再从该点出发找到最远点）或树形DP（维护每个节点向下的最长链和次长链）求解。\n4. **换根DP**：当需要计算以每个节点为根时的全局答案时使用。先进行一次DFS计算子树信息，再进行一次DFS，在遍历时动态调整根节点，将父节点作为子节点考虑，从而高效计算所有根的答案。\n\n**解题步骤：**\n1. 建图（邻接表）。\n2. 设计DP状态和转移方程。\n3. 进行DFS，在递归返回时更新状态。\n4. 对于换根问题，进行第二次DFS，在进入子节点前更新子节点的全局状态。",
+          "problems": [
+            {
+              "id": "982C",
+              "name": "Cut 'em all!",
+              "difficulty": 1500,
+              "tags": [
+                "dfs and similar",
+                "dp",
+                "graphs",
+                "greedy",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/982/C",
+              "note": "树形DP基础题。统计每个子树的大小，如果子树大小为偶数则可以切断与父节点的边。"
+            },
+            {
+              "id": "1000E",
+              "name": "We Need More Bosses",
+              "difficulty": 2100,
+              "tags": [
+                "dfs and similar",
+                "graphs",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1000/E",
+              "note": "先缩点构建树，然后求树的直径。树的直径可以通过两次DFS或树形DP求解。"
+            },
+            {
+              "id": "1016F",
+              "name": "Road Projects",
+              "difficulty": 2600,
+              "tags": [
+                "dfs and similar",
+                "dp",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1016/F",
+              "note": "树形DP与换根结合。需要维护每个节点到其他节点的最大距离，并在添加边后更新答案。"
+            }
+          ]
+        },
+        {
+          "title": "§5 状压DP",
+          "code_template": "#include <bits/stdc++.h>\nusing namespace std;\n\nconst int INF = 0x3f3f3f3f;\nconst int MAXN = 20; // 最大城市数\nconst int MAXM = (1 << 20) + 5; // 最大状态数\n\nint n; // 城市数量\nint dist[MAXN][MAXN]; // 距离矩阵\nint dp[MAXM][MAXN]; // dp[state][i]: 当前访问状态为state，最后停留在城市i的最小代价\n\n// 旅行商问题模板\nint tsp() {\n    memset(dp, INF, sizeof(dp));\n    dp[1][0] = 0; // 从城市0出发，状态为000...001\n    \n    for (int mask = 1; mask < (1 << n); mask++) {\n        for (int i = 0; i < n; i++) {\n            if (dp[mask][i] == INF) continue;\n            if (!(mask & (1 << i))) continue;\n            \n            // 尝试从i走到j\n            for (int j = 0; j < n; j++) {\n                if (mask & (1 << j)) continue; // j已经访问过\n                int newMask = mask | (1 << j);\n                dp[newMask][j] = min(dp[newMask][j], dp[mask][i] + dist[i][j]);\n            }\n        }\n    }\n    \n    // 计算回到起点的最小代价\n    int ans = INF;\n    int fullMask = (1 << n) - 1;\n    for (int i = 1; i < n; i++) {\n        if (dp[fullMask][i] != INF && dist[i][0] != INF) {\n            ans = min(ans, dp[fullMask][i] + dist[i][0]);\n        }\n    }\n    return ans;\n}\n\n// 棋盘放置问题模板（n皇后变种）\nint boardDP(int n, int m) {\n    vector<int> validStates;\n    // 预处理所有合法行状态（没有相邻的1）\n    for (int s = 0; s < (1 << m); s++) {\n        if (!(s & (s << 1))) {\n            validStates.push_back(s);\n        }\n    }\n    \n    vector<vector<int>> dp(n + 1, vector<int>(1 << m, 0));\n    dp[0][0] = 1;\n    \n    for (int i = 1; i <= n; i++) {\n        for (int cur : validStates) {\n            for (int prev : validStates) {\n                // 检查列冲突和斜向冲突\n                if ((cur & prev) == 0 && ((cur << 1) & prev) == 0 && (cur & (prev << 1)) == 0) {\n                    dp[i][cur] += dp[i - 1][prev];\n                }\n            }\n        }\n    }\n    \n    int ans = 0;\n    for (int s : validStates) {\n        ans += dp[n][s];\n    }\n    return ans;\n}\n\nint main() {\n    // 旅行商问题示例\n    cin >> n;\n    for (int i = 0; i < n; i++) {\n        for (int j = 0; j < n; j++) {\n            cin >> dist[i][j];\n        }\n    }\n    cout << tsp() << endl;\n    \n    // 棋盘问题示例\n    int rows, cols;\n    cin >> rows >> cols;\n    cout << boardDP(rows, cols) << endl;\n    \n    return 0;\n}",
+          "idea": "状压DP（状态压缩动态规划）是一种处理小规模集合问题的有效技巧，通常用于解决NP-hard问题的精确解。核心思想是用二进制位表示集合状态，每一位表示某个元素是否被选中/访问。\n\n解题思路：\n1. 状态设计：通常用整数mask的二进制表示当前状态，dp[mask][i]表示在状态mask下，最后位于位置i的最优值。\n2. 状态转移：从已知状态扩展新状态，通过位运算检查合法性。\n3. 初始化：起点状态设为0，其他状态设为无穷大。\n4. 遍历顺序：通常按mask从小到大遍历，确保子问题先被求解。\n\n常见应用：\n- 旅行商问题（TSP）：n≤20时可用状压DP在O(n²·2ⁿ)求解\n- 棋盘放置问题：处理行间约束，预处理合法行状态\n- 集合覆盖问题：选择最小子集覆盖所有元素\n\n优化技巧：\n1. 预处理合法状态，减少无效转移\n2. 使用lowbit快速枚举子集\n3. 对于对称问题，可以固定起点减少状态数\n4. 使用滚动数组优化空间",
+          "problems": [
+            {
+              "id": "677C",
+              "name": "Vanya and Label",
+              "difficulty": 1500,
+              "tags": [
+                "bitmasks",
+                "combinatorics"
+              ],
+              "url": "https://codeforces.com/problemset/problem/677/C",
+              "note": "统计字符编码中0的个数，每个字符对应6位二进制，计算有多少位可以自由选择0/1而不改变AND结果"
+            },
+            {
+              "id": "1466E",
+              "name": "Apollo versus Pan",
+              "difficulty": 1800,
+              "tags": [
+                "bitmasks",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1466/E",
+              "note": "利用位运算性质，统计每位1的个数，计算所有三元组(ai & aj) * (aj | ak)的和"
+            },
+            {
+              "id": "1006F",
+              "name": "Xor-Paths",
+              "difficulty": 2100,
+              "tags": [
+                "bitmasks",
+                "meet-in-the-middle"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1006F",
+              "note": "折半搜索+状压，从起点和终点同时DFS，在中点处用map记录异或值，统计路径异或等于k的方案数"
+            },
+            {
+              "id": "1004F",
+              "name": "Sonya and Bitwise OR",
+              "difficulty": 2600,
+              "tags": [
+                "bitmasks",
+                "data structures"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1004F",
+              "note": "线段树维护区间OR信息，利用OR运算的性质：每个位置作为左端点时，区间OR值最多变化log(MAX)次"
+            }
+          ]
+        },
+        {
+          "title": "§6 数位DP",
+          "code_template": "#include <bits/stdc++.h>\nusing namespace std;\n\n// 数位DP模板\n// 问题：统计区间[L,R]中满足某种条件的数字个数\n// 通常转化为 count(R) - count(L-1)\n\nlong long dp[20][2][2]; // 状态数组，维度根据具体问题调整\nvector<int> digits;     // 存储数字的每一位\n\n// 记忆化搜索\n// pos: 当前处理到的位置（从高位到低位）\n// tight: 是否受到上界限制（1表示受限）\n// lead: 是否有前导零（1表示有前导零）\n// 其他状态根据具体问题添加\nlong long dfs(int pos, int tight, int lead) {\n    // 递归终止条件：处理完所有数位\n    if (pos == digits.size()) {\n        // 根据具体问题返回结果\n        // 例如：统计非零数字个数，有前导零不算\n        return lead ? 0 : 1;\n    }\n    \n    // 记忆化：如果已经计算过，直接返回\n    if (dp[pos][tight][lead] != -1) {\n        return dp[pos][tight][lead];\n    }\n    \n    long long res = 0;\n    // 确定当前位可以取的数字范围\n    int limit = tight ? digits[pos] : 9;\n    \n    for (int d = 0; d <= limit; d++) {\n        // 计算新的状态\n        int new_tight = tight && (d == limit);\n        int new_lead = lead && (d == 0);\n        \n        // 根据具体问题添加条件判断\n        // 例如：不能出现连续的数字\n        // if (!lead && abs(d - prev_digit) <= 1) continue;\n        \n        // 递归处理下一位\n        res += dfs(pos + 1, new_tight, new_lead);\n    }\n    \n    return dp[pos][tight][lead] = res;\n}\n\n// 将数字x分解为数位数组\nlong long solve(long long x) {\n    if (x < 0) return 0;\n    \n    digits.clear();\n    while (x) {\n        digits.push_back(x % 10);\n        x /= 10;\n    }\n    reverse(digits.begin(), digits.end());\n    \n    // 初始化dp数组为-1\n    memset(dp, -1, sizeof(dp));\n    \n    // 从最高位开始搜索\n    return dfs(0, 1, 1);\n}\n\nint main() {\n    long long L, R;\n    cin >> L >> R;\n    \n    // 计算[0,R]的答案减去[0,L-1]的答案\n    long long ans = solve(R) - solve(L - 1);\n    cout << ans << endl;\n    \n    return 0;\n}",
+          "idea": "数位DP是一种用于解决与数字数位相关计数问题的动态规划方法。核心思想是将数字按位分解，通过记忆化搜索统计满足特定条件的数字个数。\n\n解题步骤：\n1. 问题转化：将区间[L,R]的问题转化为count(R)-count(L-1)\n2. 数位分解：将数字分解为十进制数位数组（或其他进制）\n3. 状态设计：通常包含以下维度：\n   - 当前位置pos\n   - 是否受上界限制tight（保证不超过原数字）\n   - 是否有前导零lead（影响条件判断）\n   - 根据具体问题添加其他状态（如前一位数字、已满足的条件等）\n4. 记忆化搜索：从高位向低位递归，记录已计算的状态\n5. 状态转移：枚举当前位所有可能的数字，根据条件筛选，递归到下一位\n\n常见应用：\n- 统计数字中特定数字出现的次数\n- 统计不含某些数字或模式的数字\n- 统计满足数位和条件的数字\n- 统计回文数字或对称数字\n\n优化技巧：\n1. 合理设计状态，避免状态爆炸\n2. 注意前导零的处理，有些条件对前导零有特殊要求\n3. 对于复杂条件，可以使用位运算压缩状态\n4. 注意long long范围，特别是大数位的情况",
+          "problems": [
+            {
+              "id": "1180A",
+              "name": "Alex and a Rhombus",
+              "difficulty": 800,
+              "tags": [
+                "dp",
+                "implementation",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1180/A",
+              "note": "简单的DP问题，虽然不是标准数位DP，但可以作为DP入门"
+            },
+            {
+              "id": "1807G2",
+              "name": "Subsequence Addition (Hard Version)",
+              "difficulty": 1100,
+              "tags": [
+                "bitmasks",
+                "dp",
+                "greedy",
+                "implementation",
+                "sortings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1807/G2",
+              "note": "背包DP问题，帮助理解DP状态设计"
+            },
+            {
+              "id": "1037C",
+              "name": "Equalize",
+              "difficulty": 1300,
+              "tags": [
+                "dp",
+                "greedy",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1037C",
+              "note": "字符串DP，涉及相邻位置的操作"
+            },
+            {
+              "id": "505B",
+              "name": "Mr. Kitayuta's Colorful Graph",
+              "difficulty": 1400,
+              "tags": [
+                "dfs and similar",
+                "dp",
+                "dsu",
+                "graphs"
+              ],
+              "url": "https://codeforces.com/problemset/problem/505/B",
+              "note": "图论与DP结合，理解状态转移"
+            },
+            {
+              "id": "891A",
+              "name": "Pride",
+              "difficulty": 1500,
+              "tags": [
+                "brute force",
+                "dp",
+                "greedy",
+                "math",
+                "number theory"
+              ],
+              "url": "https://codeforces.com/problemset/problem/891/A",
+              "note": "数学与DP结合，涉及gcd操作"
+            },
+            {
+              "id": "1015E1",
+              "name": "Stars Drawing (Easy Edition)",
+              "difficulty": 1700,
+              "tags": [
+                "brute force",
+                "dp",
+                "greedy"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1015/E1",
+              "note": "二维DP，预处理和状态设计"
+            },
+            {
+              "id": "1509C",
+              "name": "The Sports Festival",
+              "difficulty": 1800,
+              "tags": [
+                "dp",
+                "greedy"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1509/C",
+              "note": "区间DP，排序后处理最优子结构"
+            },
+            {
+              "id": "14D",
+              "name": "Two Paths",
+              "difficulty": 1900,
+              "tags": [
+                "dfs and similar",
+                "dp",
+                "graphs",
+                "shortest paths",
+                "trees",
+                "two pointers"
+              ],
+              "url": "https://codeforces.com/problemset/problem/14/D",
+              "note": "树形DP，求两条不相交路径的最大乘积"
+            },
+            {
+              "id": "119C",
+              "name": "Education Reform",
+              "difficulty": 2000,
+              "tags": [
+                "dp"
+              ],
+              "url": "https://codeforces.com/problemset/problem/119/C",
+              "note": "复杂DP，需要记录路径和状态转移"
+            },
+            {
+              "id": "1006F",
+              "name": "Xor-Paths",
+              "difficulty": 2100,
+              "tags": [
+                "bitmasks",
+                "brute force",
+                "dp",
+                "meet-in-the-middle"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1006/F",
+              "note": "折半搜索与DP结合，处理路径异或问题"
+            },
+            {
+              "id": "2065H",
+              "name": "Bro Thinks He's Him",
+              "difficulty": 2200,
+              "tags": [
+                "combinatorics",
+                "data structures",
+                "divide and conquer",
+                "dp",
+                "math",
+                "matrices"
+              ],
+              "url": "https://codeforces.com/problemset/problem/2065/H",
+              "note": "组合数学与DP，矩阵优化"
+            },
+            {
+              "id": "1750E",
+              "name": "Bracket Cost",
+              "difficulty": 2400,
+              "tags": [
+                "binary search",
+                "data structures",
+                "divide and conquer",
+                "dp",
+                "greedy",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1750/E",
+              "note": "括号序列DP，复杂状态设计"
+            },
+            {
+              "id": "1016F",
+              "name": "Road Projects",
+              "difficulty": 2600,
+              "tags": [
+                "dfs and similar",
+                "dp",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1016/F",
+              "note": "树形DP高级应用，处理路径和距离"
+            }
+          ]
+        },
+        {
+          "title": "§7 概率/期望DP",
+          "code_template": "#include <bits/stdc++.h>\nusing namespace std;\n\nconst int N = 1e5 + 5;\ndouble dp[N]; // dp[i] 表示从状态i到达目标状态的期望步数/收益\n// 有时也使用 dp[i] 表示到达状态i的概率\n\nint main() {\n    int n;\n    cin >> n;\n    // 初始化边界条件\n    dp[n] = 0; // 假设n是目标状态，期望为0\n    \n    // 逆推（常见于期望DP）\n    for (int i = n - 1; i >= 0; i--) {\n        // 情况1：等概率转移\n        // double p = 1.0 / k; // k种等概率选择\n        // dp[i] = 1 + p * (dp[a1] + dp[a2] + ... + dp[ak]);\n        \n        // 情况2：带权转移（概率不均等）\n        // dp[i] = 1 + sum_{j} (p_j * dp[next_j])\n        // 其中 sum(p_j) = 1\n        \n        // 情况3：有自环（i可能转移到自身）\n        // dp[i] = p_self * dp[i] + sum_{j != i} (p_j * dp[next_j]) + cost\n        // 移项得：dp[i] = (sum_{j != i} (p_j * dp[next_j]) + cost) / (1 - p_self)\n    }\n    \n    // 正推（常见于概率DP）\n    /*\n    dp[0] = 1.0; // 初始状态概率为1\n    for (int i = 0; i < n; i++) {\n        for (auto [next, p] : transitions[i]) {\n            dp[next] += dp[i] * p;\n        }\n    }\n    */\n    \n    printf(\"%.10f\\n\", dp[0]);\n    return 0;\n}\n\n/*\n补充说明：\n1. 期望DP常用逆推，因为目标状态已知。\n2. 当转移有环时，可能需要解方程组（高斯消元）。\n3. 浮点数比较注意精度，通常使用1e-10容差。\n4. 有时需要long double提高精度。\n*/",
+          "idea": "概率/期望DP是动态规划的一个分支，用于处理随机过程中的概率和期望值问题。\n\n核心思想：\n1. 定义状态：通常用 dp[i] 表示从状态 i 到达目标状态的期望步数（或期望收益），或者表示到达状态 i 的概率。\n2. 状态转移：根据随机过程的规则，写出期望/概率的转移方程。\n   - 期望DP常用逆推：dp[i] = 1 + Σ(p_j * dp[next_j])，其中 +1 表示当前步的代价。\n   - 概率DP常用正推：dp[next] += dp[i] * p_trans。\n3. 处理自环：当状态可能转移到自身时，需要移项解出 dp[i]。\n4. 边界条件：目标状态的期望通常为0，初始状态的概率通常为1。\n\n常见技巧：\n- 当转移图是DAG时，直接DP即可。\n- 当转移有环时，可能需要高斯消元解线性方程组。\n- 对于无限过程，有时可以通过数学推导化简递推式。\n- 注意精度问题，适当使用long double。\n\n解题步骤：\n1. 分析随机过程，定义合适的状态。\n2. 写出转移方程，考虑所有可能的下一个状态及其概率。\n3. 确定边界条件。\n4. 根据转移方向（正推/逆推）实现DP。\n5. 输出答案，注意精度控制。",
+          "problems": [
+            {
+              "id": "1180A",
+              "name": "Alex and a Rhombus",
+              "difficulty": 800,
+              "tags": [
+                "dp",
+                "implementation",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1180/A",
+              "note": "简单DP，计算菱形格子数。虽然不是概率题，但可作为DP入门。"
+            },
+            {
+              "id": "1807G1",
+              "name": "Subsequence Addition (Easy Version)",
+              "difficulty": 1100,
+              "tags": [
+                "brute force",
+                "data structures",
+                "dp",
+                "greedy",
+                "implementation",
+                "sortings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1807/G1",
+              "note": "背包DP，判断数组能否由初始[1]通过添加子序列和构成。"
+            },
+            {
+              "id": "1037C",
+              "name": "Equalize",
+              "difficulty": 1300,
+              "tags": [
+                "dp",
+                "greedy",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1037/C",
+              "note": "字符串转换的最小代价，相邻位置交换有优惠。线性DP或贪心。"
+            },
+            {
+              "id": "538B",
+              "name": "Quasi Binary",
+              "difficulty": 1400,
+              "tags": [
+                "constructive algorithms",
+                "dp",
+                "greedy",
+                "implementation"
+              ],
+              "url": "https://codeforces.com/problemset/problem/538/B",
+              "note": "用拟二进制数（仅含0/1）表示一个数，求最少个数。DP或贪心。"
+            },
+            {
+              "id": "991D",
+              "name": "Bishwock",
+              "difficulty": 1500,
+              "tags": [
+                "dp",
+                "greedy"
+              ],
+              "url": "https://codeforces.com/problemset/problem/991/D",
+              "note": "棋盘放置L形骨牌的最大数量。状态压缩DP，每列用2位表示状态。"
+            },
+            {
+              "id": "1015E1",
+              "name": "Stars Drawing (Easy Edition)",
+              "difficulty": 1700,
+              "tags": [
+                "brute force",
+                "dp",
+                "greedy"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1015/E1",
+              "note": "用星形覆盖网格中的'*'，求方案。预处理每个点向四个方向的延伸长度。"
+            },
+            {
+              "id": "1517D",
+              "name": "Explorer Space",
+              "difficulty": 1800,
+              "tags": [
+                "dp",
+                "graphs",
+                "shortest paths"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1517/D",
+              "note": "网格图中恰好走k步回到原点的最短路径。DP[k][i][j]表示步数和位置。"
+            },
+            {
+              "id": "1494C",
+              "name": "1D Sokoban",
+              "difficulty": 1900,
+              "tags": [
+                "binary search",
+                "dp",
+                "greedy",
+                "implementation",
+                "two pointers"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1494/C",
+              "note": "一维推箱子，箱子只能推不能拉。预处理前缀最大匹配数，前后缀结合。"
+            },
+            {
+              "id": "119C",
+              "name": "Education Reform",
+              "difficulty": 2000,
+              "tags": [
+                "dp"
+              ],
+              "url": "https://codeforces.com/problemset/problem/119/C",
+              "note": "选择作业使得分数严格递增，且科目不重复。DP[i][j][k]表示前i天、最后科目j、分数k的最大收益。"
+            },
+            {
+              "id": "1006F",
+              "name": "Xor-Paths",
+              "difficulty": 2100,
+              "tags": [
+                "bitmasks",
+                "brute force",
+                "dp",
+                "meet-in-the-middle"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1006/F",
+              "note": "网格中从左上到右下路径异或和为给定值的路径数。折半搜索，在中点处合并。"
+            },
+            {
+              "id": "2114G",
+              "name": "Build an Array",
+              "difficulty": 2200,
+              "tags": [
+                "brute force",
+                "constructive algorithms",
+                "dp",
+                "greedy",
+                "math",
+                "number theory"
+              ],
+              "url": "https://codeforces.com/problemset/problem/2114/G",
+              "note": "构造数组使得所有子数组的LCM不超过给定值。DP考虑质因数分解和状态压缩。"
+            },
+            {
+              "id": "1750E",
+              "name": "Bracket Cost",
+              "difficulty": 2400,
+              "tags": [
+                "binary search",
+                "data structures",
+                "divide and conquer",
+                "dp",
+                "greedy",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1750/E",
+              "note": "计算所有子串的括号序列最小操作代价（交换或插入）之和。贡献分解，单调栈维护。"
+            },
+            {
+              "id": "1016F",
+              "name": "Road Projects",
+              "difficulty": 2600,
+              "tags": [
+                "dfs and similar",
+                "dp",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1016/F",
+              "note": "树中添加一条边后，1到n的最短路径的最大值。预处理路径上的点，考虑不在路径上的分支。"
+            }
+          ]
+        },
+        {
+          "title": "§8 优化技巧",
+          "code_template": "// 单调队列优化DP模板\n#include <bits/stdc++.h>\nusing namespace std;\n\nconst int N = 1e6 + 10;\nint dp[N], a[N];\nint n, k;\n\ndeque<int> q; // 存储下标\n\nint main() {\n    cin >> n >> k;\n    for (int i = 1; i <= n; i++) cin >> a[i];\n    \n    // 初始化\n    dp[1] = a[1];\n    q.push_back(1);\n    \n    for (int i = 2; i <= n; i++) {\n        // 维护队列范围：窗口大小k\n        while (!q.empty() && i - q.front() > k) q.pop_front();\n        \n        // 状态转移：dp[i] = min(dp[j]) + a[i], j在[i-k, i-1]\n        dp[i] = dp[q.front()] + a[i];\n        \n        // 维护单调性（递增队列求最小值）\n        while (!q.empty() && dp[q.back()] >= dp[i]) q.pop_back();\n        q.push_back(i);\n    }\n    \n    cout << dp[n] << endl;\n    return 0;\n}\n\n// 斜率优化模板（以最小值为例）\n#include <bits/stdc++.h>\nusing namespace std;\n\ntypedef long long ll;\nconst int N = 1e6 + 10;\nll dp[N], sum[N], a[N];\nint n;\n\ndeque<int> q;\n\n// 斜率计算\ninline ll X(int j) { return sum[j]; }\ninline ll Y(int j) { return dp[j] + sum[j] * sum[j]; }\ninline double slope(int i, int j) {\n    if (X(i) == X(j)) return 1e18;\n    return (double)(Y(i) - Y(j)) / (X(i) - X(j));\n}\n\nint main() {\n    cin >> n;\n    for (int i = 1; i <= n; i++) {\n        cin >> a[i];\n        sum[i] = sum[i-1] + a[i];\n    }\n    \n    q.push_back(0);\n    for (int i = 1; i <= n; i++) {\n        // 维护队首：斜率单调性\n        while (q.size() >= 2 && slope(q[0], q[1]) <= 2 * sum[i]) q.pop_front();\n        \n        int j = q.front();\n        // 状态转移：dp[i] = dp[j] + (sum[i]-sum[j])^2\n        dp[i] = dp[j] + (sum[i] - sum[j]) * (sum[i] - sum[j]);\n        \n        // 维护队尾：下凸包性质\n        while (q.size() >= 2 && slope(q[q.size()-2], q.back()) >= slope(q.back(), i)) q.pop_back();\n        q.push_back(i);\n    }\n    \n    cout << dp[n] << endl;\n    return 0;\n}",
+          "idea": "优化技巧主要用于加速动态规划的状态转移过程。\n\n1. 单调队列优化：\n   - 适用场景：状态转移方程形如 dp[i] = min/max{ dp[j] + f(i,j) }，其中 j 的取值范围是一个滑动窗口 [i-k, i-1]\n   - 核心思想：维护一个单调队列，存储可能成为最优决策的候选下标\n   - 实现步骤：\n     a) 维护队列范围，移除超出窗口的元素\n     b) 取队首作为当前最优决策\n     c) 将新状态加入队列，维护单调性\n\n2. 斜率优化：\n   - 适用场景：状态转移方程可整理为 dp[i] = min{ dp[j] + A(i)*B(j) + C(i) + D(j) } 的形式\n   - 核心思想：将转移方程转化为斜率形式，维护决策点的下凸包（求最小值）或上凸包（求最大值）\n   - 实现步骤：\n     a) 将转移方程改写为 Y(j) = dp[j] + D(j), X(j) = B(j)\n     b) 斜率 K = A(i)，在凸包上二分查找最优决策点\n     c) 维护凸包性质：新加入点需保证斜率单调性\n\n关键区别：\n- 单调队列优化：决策区间是滑动窗口，维护队列单调性\n- 斜率优化：决策区间通常无固定窗口，维护凸包结构\n两者常结合使用，如单调队列维护凸包上的点。",
+          "problems": [
+            {
+              "id": "1180A",
+              "name": "Alex and a Rhombus",
+              "difficulty": 800,
+              "tags": [
+                "dp",
+                "implementation",
+                "math"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1180/A",
+              "note": "简单递推问题，可用dp[i]表示第i层的菱形数，dp[i]=dp[i-1]+4*(i-1)"
+            },
+            {
+              "id": "1807G2",
+              "name": "Subsequence Addition (Hard Version)",
+              "difficulty": 1100,
+              "tags": [
+                "bitmasks",
+                "dp",
+                "greedy",
+                "implementation",
+                "sortings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1807/G2",
+              "note": "背包问题变种，排序后贪心检查每个数是否能由前面的数组成"
+            },
+            {
+              "id": "1037C",
+              "name": "Equalize",
+              "difficulty": 1300,
+              "tags": [
+                "dp",
+                "greedy",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1037C",
+              "note": "字符串匹配问题，dp[i]表示前i位的最小代价，考虑交换操作的优化"
+            },
+            {
+              "id": "505B",
+              "name": "Mr. Kitayuta's Colorful Graph",
+              "difficulty": 1400,
+              "tags": [
+                "dfs and similar",
+                "dp",
+                "dsu",
+                "graphs"
+              ],
+              "url": "https://codeforces.com/problemset/problem/505/B",
+              "note": "多颜色图连通性问题，可用DP思想记录每种颜色的连通分量"
+            },
+            {
+              "id": "891A",
+              "name": "Pride",
+              "difficulty": 1500,
+              "tags": [
+                "brute force",
+                "dp",
+                "greedy",
+                "math",
+                "number theory"
+              ],
+              "url": "https://codeforces.com/problemset/problem/891/A",
+              "note": "区间GCD问题，dp[l][r]表示区间[l,r]的GCD值，可优化为O(n^2)"
+            },
+            {
+              "id": "1015E1",
+              "name": "Stars Drawing (Easy Edition)",
+              "difficulty": 1700,
+              "tags": [
+                "brute force",
+                "dp",
+                "greedy"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1015E1",
+              "note": "预处理每个点向四个方向延伸的长度，然后DP统计星星覆盖情况"
+            },
+            {
+              "id": "1509C",
+              "name": "The Sports Festival",
+              "difficulty": 1800,
+              "tags": [
+                "dp",
+                "greedy"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1509/C",
+              "note": "区间DP，dp[l][r]表示安排[l,r]区间的最小代价，需要排序后DP"
+            },
+            {
+              "id": "14D",
+              "name": "Two Paths",
+              "difficulty": 1900,
+              "tags": [
+                "dfs and similar",
+                "dp",
+                "graphs",
+                "shortest paths",
+                "trees",
+                "two pointers"
+              ],
+              "url": "https://codeforces.com/problemset/problem/14D",
+              "note": "树形DP求两条不相交路径的最大乘积，需要枚举断边后分别求直径"
+            },
+            {
+              "id": "119C",
+              "name": "Education Reform",
+              "difficulty": 2000,
+              "tags": [
+                "dp"
+              ],
+              "url": "https://codeforces.com/problemset/problem/119C",
+              "note": "复杂DP问题，需要记录前驱状态进行回溯，状态设计较复杂"
+            },
+            {
+              "id": "1006F",
+              "name": "Xor-Paths",
+              "difficulty": 2100,
+              "tags": [
+                "bitmasks",
+                "brute force",
+                "dp",
+                "meet-in-the-middle"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1006F",
+              "note": "双向搜索优化，将路径分为两半分别DP，最后合并结果"
+            },
+            {
+              "id": "2065H",
+              "name": "Bro Thinks He's Him",
+              "difficulty": 2200,
+              "tags": [
+                "combinatorics",
+                "data structures",
+                "divide and conquer",
+                "dp",
+                "math",
+                "matrices"
+              ],
+              "url": "https://codeforces.com/problemset/problem/2065/H",
+              "note": "需要矩阵优化或分治DP，状态转移涉及组合数学"
+            },
+            {
+              "id": "1750E",
+              "name": "Bracket Cost",
+              "difficulty": 2400,
+              "tags": [
+                "binary search",
+                "data structures",
+                "divide and conquer",
+                "dp",
+                "greedy",
+                "strings"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1750/E",
+              "note": "括号序列问题，需要斜率优化或分治优化计算所有子串的代价和"
+            },
+            {
+              "id": "1016F",
+              "name": "Road Projects",
+              "difficulty": 2600,
+              "tags": [
+                "dfs and similar",
+                "dp",
+                "trees"
+              ],
+              "url": "https://codeforces.com/problemset/problem/1016/F",
+              "note": "树形DP结合路径优化，需要处理加边后的最短路变化，涉及复杂的状态设计和优化"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

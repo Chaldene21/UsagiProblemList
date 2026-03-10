@@ -13,7 +13,7 @@ import (
 
 const (
 	dataDir         = "./data/problemsets"
-	indexFile       = "./data/index.json"
+	indexFile       = "./data/problemsets/index.json"
 	cacheExpiration = 5 * time.Minute
 )
 
