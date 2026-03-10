@@ -1721,7 +1721,8 @@ async function performUserSearch() {
 
 // 渲染用户卡片
 function renderUserCard(user) {
-    const isSelf = currentUser && currentUser.id === user.id;
+    // 使用 == 比较，避免类型问题
+    const isSelf = currentUser && currentUser.id == user.id;
 
     return `
         <div class="user-card" onclick="navigateTo('/user/${user.id}')">
@@ -1736,7 +1737,7 @@ function renderUserCard(user) {
                 </div>
             </div>
             <div class="user-card-actions" onclick="event.stopPropagation()">
-                ${!isSelf ? `
+                ${!isSelf && currentUser ? `
                     <button class="btn-follow ${user.is_following ? 'following' : ''}"
                             onclick="toggleFollow(${user.id}, ${user.is_following}, this)">
                         ${user.is_following ? '已关注' : '关注'}
@@ -1786,7 +1787,8 @@ async function renderUserProfilePage(userId) {
         return;
     }
 
-    const isSelf = currentUser && currentUser.id === profile.id;
+    // 使用 == 比较，避免类型问题
+    const isSelf = currentUser && currentUser.id == profile.id;
 
     content.innerHTML = `
         <div class="profile-container">
@@ -1830,7 +1832,7 @@ async function renderUserProfilePage(userId) {
                         <div class="profile-days-label">天加入社区</div>
                     </div>
 
-                    ${!isSelf ? `
+                    ${!isSelf && currentUser ? `
                         <div class="profile-actions">
                             <button class="btn-follow-large ${profile.is_following ? 'following' : ''}"
                                     onclick="toggleProfileFollow(${profile.id}, ${profile.is_following})">
@@ -1878,24 +1880,22 @@ async function renderUserProfilePage(userId) {
                     </div>
                 </div>
 
-                ${isSelf ? `
-                    <div class="stats-box">
-                        <div class="stats-box-title">
-                            <i class="fas fa-users"></i>
-                            关注动态
+                <div class="stats-box">
+                    <div class="stats-box-title">
+                        <i class="fas fa-users"></i>
+                        关注信息
+                    </div>
+                    <div class="follow-stats">
+                        <div class="follow-stat-item" onclick="navigateTo('/user/${profile.id}/followings')">
+                            <span class="follow-stat-count">${profile.followings_count || 0}</span>
+                            <span class="follow-stat-label">关注</span>
                         </div>
-                        <div class="follow-stats">
-                            <div class="follow-stat-item" onclick="navigateTo('/user/${profile.id}/followings')">
-                                <span class="follow-stat-count">${profile.followings_count || 0}</span>
-                                <span class="follow-stat-label">关注</span>
-                            </div>
-                            <div class="follow-stat-item" onclick="navigateTo('/user/${profile.id}/followers')">
-                                <span class="follow-stat-count">${profile.followers_count || 0}</span>
-                                <span class="follow-stat-label">粉丝</span>
-                            </div>
+                        <div class="follow-stat-item" onclick="navigateTo('/user/${profile.id}/followers')">
+                            <span class="follow-stat-count">${profile.followers_count || 0}</span>
+                            <span class="follow-stat-label">粉丝</span>
                         </div>
                     </div>
-                ` : ''}
+                </div>
             </div>
         </div>
     `;
