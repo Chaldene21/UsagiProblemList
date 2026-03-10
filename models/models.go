@@ -221,6 +221,13 @@ type UserProfile struct {
 	FollowersCount   int    `json:"followers_count"`    // 粉丝数
 	FollowingsCount  int    `json:"followings_count"`   // 关注数
 	TotalCompleted   int    `json:"total_completed"`    // 完成题目数
+	TotalProblems    int    `json:"total_problems"`     // 总题目数
+	EasyCompleted    int    `json:"easy_completed"`     // 简单完成数
+	EasyTotal        int    `json:"easy_total"`         // 简单总数
+	MediumCompleted  int    `json:"medium_completed"`   // 中等完成数
+	MediumTotal      int    `json:"medium_total"`       // 中等总数
+	HardCompleted    int    `json:"hard_completed"`     // 困难完成数
+	HardTotal        int    `json:"hard_total"`         // 困难总数
 	CurrentStreak    int    `json:"current_streak"`     // 当前连续天数
 	MaxStreak        int    `json:"max_streak"`         // 最大连续天数
 }

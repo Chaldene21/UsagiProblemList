@@ -98,6 +98,13 @@ func (s *FollowService) GetUserProfile(viewerID, targetUserID uint) (*models.Use
 	stats, err := progressService.GetDetailedStats(targetUserID)
 	if err == nil {
 		profile.TotalCompleted = stats.TotalCompleted
+		profile.TotalProblems = stats.TotalProblems
+		profile.EasyCompleted = stats.EasyCompleted
+		profile.EasyTotal = stats.EasyTotal
+		profile.MediumCompleted = stats.MediumCompleted
+		profile.MediumTotal = stats.MediumTotal
+		profile.HardCompleted = stats.HardCompleted
+		profile.HardTotal = stats.HardTotal
 		profile.CurrentStreak = stats.CurrentStreak
 		profile.MaxStreak = stats.MaxStreak
 	}

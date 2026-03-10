@@ -1153,17 +1153,19 @@ async function renderStatsPage() {
 
     try {
         // 并行获取所有数据
-        const [heatmapResult, detailResult, categoryResult, problemsetResult] = await Promise.all([
+        const [heatmapResult, detailResult, categoryResult, problemsetResult, profileResult] = await Promise.all([
             apiRequest('/progress/heatmap'),
             apiRequest('/progress/detail'),
             apiRequest('/progress/category'),
-            apiRequest('/progress/problemset')
+            apiRequest('/progress/problemset'),
+            apiRequest(`/users/${currentUser.id}`)
         ]);
 
         const heatmapData = heatmapResult.data || [];
         const detail = detailResult.data || {};
         const categories = categoryResult.data || [];
         const problemsets = problemsetResult.data || [];
+        const userProfile = profileResult.data || {};
 
         // 计算注册天数
         const createdDate = new Date(currentUser.created_at);
@@ -1187,6 +1189,17 @@ async function renderStatsPage() {
                         <div class="profile-name">${currentUser.nickname || currentUser.username}</div>
                         <div class="profile-username">@${currentUser.username}</div>
                         
+                        <div class="profile-stats-mini">
+                            <div class="profile-stat-item clickable" onclick="navigateTo('/user/${currentUser.id}/followings')">
+                                <div class="profile-stat-value">${userProfile.followings_count || 0}</div>
+                                <div class="profile-stat-label">关注</div>
+                            </div>
+                            <div class="profile-stat-item clickable" onclick="navigateTo('/user/${currentUser.id}/followers')">
+                                <div class="profile-stat-value">${userProfile.followers_count || 0}</div>
+                                <div class="profile-stat-label">粉丝</div>
+                            </div>
+                        </div>
+
                         <div class="profile-stats-mini">
                             <div class="profile-stat-item">
                                 <div class="profile-stat-value">${detail.total_completed || 0}</div>
@@ -1773,6 +1786,11 @@ async function renderUserProfilePage(userId) {
 
     content.innerHTML = '<div class="loading"><div class="spinner"></div><p>加载中...</p></div>';
 
+    // 先尝试恢复登录状态
+    if (!currentUser && authToken) {
+        await checkAuth(true);
+    }
+
     const profile = await getUserProfile(userId);
 
     if (!profile) {
@@ -1787,8 +1805,23 @@ async function renderUserProfilePage(userId) {
         return;
     }
 
+    // 获取热力图和详细统计
+    const [heatmapResult, detailResult] = await Promise.all([
+        apiRequest(`/users/${userId}/heatmap`),
+        apiRequest(`/users/${userId}/stats/detail`)
+    ]);
+
+    const heatmapData = heatmapResult.data || [];
+    const detail = detailResult.data || {};
+
     // 使用 == 比较，避免类型问题
     const isSelf = currentUser && currentUser.id == profile.id;
+
+    // 计算难度分布角度
+    const total = detail.total_completed || 1;
+    const easyDeg = ((detail.easy_completed || 0) / total) * 360;
+    const mediumDeg = easyDeg + ((detail.medium_completed || 0) / total) * 360;
+    const hardDeg = mediumDeg + ((detail.hard_completed || 0) / total) * 360;
 
     content.innerHTML = `
         <div class="profile-container">
@@ -1850,49 +1883,101 @@ async function renderUserProfilePage(userId) {
 
             <!-- 右侧主内容 -->
             <div class="profile-main">
-                <div class="stats-box">
-                    <div class="stats-box-title">
-                        <i class="fas fa-chart-bar"></i>
-                        刷题统计
+                <!-- 进度卡片 -->
+                <div class="progress-cards">
+                    <div class="progress-card all">
+                        <div class="progress-card-icon"><i class="fas fa-code"></i></div>
+                        <div class="progress-card-value">${profile.total_completed || 0}</div>
+                        <div class="progress-card-label">已完成题目</div>
+                        <div class="progress-card-sub">共 ${profile.total_problems || 0} 题</div>
                     </div>
-                    <div class="profile-stats-grid">
-                        <div class="profile-stat-card">
-                            <div class="stat-icon"><i class="fas fa-code"></i></div>
-                            <div class="stat-info">
-                                <div class="stat-value">${profile.total_completed || 0}</div>
-                                <div class="stat-label">已完成题目</div>
-                            </div>
-                        </div>
-                        <div class="profile-stat-card">
-                            <div class="stat-icon"><i class="fas fa-fire"></i></div>
-                            <div class="stat-info">
-                                <div class="stat-value">${profile.current_streak || 0}</div>
-                                <div class="stat-label">当前连续</div>
-                            </div>
-                        </div>
-                        <div class="profile-stat-card">
-                            <div class="stat-icon"><i class="fas fa-trophy"></i></div>
-                            <div class="stat-info">
-                                <div class="stat-value">${profile.max_streak || 0}</div>
-                                <div class="stat-label">最长连续</div>
-                            </div>
-                        </div>
+                    <div class="progress-card easy">
+                        <div class="progress-card-icon"><i class="fas fa-star"></i></div>
+                        <div class="progress-card-value">${profile.easy_completed || 0}</div>
+                        <div class="progress-card-label">简单</div>
+                        <div class="progress-card-sub">共 ${profile.easy_total || 0} 题</div>
+                    </div>
+                    <div class="progress-card medium">
+                        <div class="progress-card-icon"><i class="fas fa-star-half-alt"></i></div>
+                        <div class="progress-card-value">${profile.medium_completed || 0}</div>
+                        <div class="progress-card-label">中等</div>
+                        <div class="progress-card-sub">共 ${profile.medium_total || 0} 题</div>
+                    </div>
+                    <div class="progress-card hard">
+                        <div class="progress-card-icon"><i class="fas fa-bolt"></i></div>
+                        <div class="progress-card-value">${profile.hard_completed || 0}</div>
+                        <div class="progress-card-label">困难</div>
+                        <div class="progress-card-sub">共 ${profile.hard_total || 0} 题</div>
                     </div>
                 </div>
 
-                <div class="stats-box">
-                    <div class="stats-box-title">
-                        <i class="fas fa-users"></i>
-                        关注信息
-                    </div>
-                    <div class="follow-stats">
-                        <div class="follow-stat-item" onclick="navigateTo('/user/${profile.id}/followings')">
-                            <span class="follow-stat-count">${profile.followings_count || 0}</span>
-                            <span class="follow-stat-label">关注</span>
+                <!-- 热力图 -->
+                <div class="heatmap-section">
+                    <div class="heatmap-header">
+                        <div class="heatmap-title">
+                            <i class="fas fa-calendar-alt"></i>
+                            刷题热力图
                         </div>
-                        <div class="follow-stat-item" onclick="navigateTo('/user/${profile.id}/followers')">
-                            <span class="follow-stat-count">${profile.followers_count || 0}</span>
-                            <span class="follow-stat-label">粉丝</span>
+                        <div class="heatmap-legend">
+                            <span>Less</span>
+                            <span class="heatmap-legend-item level-0"></span>
+                            <span class="heatmap-legend-item level-1"></span>
+                            <span class="heatmap-legend-item level-2"></span>
+                            <span class="heatmap-legend-item level-3"></span>
+                            <span class="heatmap-legend-item level-4"></span>
+                            <span>More</span>
+                        </div>
+                    </div>
+                    <div class="heatmap-container">
+                        ${renderHeatmap(heatmapData)}
+                    </div>
+                </div>
+
+                <!-- 难度分布和最近活动 -->
+                <div class="stats-grid">
+                    <div class="stats-box">
+                        <div class="stats-box-title">
+                            <i class="fas fa-chart-pie"></i>
+                            难度分布
+                        </div>
+                        <div class="pie-chart-container">
+                            <div class="pie-chart" style="--easy-deg: ${easyDeg}deg; --medium-deg: ${mediumDeg}deg; --hard-deg: ${hardDeg}deg;">
+                                <div class="pie-chart-center">
+                                    <div class="pie-chart-total">${detail.total_completed || 0}</div>
+                                    <div class="pie-chart-label">题目</div>
+                                </div>
+                            </div>
+                            <div class="pie-legend">
+                                <div class="pie-legend-item">
+                                    <span class="pie-legend-color easy"></span>
+                                    <span class="pie-legend-text">简单</span>
+                                    <span class="pie-legend-value">${detail.easy_completed || 0}</span>
+                                </div>
+                                <div class="pie-legend-item">
+                                    <span class="pie-legend-color medium"></span>
+                                    <span class="pie-legend-text">中等</span>
+                                    <span class="pie-legend-value">${detail.medium_completed || 0}</span>
+                                </div>
+                                <div class="pie-legend-item">
+                                    <span class="pie-legend-color hard"></span>
+                                    <span class="pie-legend-text">困难</span>
+                                    <span class="pie-legend-value">${detail.hard_completed || 0}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="difficulty-progress" style="margin-top: 1.5rem;">
+                            ${renderDifficultyProgress(detail)}
+                        </div>
+                    </div>
+
+                    <div class="stats-box">
+                        <div class="stats-box-title">
+                            <i class="fas fa-history"></i>
+                            最近活动
+                        </div>
+                        <div class="activity-list">
+                            ${renderRecentActivities(detail.recent_activities || [])}
                         </div>
                     </div>
                 </div>
