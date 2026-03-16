@@ -1,5 +1,4 @@
 /* 🐰 ご注文はうさぎですか？ 主题样式 🐰 */
-@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700&display=swap');
 
 :root {
     /* 点兔角色主题色 */
@@ -188,6 +187,312 @@ body.bg-enabled {
     margin: 0 auto;
     padding: 2.5rem;
     flex: 1;
+}
+
+/* 🐰✨ 主页 Hero 区域 ✨🐰 */
+.hero-section {
+    position: relative;
+    min-height: 480px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    margin: -2.5rem -2.5rem 0 -2.5rem;
+    background: linear-gradient(135deg, 
+        rgba(255, 158, 172, 0.15) 0%, 
+        rgba(108, 180, 238, 0.12) 40%, 
+        rgba(155, 123, 184, 0.15) 70%,
+        rgba(125, 190, 125, 0.1) 100%
+    );
+    overflow: hidden;
+}
+
+.hero-decorations {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+}
+
+.floating-icon {
+    position: absolute;
+    font-size: 2rem;
+    opacity: 0.15;
+    animation: floatAround 20s ease-in-out infinite;
+}
+
+.icon-1 { top: 15%; left: 8%; color: var(--kokoa-pink); animation-delay: 0s; }
+.icon-2 { top: 25%; right: 12%; color: var(--rize-purple); animation-delay: -4s; }
+.icon-3 { top: 60%; left: 5%; color: var(--syaro-yellow); animation-delay: -8s; }
+.icon-4 { top: 70%; right: 8%; color: var(--chino-blue); animation-delay: -12s; }
+.icon-5 { top: 40%; left: 15%; color: var(--chiya-green); animation-delay: -16s; }
+
+@keyframes floatAround {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(15px, -20px) rotate(10deg); }
+    50% { transform: translate(-10px, -35px) rotate(-5deg); }
+    75% { transform: translate(20px, -15px) rotate(15deg); }
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    max-width: 700px;
+}
+
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1.2rem;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 248, 231, 0.9));
+    border-radius: 25px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--kokoa-pink);
+    border: 2px solid rgba(255, 158, 172, 0.3);
+    box-shadow: 0 4px 15px rgba(255, 158, 172, 0.15);
+    margin-bottom: 1.5rem;
+}
+
+.hero-badge i {
+    color: var(--syaro-yellow);
+}
+
+.hero-title {
+    margin-bottom: 1rem;
+}
+
+.title-line {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--text-light);
+    margin-bottom: 0.3rem;
+}
+
+.title-highlight {
+    display: block;
+    font-size: 3.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--kokoa-pink), var(--chino-blue), var(--rize-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: none;
+    animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.1); }
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    color: var(--text-light);
+    margin-bottom: 2rem;
+    line-height: 1.8;
+}
+
+.hero-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.hero-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 1rem 2rem;
+    border-radius: 30px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: none;
+}
+
+.hero-btn.primary {
+    background: linear-gradient(135deg, var(--kokoa-pink), var(--rize-purple));
+    color: white;
+    box-shadow: 0 8px 30px rgba(255, 158, 172, 0.4);
+}
+
+.hero-btn.primary:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 15px 40px rgba(255, 158, 172, 0.5);
+}
+
+.hero-btn.secondary {
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--text-dark);
+    border: 3px solid rgba(108, 180, 238, 0.4);
+    box-shadow: 0 4px 20px rgba(108, 180, 238, 0.2);
+}
+
+.hero-btn.secondary:hover {
+    background: linear-gradient(135deg, var(--chino-blue), var(--rize-purple));
+    color: white;
+    border-color: transparent;
+    transform: translateY(-5px);
+}
+
+.hero-wave {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    z-index: 1;
+}
+
+.hero-wave svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* 🐰✨ 用户统计区域 ✨🐰 */
+.stats-section {
+    padding: 2rem 0;
+    margin-bottom: 1rem;
+}
+
+.stats-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.stats-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.stats-title i {
+    color: var(--kokoa-pink);
+}
+
+.stats-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 158, 172, 0.1);
+    border: 2px solid rgba(255, 158, 172, 0.3);
+    border-radius: 20px;
+    color: var(--kokoa-pink);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.stats-more:hover {
+    background: linear-gradient(135deg, var(--kokoa-pink), var(--rize-purple));
+    color: white;
+    border-color: transparent;
+}
+
+.stats-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 250, 252, 0.95));
+    border-radius: 20px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border: 3px solid rgba(255, 158, 172, 0.2);
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(255, 158, 172, 0.15);
+}
+
+.stat-card .stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    color: white;
+}
+
+.stat-card.pink .stat-icon {
+    background: linear-gradient(135deg, var(--kokoa-pink), #FFB6C1);
+}
+
+.stat-card.blue .stat-icon {
+    background: linear-gradient(135deg, var(--chino-blue), #87CEEB);
+}
+
+.stat-card.purple .stat-icon {
+    background: linear-gradient(135deg, var(--rize-purple), #DDA0DD);
+}
+
+.stat-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    line-height: 1.2;
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    margin-top: 0.2rem;
+}
+
+/* 🐰✨ 题单区域 ✨🐰 */
+.problemsets-section {
+    padding-top: 2rem;
+}
+
+.section-header {
+    margin-bottom: 2rem;
+}
+
+.section-main-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 0.5rem;
+}
+
+.section-main-title i {
+    color: var(--rize-purple);
+}
+
+.section-desc {
+    color: var(--text-light);
+    font-size: 1rem;
 }
 
 /* 🐰 页脚 - 点兔风格 🐰 */
@@ -1124,6 +1429,58 @@ body.bg-enabled {
 
     .subsection {
         padding: 1.5rem;
+    }
+
+    /* 主页 Hero 响应式 */
+    .hero-section {
+        min-height: 380px;
+        padding: 3rem 1.5rem;
+        margin: -1.2rem -1.2rem 0 -1.2rem;
+    }
+
+    .title-line {
+        font-size: 1.2rem;
+    }
+
+    .title-highlight {
+        font-size: 2.2rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+
+    .hero-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .hero-btn {
+        width: 100%;
+        max-width: 280px;
+        justify-content: center;
+    }
+
+    .floating-icon {
+        font-size: 1.5rem;
+        opacity: 0.1;
+    }
+
+    /* 统计区域响应式 */
+    .stats-cards {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .stats-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.8rem;
+    }
+
+    /* 题单区域响应式 */
+    .section-main-title {
+        font-size: 1.5rem;
     }
 
     .problem-info {

@@ -452,12 +452,13 @@ async function refreshProblemSetData() {
     try {
         const data = await fetchProblemSets();
         currentProblemSets = data;
-        
+
         // 获取所有分类
         const categories = ['all', ...new Set(currentProblemSets.map(ps => ps.category))];
-        
-        // 如果已登录，获取进度
+
+        // 如果已登录，获取进度和统计
         let progressData = {};
+        let userStats = null;
         if (currentUser) {
             const progressResult = await apiRequest('/progress/problemset');
             if (progressResult.code === 0 && progressResult.data) {
@@ -465,31 +466,18 @@ async function refreshProblemSetData() {
                     progressData[p.problemset_id] = p;
                 });
             }
+            // 获取用户统计
+            const statsResult = await apiRequest('/stats');
+            if (statsResult.code === 0) {
+                userStats = statsResult.data;
+            }
         }
         // 缓存进度数据供分类切换使用
         problemsetProgressData = progressData;
-        
-        // 更新页面内容
+
+        // 更新页面内容 - 新主页设计
         const content = document.getElementById('content');
-        content.innerHTML = `
-            <div class="page-header">
-                <h1 class="page-title">题单列表</h1>
-                <p class="page-subtitle">精选算法题单，助你高效提升</p>
-            </div>
-            
-            <div class="category-tabs" id="categoryTabs">
-                ${categories.map(cat => `
-                    <button class="category-tab ${cat === currentCategory ? 'active' : ''}" 
-                            onclick="filterByCategory('${cat}')">
-                        ${cat === 'all' ? '全部' : cat}
-                    </button>
-                `).join('')}
-            </div>
-            
-            <div class="problemset-grid" id="problemsetGrid">
-                ${renderProblemSetCards(currentProblemSets, progressData)}
-            </div>
-        `;
+        content.innerHTML = renderHomePage(categories, progressData, userStats);
     } catch (error) {
         const content = document.getElementById('content');
         // 只有在没有数据时才显示错误
@@ -504,6 +492,115 @@ async function refreshProblemSetData() {
             `;
         }
     }
+}
+
+// 渲染主页
+function renderHomePage(categories, progressData, userStats) {
+    return `
+        <!-- Hero 区域 -->
+        <section class="hero-section">
+            <div class="hero-decorations">
+                <div class="floating-icon icon-1"><i class="fas fa-mug-hot"></i></div>
+                <div class="floating-icon icon-2"><i class="fas fa-heart"></i></div>
+                <div class="floating-icon icon-3"><i class="fas fa-star"></i></div>
+                <div class="floating-icon icon-4"><i class="fas fa-rabbit"></i></div>
+                <div class="floating-icon icon-5"><i class="fas fa-coffee"></i></div>
+            </div>
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    <span class="title-line">欢迎来到</span>
+                    <span class="title-highlight">Rabbit House</span>
+                </h1>
+                <div class="hero-actions">
+                    <button class="hero-btn primary" onclick="document.getElementById('problemsets-section').scrollIntoView({behavior: 'smooth'})">
+                        <i class="fas fa-rocket"></i>
+                        开始刷题
+                    </button>
+                    <button class="hero-btn secondary" onclick="navigateTo('/guide')">
+                        <i class="fas fa-book-open"></i>
+                        使用指南
+                    </button>
+                </div>
+            </div>
+            <div class="hero-wave">
+                <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+                    <path d="M0,64 C480,150 960,-20 1440,64 L1440,120 L0,120 Z" fill="rgba(255,255,255,0.6)"/>
+                </svg>
+            </div>
+        </section>
+
+        ${userStats ? renderUserStatsSection(userStats) : ''}
+
+        <!-- 题单区域 -->
+        <section class="problemsets-section" id="problemsets-section">
+            <div class="section-header">
+                <div class="section-title-group">
+                    <h2 class="section-main-title">
+                        <i class="fas fa-layer-group"></i>
+                        题单列表
+                    </h2>
+                    <p class="section-desc">按分类浏览，找到适合你的题单</p>
+                </div>
+            </div>
+
+            <div class="category-tabs" id="categoryTabs">
+                ${categories.map(cat => `
+                    <button class="category-tab ${cat === currentCategory ? 'active' : ''}"
+                            onclick="filterByCategory('${cat}')">
+                        ${cat === 'all' ? '<i class="fas fa-grip"></i> 全部' : `<i class="fas fa-folder"></i> ${cat}`}
+                    </button>
+                `).join('')}
+            </div>
+
+            <div class="problemset-grid" id="problemsetGrid">
+                ${renderProblemSetCards(currentProblemSets, progressData)}
+            </div>
+        </section>
+    `;
+}
+
+// 渲染用户统计区域
+function renderUserStatsSection(stats) {
+    const totalCount = stats.total_completed || 0;
+    const recentCount = stats.recent_completed || 0;
+    const streakDays = stats.streak_days || 0;
+
+    return `
+        <section class="stats-section">
+            <div class="stats-header">
+                <h2 class="stats-title">
+                    <i class="fas fa-chart-line"></i>
+                    我的学习进度
+                </h2>
+                <button class="stats-more" onclick="navigateTo('/stats')">
+                    查看详情 <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+            <div class="stats-cards">
+                <div class="stat-card pink">
+                    <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-value">${totalCount}</span>
+                        <span class="stat-label">已完成题目</span>
+                    </div>
+                </div>
+                <div class="stat-card blue">
+                    <div class="stat-icon"><i class="fas fa-fire"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-value">${recentCount}</span>
+                        <span class="stat-label">本周完成</span>
+                    </div>
+                </div>
+                <div class="stat-card purple">
+                    <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-value">${streakDays}</span>
+                        <span class="stat-label">连续天数</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    `;
 }
 
 // 渲染题单卡片
@@ -878,7 +975,7 @@ async function toggleProblemProgress(problemId, problemSetId, isCompleted) {
     }
 }
 
-// 渲染新手指引页面
+// 渲染指南页面
 function renderGuidePage() {
     const content = document.getElementById('content');
 
@@ -890,23 +987,8 @@ function renderGuidePage() {
                     <div class="guide-logo">
                         <i class="fas fa-mug-hot"></i>
                     </div>
-                    <h1 class="guide-title">欢迎使用 Rabbit House</h1>
-                    <p class="guide-subtitle">Codeforces 算法题单训练平台 · 新手指南</p>
-                </div>
-            </div>
-
-            <!-- 快速开始卡片 -->
-            <div class="guide-section">
-                <div class="guide-card hero-card">
-                    <div class="hero-content">
-                        <div class="hero-text">
-                            <h2><i class="fas fa-rocket"></i> 30秒快速上手</h2>
-                            <p>跟随指引，快速开启你的刷题之旅</p>
-                        </div>
-                        <button class="hero-btn" onclick="navigateTo('/')">
-                            开始刷题 <i class="fas fa-arrow-right"></i>
-                        </button>
-                    </div>
+                    <h1 class="guide-title">Rabbit House</h1>
+                    <p class="guide-subtitle">Codeforces 题单</p>
                 </div>
             </div>
 
@@ -914,95 +996,36 @@ function renderGuidePage() {
             <div class="guide-section">
                 <h2 class="section-title">
                     <i class="fas fa-star"></i>
-                    核心功能
+                    功能
                 </h2>
                 <div class="guide-grid">
                     <div class="guide-card feature-card">
                         <div class="feature-icon pink">
                             <i class="fas fa-list-alt"></i>
                         </div>
-                        <h3>精选题单</h3>
-                        <p>精选 Codeforces 算法题单，涵盖基础到进阶，系统化提升算法能力</p>
+                        <h3>题单</h3>
+                        <p>按知识点分类的题单，点击题目编号跳转 Codeforces 提交代码</p>
                     </div>
                     <div class="guide-card feature-card">
                         <div class="feature-icon blue">
                             <i class="fas fa-tasks"></i>
                         </div>
-                        <h3>进度追踪</h3>
-                        <p>记录你的刷题进度，标记已完成题目，随时回顾学习状态</p>
+                        <h3>进度</h3>
+                        <p>登录后可标记完成状态，进度保存在云端</p>
                     </div>
                     <div class="guide-card feature-card">
                         <div class="feature-icon purple">
                             <i class="fas fa-chart-line"></i>
                         </div>
-                        <h3>数据统计</h3>
-                        <p>可视化刷题数据，热力图展示刷题频率，了解你的学习节奏</p>
+                        <h3>统计</h3>
+                        <p>热力图展示刷题记录，分类统计完成情况</p>
                     </div>
                     <div class="guide-card feature-card">
                         <div class="feature-icon green">
-                            <i class="fas fa-lightbulb"></i>
+                            <i class="fas fa-users"></i>
                         </div>
-                        <h3>解题思路</h3>
-                        <p>每道题目附带解题思路和代码模板，助力理解算法精髓</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 使用步骤 -->
-            <div class="guide-section">
-                <h2 class="section-title">
-                    <i class="fas fa-route"></i>
-                    使用步骤
-                </h2>
-                <div class="steps-container">
-                    <div class="step-card">
-                        <div class="step-number">1</div>
-                        <div class="step-content">
-                            <h3>注册账号</h3>
-                            <p>点击右上角「注册」按钮，创建你的专属账号，保存刷题进度</p>
-                        </div>
-                        <div class="step-icon">
-                            <i class="fas fa-user-plus"></i>
-                        </div>
-                    </div>
-                    <div class="step-arrow">
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                    <div class="step-card">
-                        <div class="step-number">2</div>
-                        <div class="step-content">
-                            <h3>选择题单</h3>
-                            <p>浏览题单列表，根据分类选择适合你当前水平的题单开始练习</p>
-                        </div>
-                        <div class="step-icon">
-                            <i class="fas fa-book-open"></i>
-                        </div>
-                    </div>
-                    <div class="step-arrow">
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                    <div class="step-card">
-                        <div class="step-number">3</div>
-                        <div class="step-content">
-                            <h3>刷题练习</h3>
-                            <p>点击题目链接跳转 Codeforces 提交代码，完成后勾选标记进度</p>
-                        </div>
-                        <div class="step-icon">
-                            <i class="fas fa-code"></i>
-                        </div>
-                    </div>
-                    <div class="step-arrow">
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                    <div class="step-card">
-                        <div class="step-number">4</div>
-                        <div class="step-content">
-                            <h3>查看统计</h3>
-                            <p>登录后点击「个人主页」查看刷题统计、热力图和进度分析</p>
-                        </div>
-                        <div class="step-icon">
-                            <i class="fas fa-chart-bar"></i>
-                        </div>
+                        <h3>关注</h3>
+                        <p>关注好友，查看他人的刷题进度</p>
                     </div>
                 </div>
             </div>
@@ -1011,7 +1034,7 @@ function renderGuidePage() {
             <div class="guide-section">
                 <h2 class="section-title">
                     <i class="fas fa-layer-group"></i>
-                    难度分级
+                    难度
                 </h2>
                 <div class="difficulty-cards">
                     <div class="difficulty-card easy">
@@ -1020,7 +1043,7 @@ function renderGuidePage() {
                             <span class="diff-range">Rating &lt; 1300</span>
                         </div>
                         <h3>简单</h3>
-                        <p>适合入门选手，帮助建立编程思维和基础语法熟练度</p>
+                        <p>基础题目，适合熟悉语法和基础思维</p>
                     </div>
                     <div class="difficulty-card medium">
                         <div class="diff-header">
@@ -1028,7 +1051,7 @@ function renderGuidePage() {
                             <span class="diff-range">1300 ≤ Rating &lt; 1700</span>
                         </div>
                         <h3>中等</h3>
-                        <p>需要掌握一定算法思想，提升问题分析和解决能力</p>
+                        <p>需要掌握常见算法思想</p>
                     </div>
                     <div class="difficulty-card hard">
                         <div class="diff-header">
@@ -1036,7 +1059,7 @@ function renderGuidePage() {
                             <span class="diff-range">Rating ≥ 1700</span>
                         </div>
                         <h3>困难</h3>
-                        <p>挑战高难度问题，精进算法技巧，冲击更高 Rating</p>
+                        <p>挑战难度较高的问题</p>
                     </div>
                 </div>
             </div>
@@ -1045,59 +1068,44 @@ function renderGuidePage() {
             <div class="guide-section">
                 <h2 class="section-title">
                     <i class="fas fa-question-circle"></i>
-                    常见问题
+                    FAQ
                 </h2>
                 <div class="faq-container">
                     <div class="faq-item">
                         <div class="faq-question" onclick="toggleFaq(this)">
                             <i class="fas fa-plus-circle"></i>
-                            <span>题目链接无法打开怎么办？</span>
+                            <span>题目链接打不开？</span>
                         </div>
                         <div class="faq-answer">
-                            <p>题目链接指向 Codeforces 官网，请确保你能正常访问 Codeforces。如果网络不稳定，可以尝试使用代理或 VPN。</p>
+                            <p>题目链接指向 Codeforces 官网，请确保网络可以访问。如果无法访问，可以尝试代理。</p>
                         </div>
                     </div>
                     <div class="faq-item">
                         <div class="faq-question" onclick="toggleFaq(this)">
                             <i class="fas fa-plus-circle"></i>
-                            <span>进度数据会丢失吗？</span>
+                            <span>进度会丢失吗？</span>
                         </div>
                         <div class="faq-answer">
-                            <p>进度数据与你的账号绑定，存储在服务器数据库中。只要使用同一账号登录，进度就不会丢失。</p>
+                            <p>进度保存在服务器，登录账号即可同步。</p>
                         </div>
                     </div>
                     <div class="faq-item">
                         <div class="faq-question" onclick="toggleFaq(this)">
                             <i class="fas fa-plus-circle"></i>
-                            <span>可以在手机上使用吗？</span>
+                            <span>支持手机访问吗？</span>
                         </div>
                         <div class="faq-answer">
-                            <p>网站采用响应式设计，支持手机、平板等移动设备访问，随时随地刷题学习。</p>
-                        </div>
-                    </div>
-                    <div class="faq-item">
-                        <div class="faq-question" onclick="toggleFaq(this)">
-                            <i class="fas fa-plus-circle"></i>
-                            <span>如何提高刷题效率？</span>
-                        </div>
-                        <div class="faq-answer">
-                            <p>建议按照题单顺序系统学习，每道题先独立思考，遇到困难再参考解题思路。坚持每日刷题，保持手感！</p>
+                            <p>支持，网站采用响应式设计。</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 底部行动按钮 -->
+            <!-- 底部 -->
             <div class="guide-footer">
-                <div class="footer-decor">
-                    <i class="fas fa-heart"></i>
-                    <i class="fas fa-coffee"></i>
-                    <i class="fas fa-heart"></i>
-                </div>
-                <p class="footer-text">准备好了吗？开始你的算法之旅吧！</p>
                 <button class="guide-start-btn" onclick="navigateTo('/')">
-                    <i class="fas fa-play"></i>
-                    立即开始
+                    <i class="fas fa-arrow-left"></i>
+                    返回首页
                 </button>
             </div>
         </div>
