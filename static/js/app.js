@@ -150,8 +150,8 @@ function updateBackgroundLayer() {
         bgLayer.classList.toggle('visible', bgEnabled);
         console.log('bgLayer classes:', bgLayer.className);
     }
-    // 同时更新body的类
-    document.body.classList.toggle('bg-enabled', bgEnabled);
+    // 背景禁用时添加 bg-disabled 类显示渐变回退
+    document.body.classList.toggle('bg-disabled', !bgEnabled);
 }
 
 // 初始化背景图层
@@ -175,24 +175,22 @@ let isFirstLoad = true;
 async function handleRoute() {
     const path = window.location.pathname;
     const content = document.getElementById('content');
-    
+
     // 如果是同一路由且非首次加载，跳过
     if (path === currentPath && !isFirstLoad) {
         return;
     }
     currentPath = path;
 
-    // 首次加载时先初始化导航栏
+    // 首次加载时先检查登录状态，再初始化导航栏
     if (isFirstLoad) {
+        // 先检查登录状态（阻塞），确保 currentUser 被正确设置
+        if (authToken) {
+            await checkAuth(true);
+        }
         updateNavbar();
         isFirstLoad = false;
     }
-
-    // 后台检查登录状态（不阻塞渲染）
-    checkAuth().then(isLoggedIn => {
-        // 登录状态变化时更新导航栏
-        updateNavbar();
-    });
 
     if (path === '/' || path === '') {
         renderProblemSetList();
@@ -407,30 +405,26 @@ async function showStats() {
 // 渲染题单列表页
 async function renderProblemSetList() {
     const content = document.getElementById('content');
-    
-    // 如果已有缓存数据，直接渲染（避免闪烁）
+    if (!content) return;
+
+    // 如果已有缓存数据，直接渲染完整主页（避免闪烁和 Hero 消失）
     if (currentProblemSets.length > 0) {
         const categories = ['all', ...new Set(currentProblemSets.map(ps => ps.category))];
-        content.innerHTML = `
-            <div class="page-header">
-                <h1 class="page-title">题单列表</h1>
-                <p class="page-subtitle">精选算法题单，助你高效提升</p>
-            </div>
-            
-            <div class="category-tabs" id="categoryTabs">
-                ${categories.map(cat => `
-                    <button class="category-tab ${cat === currentCategory ? 'active' : ''}" 
-                            onclick="filterByCategory('${cat}')">
-                        ${cat === 'all' ? '全部' : cat}
-                    </button>
-                `).join('')}
-            </div>
-            
-            <div class="problemset-grid" id="problemsetGrid">
-                ${renderProblemSetCards(currentProblemSets, problemsetProgressData)}
-            </div>
-        `;
-        
+        // 如果已登录但没有缓存的用户统计，先尝试获取
+        let userStats = null;
+        if (currentUser) {
+            try {
+                const statsResult = await apiRequest('/stats');
+                if (statsResult.code === 0) {
+                    userStats = statsResult.data;
+                }
+            } catch (e) {
+                console.error('获取用户统计失败:', e);
+            }
+        }
+        // 直接渲染完整主页，保持 Hero 区域
+        content.innerHTML = renderHomePage(categories, problemsetProgressData, userStats);
+
         // 后台刷新数据（静默更新）
         refreshProblemSetData();
         return;
@@ -443,13 +437,35 @@ async function renderProblemSetList() {
             <p>加载中...</p>
         </div>
     `;
-    
-    await refreshProblemSetData();
+
+    try {
+        await refreshProblemSetData();
+    } catch (error) {
+        console.error('renderProblemSetList error:', error);
+        if (currentProblemSets.length === 0) {
+            content.innerHTML = `
+                <div class="error">
+                    <p>加载失败：${error.message}</p>
+                    <button onclick="renderProblemSetList()" class="btn-primary" style="margin-top: 1rem;">
+                        重试
+                    </button>
+                </div>
+            `;
+        }
+    }
 }
 
 // 刷新题单数据（可静默执行）
 async function refreshProblemSetData() {
+    const content = document.getElementById('content');
+    if (!content) return;
+
     try {
+        // 如果有 token 但 currentUser 未恢复，先检查登录状态
+        if (authToken && !currentUser) {
+            await checkAuth(true);
+        }
+
         const data = await fetchProblemSets();
         currentProblemSets = data;
 
@@ -460,26 +476,30 @@ async function refreshProblemSetData() {
         let progressData = {};
         let userStats = null;
         if (currentUser) {
-            const progressResult = await apiRequest('/progress/problemset');
-            if (progressResult.code === 0 && progressResult.data) {
-                progressResult.data.forEach(p => {
-                    progressData[p.problemset_id] = p;
-                });
-            }
-            // 获取用户统计
-            const statsResult = await apiRequest('/stats');
-            if (statsResult.code === 0) {
-                userStats = statsResult.data;
+            try {
+                const progressResult = await apiRequest('/progress/problemset');
+                if (progressResult.code === 0 && progressResult.data) {
+                    progressResult.data.forEach(p => {
+                        progressData[p.problemset_id] = p;
+                    });
+                }
+                // 获取用户统计
+                const statsResult = await apiRequest('/stats');
+                if (statsResult.code === 0) {
+                    userStats = statsResult.data;
+                }
+            } catch (e) {
+                console.error('获取进度/统计数据失败:', e);
+                // 继续渲染，只是没有进度数据
             }
         }
         // 缓存进度数据供分类切换使用
         problemsetProgressData = progressData;
 
         // 更新页面内容 - 新主页设计
-        const content = document.getElementById('content');
         content.innerHTML = renderHomePage(categories, progressData, userStats);
     } catch (error) {
-        const content = document.getElementById('content');
+        console.error('refreshProblemSetData error:', error);
         // 只有在没有数据时才显示错误
         if (currentProblemSets.length === 0) {
             content.innerHTML = `
