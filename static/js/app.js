@@ -798,10 +798,102 @@ function scrollToSection(id, event) {
             top: elementPosition - offset,
             behavior: 'smooth'
         });
-        
+
         // 高亮当前章节
-        document.querySelectorAll('.toc-item').forEach(item => item.classList.remove('active'));
-        event.target.classList.add('active');
+        document.querySelectorAll('.toc-item, .sidebar-toc-item').forEach(item => item.classList.remove('active'));
+        document.querySelectorAll(`[data-target="${id}"], [href="#${id}"]`).forEach(item => item.classList.add('active'));
+    }
+}
+
+// 初始化侧边栏目录
+function initSidebarToc() {
+    // 从 localStorage 读取折叠状态
+    const isCollapsed = localStorage.getItem('sidebarTocCollapsed') === 'true';
+    const sidebar = document.getElementById('sidebarToc');
+    const mainContent = document.getElementById('problemsetMain');
+
+    if (sidebar) {
+        if (isCollapsed) {
+            sidebar.classList.add('collapsed');
+            if (mainContent) mainContent.classList.add('toc-collapsed');
+        }
+
+        // 设置滚动监听，高亮当前章节
+        setupScrollSpy();
+    }
+}
+
+// 切换侧边栏目录展开/折叠
+function toggleSidebarToc() {
+    const sidebar = document.getElementById('sidebarToc');
+    const mainContent = document.getElementById('problemsetMain');
+    const icon = document.querySelector('.sidebar-toc-toggle i');
+
+    if (sidebar) {
+        const isCollapsed = sidebar.classList.toggle('collapsed');
+        if (mainContent) {
+            mainContent.classList.toggle('toc-collapsed', isCollapsed);
+        }
+        if (icon) {
+            icon.className = isCollapsed ? 'fas fa-chevron-left' : 'fas fa-chevron-right';
+        }
+        // 保存状态到 localStorage
+        localStorage.setItem('sidebarTocCollapsed', isCollapsed);
+    }
+}
+
+// 设置滚动监听，高亮当前可见章节
+function setupScrollSpy() {
+    const sections = document.querySelectorAll('.section, .subsection[id]');
+    const tocItems = document.querySelectorAll('.sidebar-toc-item');
+
+    if (sections.length === 0 || tocItems.length === 0) return;
+
+    let ticking = false;
+
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            window.requestAnimationFrame(() => {
+                highlightCurrentSection(sections, tocItems);
+                ticking = false;
+            });
+            ticking = true;
+        }
+    });
+
+    // 初始高亮
+    highlightCurrentSection(sections, tocItems);
+}
+
+// 高亮当前可见的章节
+function highlightCurrentSection(sections, tocItems) {
+    const scrollPos = window.scrollY + 150; // 偏移量
+
+    let currentSection = null;
+
+    sections.forEach(section => {
+        const top = section.offsetTop;
+        const height = section.offsetHeight;
+
+        if (scrollPos >= top && scrollPos < top + height) {
+            currentSection = section.id;
+        }
+    });
+
+    // 如果没有找到当前章节，查找最近的上方章节
+    if (!currentSection) {
+        for (let i = sections.length - 1; i >= 0; i--) {
+            if (sections[i].offsetTop <= scrollPos) {
+                currentSection = sections[i].id;
+                break;
+            }
+        }
+    }
+
+    if (currentSection) {
+        tocItems.forEach(item => {
+            item.classList.toggle('active', item.dataset.target === currentSection);
+        });
     }
 }
 
@@ -830,35 +922,62 @@ async function renderProblemSetDetail(id) {
         const tocItems = generateTOC(problemSet.sections);
 
         content.innerHTML = `
-            <div class="problemset-detail">
-                <div class="detail-header">
-                    <div class="back-button" onclick="navigateTo('/')">
-                        <i class="fas fa-arrow-left"></i>
-                        返回列表
+            <div class="problemset-detail-wrapper">
+                <!-- 侧边栏目录 -->
+                <aside class="sidebar-toc" id="sidebarToc">
+                    <div class="sidebar-toc-header">
+                        <i class="fas fa-list"></i>
+                        <span>目录</span>
+                        <button class="sidebar-toc-toggle" onclick="toggleSidebarToc()" title="折叠目录">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
                     </div>
-                    <h1 class="detail-title">${problemSet.title}</h1>
-                    <span class="detail-category">${problemSet.category}</span>
-                    <p class="detail-description">${problemSet.description}</p>
-                    ${progress ? `
-                        <div class="detail-progress">
-                            <div class="progress-info">
-                                <span>完成进度</span>
-                                <span class="progress-stats">${progress.completed_problems}/${progress.total_problems}</span>
-                            </div>
-                            <div class="progress-bar-lg">
-                                <div class="progress-fill" style="width: ${progress.percentage}%"></div>
-                            </div>
+                    <div class="sidebar-toc-content" id="sidebarTocContent">
+                        ${tocItems.map(item => `
+                            <a href="#${item.id}"
+                               class="sidebar-toc-item depth-${item.depth} ${item.isSection ? 'section-title' : ''}"
+                               data-target="${item.id}"
+                               onclick="scrollToSection('${item.id}', event)">
+                                ${item.title}
+                            </a>
+                        `).join('')}
+                    </div>
+                </aside>
+
+                <!-- 主内容区 -->
+                <div class="problemset-detail" id="problemsetMain">
+                    <div class="detail-header">
+                        <div class="back-button" onclick="navigateTo('/')">
+                            <i class="fas fa-arrow-left"></i>
+                            返回列表
                         </div>
-                    ` : ''}
-                </div>
+                        <h1 class="detail-title">${problemSet.title}</h1>
+                        <span class="detail-category">${problemSet.category}</span>
+                        <p class="detail-description">${problemSet.description}</p>
+                        ${progress ? `
+                            <div class="detail-progress">
+                                <div class="progress-info">
+                                    <span>完成进度</span>
+                                    <span class="progress-stats">${progress.completed_problems}/${progress.total_problems}</span>
+                                </div>
+                                <div class="progress-bar-lg">
+                                    <div class="progress-fill" style="width: ${progress.percentage}%"></div>
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
 
-                ${renderTOC(tocItems)}
+                    ${renderTOC(tocItems)}
 
-                <div class="sections">
-                    ${problemSet.sections.map((section, sectionIndex) => renderSection(section, id, completedIds, sectionIndex)).join('')}
+                    <div class="sections">
+                        ${problemSet.sections.map((section, sectionIndex) => renderSection(section, id, completedIds, sectionIndex)).join('')}
+                    </div>
                 </div>
             </div>
         `;
+
+        // 初始化侧边栏目录状态
+        initSidebarToc();
 
         // 如果 URL 中有 hash，滚动到对应 section
         if (window.location.hash) {

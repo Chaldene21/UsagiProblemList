@@ -2840,6 +2840,175 @@ body.bg-disabled {
     font-size: 1rem;
 }
 
+/* 🐰✨ 侧边栏目录样式 ✨🐰 */
+.problemset-detail-wrapper {
+    display: flex;
+    gap: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.sidebar-toc {
+    position: sticky;
+    top: 80px;
+    width: 260px;
+    min-width: 260px;
+    height: fit-content;
+    max-height: calc(100vh - 100px);
+    background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(255,250,252,0.98));
+    border-radius: 20px;
+    border: 3px solid rgba(255, 158, 172, 0.35);
+    box-shadow: 0 8px 30px rgba(255, 158, 172, 0.15);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.sidebar-toc.collapsed {
+    width: 50px;
+    min-width: 50px;
+}
+
+.sidebar-toc.collapsed .sidebar-toc-header span,
+.sidebar-toc.collapsed .sidebar-toc-content {
+    display: none;
+}
+
+.sidebar-toc.collapsed .sidebar-toc-header {
+    justify-content: center;
+    padding: 0.8rem;
+}
+
+.sidebar-toc.collapsed .sidebar-toc-toggle {
+    margin: 0;
+}
+
+.sidebar-toc-header {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 1rem 1.2rem;
+    background: linear-gradient(135deg, rgba(255, 158, 172, 0.15), rgba(108, 180, 238, 0.1));
+    border-bottom: 2px dashed rgba(255, 158, 172, 0.3);
+}
+
+.sidebar-toc-header i {
+    color: var(--kokoa-pink);
+    font-size: 1rem;
+}
+
+.sidebar-toc-header span {
+    font-weight: 700;
+    color: var(--text-dark);
+    font-size: 1rem;
+    flex: 1;
+}
+
+.sidebar-toc-toggle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 158, 172, 0.3);
+    background: white;
+    color: var(--kokoa-pink);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    font-size: 0.75rem;
+}
+
+.sidebar-toc-toggle:hover {
+    background: var(--kokoa-pink);
+    color: white;
+    border-color: var(--kokoa-pink);
+}
+
+.sidebar-toc-content {
+    padding: 0.8rem;
+    max-height: calc(100vh - 180px);
+    overflow-y: auto;
+}
+
+.sidebar-toc-content::-webkit-scrollbar {
+    width: 4px;
+}
+
+.sidebar-toc-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 158, 172, 0.3);
+    border-radius: 2px;
+}
+
+.sidebar-toc-item {
+    display: block;
+    padding: 0.5rem 0.8rem;
+    color: var(--text-dark);
+    text-decoration: none;
+    border-radius: 8px;
+    margin-bottom: 0.2rem;
+    transition: all 0.3s ease;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sidebar-toc-item:hover {
+    background: linear-gradient(135deg, rgba(255, 158, 172, 0.2), rgba(108, 180, 238, 0.1));
+    color: var(--kokoa-pink);
+}
+
+.sidebar-toc-item.active {
+    background: linear-gradient(135deg, var(--kokoa-pink), var(--rize-purple));
+    color: white;
+    font-weight: 600;
+}
+
+.sidebar-toc-item.section-title {
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-top: 0.5rem;
+    border-left: 3px solid var(--kokoa-pink);
+    padding-left: 0.8rem;
+}
+
+.sidebar-toc-item.section-title.active {
+    border-left-color: white;
+}
+
+.sidebar-toc-item.depth-0 {
+    padding-left: 0.8rem;
+}
+
+.sidebar-toc-item.depth-1 {
+    padding-left: 1.5rem;
+    font-size: 0.82rem;
+}
+
+.sidebar-toc-item.depth-2 {
+    padding-left: 2.2rem;
+    font-size: 0.8rem;
+    color: var(--text-light);
+}
+
+.sidebar-toc-item.depth-3 {
+    padding-left: 2.9rem;
+    font-size: 0.78rem;
+    color: var(--text-light);
+}
+
+/* 主内容区适配侧边栏 */
+.problemset-detail {
+    flex: 1;
+    min-width: 0;
+}
+
+.problemset-detail.toc-collapsed {
+    /* 展开时不需要特殊处理 */
+}
+
 /* 🐰✨ 目录组件样式 ✨🐰 */
 .toc-container {
     background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(255,250,252,0.98));
@@ -3579,31 +3748,62 @@ body.bg-disabled {
     .toc-container {
         border-radius: 15px;
     }
-    
+
     .toc-header {
         padding: 0.8rem 1rem;
     }
-    
+
     .toc-content {
         padding: 0.8rem 1rem;
         max-height: 300px;
     }
-    
+
     .toc-item {
         padding: 0.5rem 0.8rem;
         font-size: 0.9rem;
     }
-    
+
     .toc-item.depth-1 {
         padding-left: 1rem;
     }
-    
+
     .toc-item.depth-2 {
         padding-left: 1.8rem;
     }
-    
+
     .toc-item.depth-3 {
         padding-left: 2.6rem;
+    }
+
+    /* 侧边栏目录响应式 - 小屏幕隐藏 */
+    .sidebar-toc {
+        display: none;
+    }
+
+    .problemset-detail-wrapper {
+        display: block;
+    }
+
+    .problemset-detail {
+        max-width: 100%;
+    }
+}
+
+/* 中等屏幕适配 */
+@media (max-width: 1200px) and (min-width: 769px) {
+    .sidebar-toc {
+        width: 220px;
+        min-width: 220px;
+    }
+
+    .sidebar-toc.collapsed {
+        width: 45px;
+        min-width: 45px;
+    }
+
+    .sidebar-toc-item {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.6rem;
     }
 }
 
