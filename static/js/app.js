@@ -808,7 +808,8 @@ function scrollToSection(id, event) {
             behavior: 'smooth'
         });
 
-        // 高亮当前章节
+        // 更新高亮状态
+        lastHighlightedSection = id;
         document.querySelectorAll('.toc-item, .sidebar-toc-item').forEach(item => item.classList.remove('active'));
         document.querySelectorAll(`[data-target="${id}"], [href="#${id}"]`).forEach(item => item.classList.add('active'));
     }
@@ -816,6 +817,9 @@ function scrollToSection(id, event) {
 
 // 初始化侧边栏目录
 function initSidebarToc() {
+    // 重置高亮状态
+    lastHighlightedSection = null;
+
     // 从 localStorage 读取折叠状态
     const isCollapsed = localStorage.getItem('sidebarTocCollapsed') === 'true';
     const sidebar = document.getElementById('sidebarToc');
@@ -875,6 +879,8 @@ function setupScrollSpy() {
 }
 
 // 高亮当前可见的章节
+let lastHighlightedSection = null; // 记录上次高亮的章节
+
 function highlightCurrentSection(sections, tocItems) {
     const scrollPos = window.scrollY + 150; // 偏移量
 
@@ -924,7 +930,9 @@ function highlightCurrentSection(sections, tocItems) {
         }
     }
 
-    if (currentSection) {
+    // 只有章节变化时才更新 DOM
+    if (currentSection && currentSection !== lastHighlightedSection) {
+        lastHighlightedSection = currentSection;
         tocItems.forEach(item => {
             item.classList.toggle('active', item.dataset.target === currentSection);
         });
