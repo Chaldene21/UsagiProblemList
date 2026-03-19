@@ -1152,6 +1152,93 @@ body.bg-disabled {
     line-height: 1.8;
 }
 
+/* Markdown 内容样式 */
+.markdown-content p {
+    margin: 0.5rem 0;
+}
+
+.markdown-content h2 {
+    font-size: 1.2rem;
+    color: var(--text-dark);
+    margin: 1rem 0 0.5rem;
+    padding-bottom: 0.3rem;
+    border-bottom: 2px solid rgba(255, 158, 172, 0.3);
+}
+
+.markdown-content h3 {
+    font-size: 1.1rem;
+    color: var(--text-dark);
+    margin: 0.8rem 0 0.4rem;
+}
+
+.markdown-content h4 {
+    font-size: 1rem;
+    color: var(--text-dark);
+    margin: 0.6rem 0 0.3rem;
+}
+
+.markdown-content strong {
+    color: var(--text-dark);
+    font-weight: 700;
+}
+
+.markdown-content em {
+    color: var(--rize-purple);
+    font-style: italic;
+}
+
+.markdown-content code {
+    background: linear-gradient(135deg, rgba(255, 158, 172, 0.15), rgba(108, 180, 238, 0.1));
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.9em;
+    color: var(--kokoa-pink);
+}
+
+.markdown-content pre {
+    background: linear-gradient(135deg, #2d2d3a, #1a1a24);
+    padding: 1rem 1.2rem;
+    border-radius: 12px;
+    overflow-x: auto;
+    margin: 1rem 0;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.markdown-content pre code {
+    background: transparent;
+    padding: 0;
+    color: #e0e0e0;
+    font-size: 0.85rem;
+    line-height: 1.6;
+}
+
+.markdown-content ul {
+    margin: 0.5rem 0;
+    padding-left: 1.5rem;
+}
+
+.markdown-content li {
+    margin: 0.3rem 0;
+    position: relative;
+}
+
+.markdown-content li::before {
+    content: '•';
+    color: var(--kokoa-pink);
+    position: absolute;
+    left: -1rem;
+}
+
+.markdown-content ol {
+    margin: 0.5rem 0;
+    padding-left: 1.5rem;
+}
+
+.markdown-content ol li::before {
+    content: none;
+}
+
 /* 🐰 代码模板 🐰 */
 .code-template {
     margin-bottom: 1.5rem;
