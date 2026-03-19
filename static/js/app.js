@@ -1241,7 +1241,7 @@ function renderGuidePage() {
                             <i class="fas fa-tasks"></i>
                         </div>
                         <h3>进度</h3>
-                        <p>登录后可标记完成状态，进度保存在云端</p>
+                        <p>登录后勾选题目左侧复选框标记完成，进度自动同步云端，主页实时显示统计</p>
                     </div>
                     <div class="guide-card feature-card">
                         <div class="feature-icon purple">
