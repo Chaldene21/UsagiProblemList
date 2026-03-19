@@ -1861,59 +1861,14 @@ function safeString(val) {
     return String(val);
 }
 
-// 简单的 Markdown 解析器（支持常用语法，自动处理 XSS）
+// Markdown 解析（使用 marked 库）
 function parseMarkdown(text) {
     if (!text) return '';
-
-    // 先转义 HTML，防止 XSS
-    let html = escapeHtml(text);
-
-    // 代码块 ```code```
-    html = html.replace(/```(\w*)\n?([\s\S]*?)```/g, (match, lang, code) => {
-        return `<pre><code class="language-${lang || 'text'}">${code.trim()}</code></pre>`;
+    // 使用 marked 解析，自动处理 XSS 防护
+    return marked.parse(text, {
+        breaks: true,      // 支持 GFM 换行
+        gfm: true          // 启用 GitHub Flavored Markdown
     });
-
-    // 行内代码 `code`
-    html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-
-    // 标题
-    html = html.replace(/^### (.+)$/gm, '<h4>$1</h4>');
-    html = html.replace(/^## (.+)$/gm, '<h3>$1</h3>');
-    html = html.replace(/^# (.+)$/gm, '<h2>$1</h2>');
-
-    // 粗体 **text**
-    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-
-    // 斜体 *text*
-    html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
-
-    // 无序列表
-    html = html.replace(/^- (.+)$/gm, '<li>$1</li>');
-    html = html.replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>');
-
-    // 有序列表
-    html = html.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
-
-    // 换行处理：连续两个换行符变成段落
-    html = html.replace(/\n\n/g, '</p><p>');
-    // 单个换行符变成 <br>
-    html = html.replace(/\n/g, '<br>');
-
-    // 包裹成段落（如果还没有块级元素包裹）
-    if (!html.startsWith('<')) {
-        html = '<p>' + html + '</p>';
-    }
-
-    // 清理空段落
-    html = html.replace(/<p><\/p>/g, '');
-    html = html.replace(/<p>(<h[234]>)/g, '$1');
-    html = html.replace(/(<\/h[234]>)<\/p>/g, '$1');
-    html = html.replace(/<p>(<pre>)/g, '$1');
-    html = html.replace(/(<\/pre>)<\/p>/g, '$1');
-    html = html.replace(/<p>(<ul>)/g, '$1');
-    html = html.replace(/(<\/ul>)<\/p>/g, '$1');
-
-    return html;
 }
 
 // 转义题单数据
