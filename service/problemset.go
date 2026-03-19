@@ -123,11 +123,16 @@ func (s *ProblemSetService) GetProblemSetList() ([]models.ProblemSetSummary, err
 			sectionSummary := models.SectionSummary{
 				Title: section.Title,
 			}
-			// 从 content 中提取第一个 paragraph 作为描述
-			for _, content := range section.Content {
-				if content.Type == "paragraph" && content.Text != "" {
-					sectionSummary.Description = content.Text
-					break
+			// 优先使用 section.Text 作为描述
+			if section.Text != "" {
+				sectionSummary.Description = section.Text
+			} else {
+				// 否则从 content 中提取第一个 paragraph 作为描述
+				for _, content := range section.Content {
+					if content.Type == "paragraph" && content.Text != "" {
+						sectionSummary.Description = content.Text
+						break
+					}
 				}
 			}
 			sections = append(sections, sectionSummary)

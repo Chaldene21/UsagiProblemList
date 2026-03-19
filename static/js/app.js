@@ -466,8 +466,9 @@ async function refreshProblemSetData() {
             await checkAuth(true);
         }
 
-        const data = await fetchProblemSets();
-        currentProblemSets = data;
+        const rawData = await fetchProblemSets();
+        // 转义所有文本字段
+        currentProblemSets = sanitizeProblemSetList(rawData);
 
         // 获取所有分类
         const categories = ['all', ...new Set(currentProblemSets.map(ps => ps.category))];
@@ -817,12 +818,14 @@ async function renderProblemSetDetail(id) {
     `;
 
     try {
-        const problemSet = await fetchProblemSet(id);
+        const rawData = await fetchProblemSet(id);
+        // 转义所有文本字段，防止XSS和HTML解析问题
+        const problemSet = sanitizeProblemSet(rawData);
 
         // 获取进度
         const progress = await fetchProblemSetProgress(id);
         const completedIds = progress ? new Set(progress.completed_ids) : new Set();
-        
+
         // 生成目录
         const tocItems = generateTOC(problemSet.sections);
 
@@ -906,7 +909,7 @@ function renderContentItem(item, problemSetId, completedIds, sectionIndex) {
     // 子章节对象 - 添加锚点 ID
     const subsectionNumber = item.title ? extractSectionNumber(item.title) : null;
     const subsectionId = subsectionNumber ? generateSectionId(sectionIndex, subsectionNumber) : '';
-    
+
     return `
         <div class="subsection" ${subsectionId ? `id="${subsectionId}"` : ''}>
             ${item.title ? `<h3 class="subsection-title">${item.title}</h3>` : ''}
@@ -920,7 +923,7 @@ function renderContentItem(item, problemSetId, completedIds, sectionIndex) {
                 <div class="code-template">
                     <div class="code-label">代码模板</div>
                     <div class="code-block">
-                        <code>${escapeHtml(item.code_template)}</code>
+                        <code>${item.code_template}</code>
                     </div>
                 </div>
             ` : ''}
@@ -1658,11 +1661,95 @@ function renderCategoryList(categories) {
     `).join('');
 }
 
-// HTML 转义
+// HTML 转义（处理各种类型）
 function escapeHtml(text) {
+    if (text == null) return '';
+    if (typeof text === 'object') {
+        try {
+            text = JSON.stringify(text);
+        } catch {
+            text = String(text);
+        }
+    }
+    text = String(text);
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+// 简写
+const e = escapeHtml;
+
+// 安全获取字符串（用于可能是对象的字段如idea, code_template）
+function safeString(val) {
+    if (val == null) return '';
+    if (typeof val === 'string') return val;
+    if (typeof val === 'object') {
+        // 对象类型，尝试提取文本
+        return val.text || val.content || JSON.stringify(val);
+    }
+    return String(val);
+}
+
+// 转义题单数据
+function sanitizeProblemSet(ps) {
+    return {
+        ...ps,
+        title: e(ps.title),
+        description: e(ps.description),
+        category: e(ps.category),
+        sections: (ps.sections || []).map(sanitizeSection)
+    };
+}
+
+// 转义章节数据
+function sanitizeSection(section) {
+    return {
+        ...section,
+        title: e(section.title),
+        text: e(section.text),
+        description: e(section.description),
+        content: (section.content || []).map(sanitizeSubSection)
+    };
+}
+
+// 转义子章节数据
+function sanitizeSubSection(item) {
+    if (item.type === 'paragraph') {
+        return { ...item, text: e(item.text) };
+    }
+    return {
+        ...item,
+        title: e(item.title),
+        idea: e(safeString(item.idea)),
+        code_template: e(safeString(item.code_template)), // 代码模板也需要转义
+        problems: (item.problems || []).filter(p => p.id && p.id.trim() !== '').map(sanitizeProblem)
+    };
+}
+
+// 转义题目数据
+function sanitizeProblem(problem) {
+    return {
+        ...problem,
+        name: e(problem.name),
+        note: e(problem.note),
+        tags: (problem.tags || []).map(e)
+    };
+}
+
+// 转义题单列表（简化版，用于主页）
+function sanitizeProblemSetList(list) {
+    return list.map(ps => ({
+        ...ps,
+        id: e(ps.id),
+        title: e(ps.title),
+        description: e(ps.description),
+        category: e(ps.category),
+        sections: (ps.sections || []).map(s => ({
+            title: e(s.title),
+            description: e(s.description)
+        }))
+    }));
 }
 
 // ==================== 用户交互功能 ====================

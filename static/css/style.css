@@ -35,15 +35,16 @@
 /* 🐰 点兔主题背景 🐰 */
 body {
     font-family: 'M PLUS Rounded 1c', 'Noto Sans SC', -apple-system, sans-serif;
-    background: linear-gradient(135deg, #FFF8E7 0%, #FFE4E9 50%, #F8F0FF 100%);
+    background: transparent;
     color: var(--text-dark);
     line-height: 1.7;
     min-height: 100vh;
     position: relative;
 }
 
-body.bg-enabled {
-    background: transparent;
+/* 背景禁用时的回退渐变 */
+body.bg-disabled {
+    background: linear-gradient(135deg, #FFF8E7 0%, #FFE4E9 50%, #F8F0FF 100%);
 }
 
 /* 背景图片层 */

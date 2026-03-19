@@ -18,17 +18,18 @@ type Problem struct {
 
 // SubSection 表示子章节
 type SubSection struct {
-	Type         string    `json:"type,omitempty"`         // "paragraph" 或空（子章节对象）
-	Text         string    `json:"text,omitempty"`         // 段落文本
-	Title        string    `json:"title,omitempty"`        // 子章节标题
-	Idea         string    `json:"idea,omitempty"`         // 解题思路
-	CodeTemplate string    `json:"code_template,omitempty"` // 代码模板
-	Problems     []Problem `json:"problems,omitempty"`     // 题目列表
+	Type         string      `json:"type,omitempty"`         // "paragraph" 或空（子章节对象）
+	Text         string      `json:"text,omitempty"`         // 段落文本
+	Title        string      `json:"title,omitempty"`        // 子章节标题
+	Idea         interface{} `json:"idea,omitempty"`         // 解题思路（可能是字符串或对象）
+	CodeTemplate interface{} `json:"code_template,omitempty"` // 代码模板（可能是字符串或对象）
+	Problems     []Problem   `json:"problems,omitempty"`     // 题目列表
 }
 
 // Section 表示顶级章节
 type Section struct {
 	Title   string       `json:"title"`
+	Text    string       `json:"text,omitempty"`    // 章节简介
 	Content []SubSection `json:"content"`
 }
 

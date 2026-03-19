@@ -24,7 +24,7 @@ func main() {
 
 	// 静态文件服务
 	r.Static("/static", "./static")
-	r.StaticFile("/data/pictures/bg.png", "./data/pictures/bg.png")
+	r.Static("/data/pictures", "./data/pictures")
 	r.StaticFile("/", "./static/index.html")
 	r.StaticFile("/favicon.ico", "./static/images/favicon.ico")
 
